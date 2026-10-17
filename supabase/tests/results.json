@@ -1,0 +1,26 @@
+{
+  "passed": 19,
+  "checks": [
+    "migration compiles and applies in PostgreSQL",
+    "reserved object rerun stops atomically and preserves unrelated profiles",
+    "anonymous RPC and table access denied",
+    "missing authenticated UUID denied",
+    "unconfirmed email account denied",
+    "new account has no metadata-derived owner role or business",
+    "client identity and role fields rejected",
+    "invalid module and duplicate module inputs rejected",
+    "business, branch, owner membership created atomically",
+    "onboarding retry preserves original business without duplicates",
+    "bootstrap requires current legal acceptance",
+    "legal version matches build and retry retains server timestamp",
+    "bootstrap returns real identity and empty catalog with no invented subscription",
+    "second account sees no first tenant rows and resolves own tenant",
+    "browser direct inserts, updates and membership changes denied",
+    "MFA enrollment blocks AAL1 RPC and table access while context allows challenge",
+    "AAL2 session permits enrolled MFA tenant access",
+    "revoked membership blocks bootstrap and cannot self-onboard past revocation",
+    "every exposed function pins search_path and removes anonymous execution"
+  ],
+  "database": "PGlite 0.5.10 (PostgreSQL WASM); mocked auth.users/mfa_factors and request JWT settings",
+  "runAt": "2026-10-16T20:55:30.677Z"
+}

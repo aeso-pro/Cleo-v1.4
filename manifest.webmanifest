@@ -1,0 +1,14 @@
+{
+  "name": "Cleo POS",
+  "short_name": "Cleo",
+  "description": "Terminal, Owner Dashboard and Back Office for Philippine businesses.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d0d0e",
+  "theme_color": "#0d0d0e",
+  "icons": [
+    { "src": "assets/brand/cleo-emblem.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+  ]
+}

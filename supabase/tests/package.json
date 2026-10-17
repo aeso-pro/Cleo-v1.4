@@ -1,0 +1,11 @@
+{
+  "name": "cleo-auth-onboarding-security-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node auth-onboarding.test.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.10"
+  }
+}

@@ -1,0 +1,8 @@
+# On Apache, serve the public landing at the directory URL.
+# Explicit index.html remains the operational application.
+DirectoryIndex landing.html index.html
+
+# Never serve dotfiles (for example a local .env with build settings).
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
