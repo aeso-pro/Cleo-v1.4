@@ -117,8 +117,13 @@ await check('bootstrap requires current legal acceptance', async () => {
   await assert.rejects(asRole('authenticated', alice, () => rpc('cleo_accept_legal', ['terms 1.0, privacy 1.0', 'email'])), /current Terms/);
 });
 await check('legal version matches build and retry retains server timestamp', async () => {
-  const build = fs.readFileSync(new URL('../../Frontend/source/build.js', import.meta.url), 'utf8');
-  assert.match(build, /const LEGAL = \['privacy', 'terms'\]/);
+  // The repository ships generated HTML; validate the real browser contract.
+  const html = fs.readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
+  const embedded = html.match(/<script[^>]*id="cleo-legal"[^>]*>([\s\S]*?)<\/script>/);
+  assert.ok(embedded, 'built app must contain its legal contract');
+  const legal = JSON.parse(embedded[1]);
+  assert.equal(legal.version, legalVersion);
+  for (const doc of ['privacy', 'terms']) assert.equal(legal.docs[doc].version, '1.0');
   const first = await asRole('authenticated', alice, () => rpc('cleo_accept_legal', [legalVersion, 'google']));
   const retry = await asRole('authenticated', alice, () => rpc('cleo_accept_legal', [legalVersion, 'oauth']));
   assert.equal(first.at, retry.at);
@@ -197,5 +202,5 @@ await check('every exposed function pins search_path and removes anonymous execu
 
 await db.close();
 console.log(`\n${passed.length} PostgreSQL migration/security checks passed.`);
-fs.writeFileSync(new URL('./results.json', import.meta.url), JSON.stringify({ passed: passed.length, checks: passed, database: 'PGlite 0.5.10 (PostgreSQL WASM); mocked auth.users/mfa_factors and request JWT settings', runAt: new Date().toISOString() }, null, 2));
+if (process.env.CLEO_RESULTS_FILE) fs.writeFileSync(process.env.CLEO_RESULTS_FILE, JSON.stringify({ passed: passed.length, checks: passed, database: 'PGlite 0.5.10 (PostgreSQL WASM); mocked auth.users/mfa_factors and request JWT settings', runAt: new Date().toISOString() }, null, 2));
 
