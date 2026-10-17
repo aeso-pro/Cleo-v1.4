@@ -13,10 +13,12 @@ User requirement: successful verified email or Facebook sign-in automatically cr
 - Keep provider secrets out of frontend code. Request only the public SDK configuration.
 - Integrate the backend APIs documented below after migrations are deployed; refresh bootstrap/cache only after an RPC succeeds. Do not enable billing, payment confirmations or terminal sale upload while their server contracts remain pending.
 
-## Backend work in progress
+## Backend implementation available on this branch
 
-- Follow-up migration for verified-account profile registration and auth validation regressions. Original deployed migration stays immutable.
-- Tenant-scoped catalog, stock items, inventory ledger/receiving/adjustments, settings and audit APIs, with database security tests.
-- Fix the existing backend harness's missing-frontend-build dependency by asserting the actual checked-in app's legal-version contract.
+- Migration 002 registers confirmed email/Facebook accounts automatically and fixes the unconfirmed legal-acceptance gap. Original deployed migration stays immutable.
+- Migrations 003–004 add tenant-scoped catalog, customers, stock items, ledger/receiving/adjustments/counts, transfers, settings, inventory period locks and audit APIs. 46 local checks pass. See [complete RPC contracts and limits](../backend/README.md).
+- The backend harness now checks the actual built app legal-version contract and no longer requires the absent frontend builder.
 
-Hosted configuration and a human Facebook/email round trip still need validation. This environment has no access to the user's Chrome session. Git fetch works through the platform proxy; GitHub API and Supabase HTTPS currently return proxy Forbidden. No passwords are stored in the repository or this handoff.
+Hosted configuration, migration deployment and a human Facebook/email round trip still need validation. Production domain confirmed by the user: `https://cleopos.online`. It currently serves a Hostinger **Parked Domain** page at both `/index.html` and the SDK path. Supabase public settings enable email/Facebook/Google; Facebook authorize redirects to Facebook with email scope and the expected Supabase callback. Private management settings remain inaccessible without a securely bound management token. This session cannot use the user's Chrome tabs. No passwords are stored in source or this handoff.
+
+Coordination thread: https://github.com/aeso-pro/Cleo-v1.4/issues/1. No Claude response has been received yet. Read the frontend mapping notes before wiring APIs: stock adjustment sign differs from the demo; stale versions and idempotency keys are required; only documented settings/collections are implemented; transfer and ledger reads are protected by RLS. Keep unfinished payments, billing and fiscal-sale APIs visibly unavailable.
