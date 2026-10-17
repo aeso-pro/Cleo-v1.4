@@ -1594,6 +1594,8 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
   .shell.nav-open .nav-scrim { opacity: 1; pointer-events: auto; }
   .topbar .menu-btn { display: inline-grid; }
   .main { padding: 10px 12px calc(110px + env(safe-area-inset-bottom, 0px)); }
+  /* the scroll-edge blur spans .main's padding; past it, the page panned sideways on phones */
+  .edge-fade::before { left: -12px; right: -12px; }
   .topbar { padding-left: 20px; top: 10px; }
   .topbar .hide-sm { display: none !important; }
 }
@@ -1608,8 +1610,10 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
   .scope-btn .sb-t span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .scope-btn .sb-t small { display: none; }
   .panel-head { flex-wrap: wrap; }
-  .page-head .filters, .page-head .seg { max-width: 100%; }
-  .page-head .seg { overflow-x: auto; scrollbar-width: none; }
+  .page-head .filters, .page-head .seg, .panel-head .seg { max-width: 100%; }
+  .page-head .seg, .panel-head .seg { overflow-x: auto; scrollbar-width: none; }
+  /* a long notice (e.g. "Payment is simulated in this preview") wraps instead of widening the page */
+  .page-head .badge { white-space: normal; height: auto; min-height: 22px; padding-block: 3px; max-width: 100%; }
   .tabbar {
     display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; z-index: 28; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     height: 66px; border-radius: 26px; padding: 6px; box-shadow: var(--shadow-lg);
@@ -1625,6 +1629,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
   .page-head .filters { width: 100%; gap: 8px; }
   .page-head .filters > .seg { width: 100%; display: flex; }
   .page-head .filters > .seg button { flex: 1 1 auto; min-width: 0; padding-inline: 8px; font-size: 12px; }
+  .license-billing-link .btn { max-width: 100%; height: auto; min-height: var(--h); padding-block: 9px; white-space: normal; text-align: center; }
 }
 /* the top-bar search gives way before the branch switcher does */
 .topbar .input-wrap { flex: 0 1 260px; min-width: 150px; }
@@ -1704,6 +1709,8 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .plan-price { font-size: 26px; font-weight: 400; letter-spacing: -.02em; white-space: nowrap; }
 .plan-price small { display: block; margin-top: 3px; font-size: 12.5px; font-weight: 400; letter-spacing: 0; color: var(--ink-3); white-space: normal; }
 .plan-hero .plan-price { text-align: right; }
+/* once the panel head wraps on phones, the price sits under the plan's name: align it with the name */
+@media (max-width: 720px) { .plan-hero .plan-price { text-align: left; } }
 /* the monthly amount: the plan's price times the terminals in use */
 .plan-total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 16px 0 4px; padding: 12px 14px; border-radius: 14px; background: var(--wash); box-shadow: inset 0 0 0 1px var(--line); font-size: 13.5px; color: var(--ink-2); }
 .plan-total b { font-size: 15px; font-weight: 500; color: var(--ink); }
@@ -1837,7 +1844,7 @@ tr.short td { background: var(--warn-soft); }
 .zsum { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border-radius: 16px; overflow: hidden; margin-top: 16px; }
 .zsum > div { background: var(--glass-thick); padding: 12px 14px; display: grid; gap: 3px; }
 .zsum b { font-size: 18px; font-weight: 500; }
-.receipt-host { display: grid; place-items: start center; background: var(--glass); }
+.receipt-host { display: grid; grid-template-columns: minmax(0, 1fr); place-items: start center; background: var(--glass); }
 .receipt {
   width: 340px; max-width: 100%; padding: 22px 20px 28px; background: #fbfaf7; color: #1b1b1b;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 11.5px; line-height: 1.55;
