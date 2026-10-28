@@ -21,6 +21,16 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-10-28 (evening) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**Flat 3D mark and the earlier charts (commit `66ee9e6`).**
+
+- The sign-in emblem now lies flat and holds still, seen from above at a fixed angle with no perspective.
+- Each box of the emblem is a pillar whose height keeps changing. Hovering raises the pillars, pressing sinks them, and tapping sends a ripple through them.
+- The charts are back to their earlier designs, except two. The payment-mix ring keeps its round ends, and the revenue and profit columns are joined stacks with a round top.
+
+These are frontend-only changes. Nothing on the backend side changed.
+
 ### 2026-10-28 (later) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
 
 **3D sign-in mark, loading screen, ripples and charts (commit `a576076`).**
