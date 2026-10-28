@@ -21,6 +21,18 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-10-28 (later) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**3D sign-in mark, loading screen, ripples and charts (commit `a576076`).**
+
+- The sign-in screen's emblem is now 3D. It is drawn with WebGL2 and turned onto its side, and people can drag or tap it. Narrow screens, reduced motion and computers without WebGL2 or graphics acceleration fall back to the 2D mark.
+- The loading screen shows only the logo, with ripples in the background. The progress bar is gone. Progress is still announced to screen readers.
+- Ripples everywhere are now irregular instead of perfect circles.
+- Charts use round shapes: capsule columns, round-capped donut arcs, and dots for the heatmap and the calendar.
+- The landing page's app screenshots were captured again.
+
+Nothing on the backend side changed, and nothing in `supabase/`. One thing to know: `boot()` keeps its `work` option. Real start-up tasks still run one per step, and a failed task still ends the loading screen with `{ node, error }`. The steps just aren't shown on screen any more.
+
 ### 2026-10-28 · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
 
 **Rebrand (commit `2ed4396`).** The design team's new emblem and wordmark replace every Cleo logo: the app, the landing page, the legal pages, the favicons and the install icons.

@@ -19,7 +19,7 @@ An operational POS for Philippine businesses with an Apple-like glass language: 
 - `.glass-thick`: dense data surfaces; more opaque so text stays crisp.
 - `.glass-thin`: chips and buttons on top of other material; no blur. Never stack light glass on light glass.
 - **Refraction** (`LiquidGlass`, core.js): every `.glass`, `.glass-thick`, `.lg` and `[data-lg]` surface bends its backdrop inside a narrow rim with an SVG displacement map, the way the curved edge of real glass draws in light from just past it, while the middle stays still. The rim is about 0.8 of the corner radius (8 to 20px), applied through `--refract` inside `backdrop-filter`. New screens are picked up on their own; `LiquidGlass.attach(el, { bezel, scale, tint })` widens the rim or sets a tint on a hero surface (the sign-in card). Chromium only; elsewhere, and with reduced transparency, glass keeps the plain blur.
-- **Backdrop:** dark mode has drifting ambient light and, on sign-in screens, the lit box grid. The red light is kept subtle, about half its earlier strength (`--amb-1` to `--amb-3`), so it tints the ground without glowing; the landing keeps its own full-strength light. Light mode has a few faint, still lights so its glass reads as glass; no glows, grain or motion.
+- **Backdrop:** dark mode has drifting ambient light and, on sign-in screens, the lit box grid, dimmed there so the mark and the form lead. The red light is kept subtle, about half its earlier strength (`--amb-1` to `--amb-3`), so it tints the ground without glowing; the landing keeps its own full-strength light. Light mode has a few faint, still lights so its glass reads as glass; no glows, grain or motion (the loading screen's ripples aside).
 - **Fallbacks:** `prefers-reduced-transparency` makes glass solid; `prefers-contrast: more` makes it solid with a stronger rim.
 
 ## Brand
@@ -27,8 +27,10 @@ An operational POS for Philippine businesses with an Apple-like glass language: 
 - **Emblem** (`assets/brand/cleo-emblem.svg`): three round nodes joined by concave fillets, in Cleo red. It is the one source; the PNG icons are rendered from it.
 - **Wordmark** (`assets/brand/cleo-wordmark.svg`): "Cleo" in Helvetica Neue Light, drawn as a CSS mask so it takes the text colour.
 - **Lockup** (`lockup()` in core.js): the emblem, then the wordmark at 0.61 of the emblem's height, 0.24 of that height apart, centred on each other.
-- **Opening** (the boot screen): the three nodes fly in from the upper left, the upper right and below, 80ms apart, and settle together on a slightly bouncy spring.
-- **Sign-in mark** (`gridMark`): the emblem drawn in the backdrop's own lit boxes, on the same 18px grid. The pointer lights the boxes it passes, a drag pushes them aside and they spring back, a tap sends a ring through them, and an idle sweep passes every few seconds. Under reduced motion it is drawn once, still.
+- **Loading screen** (`boot()`): the logo alone, the emblem and the wordmark with the app's name, and no progress bar. The three nodes fly in from the upper left, the upper right and below, 80ms apart, and settle together on a slightly bouncy spring; then organic ripples spread through the background grid from behind the mark, now and then and at every finished step. The grid sits lower on this screen than anywhere else (55% opacity), and in light mode it shows only here, as faint ink boxes. Progress and the current step are announced to assistive technology.
+- **Sign-in mark, 3D** (`emblem3d`, WebGL2, beside the form on screens wider than 900px): the emblem built from the grid's rounded boxes, each a block with depth and a bevelled face, turned onto its side (about 34° of turn and 13° of tilt) and lit like glossy glass over a dimmed grid. The boxes fly in from deep behind and lock into place, centre first, warm as they land, while the mark turns from facing you onto its side. At rest it sways and floats, a wave of depth rolls through the boxes, a glint crosses them and a quiet ripple runs through every few seconds. It leans toward the pointer and the boxes under it rise; a drag turns it 1:1 and a throw carries on, then settles on the nearest resting turn; a tap sends a ripple through the boxes and the background. Reduced motion draws it once, at rest.
+- **Sign-in mark, 2D** (`gridMark`): on narrow screens (where it sits half-hidden behind the form) and wherever WebGL2 is missing or would run in software. The emblem drawn in the backdrop's own lit boxes, on the same 18px grid: the pointer lights the boxes it passes, a drag pushes them aside and they spring back, a tap sends a ripple through them, and an idle sweep passes every few seconds.
+- **Ripples** (`Ripple`): never a perfect circle. The front wobbles with direction (slow harmonics with random phases that drift as it travels), runs further one way than another, breaks into brighter and fainter stretches, carries a fainter echo, and the boxes just behind it twinkle; most throw two or three smaller ripples nearby a moment later. The background grid, both sign-in marks and the landing page share it.
 
 ## Type
 
@@ -54,6 +56,15 @@ Controls follow Apple's platforms, so people already know them:
 - **Lists:** settings rows are divided by inset separators that start 16px in.
 - **Sheets:** on phones (720px and below) dialogs and drawers rise from the bottom as sheets with 28px corners and leave the same way.
 - **Status colours:** the system set; in dark mode green `#30d158`, orange `#ff9f0a`, red `#ff453a` and blue `#0a84ff`.
+
+## Charts
+
+Round wherever a mark can be (`charts.js`), on the same quiet grid and tooltips:
+
+- **Columns:** each part is a capsule with a semicircle data end and a 3px gap to the next; only an end standing on the baseline stays square, so a length still reads from zero. They rise from the baseline one after another on a spring, revealed rather than stretched so the round ends stay round. The P&L bridge uses the same floating capsules.
+- **Donut:** a thicker ring of round-capped arcs; a share too small for an arc is a dot. The part under the pointer swells out of the ring. It draws in clockwise.
+- **Heatmap and calendar:** a dot per cell. A heat dot's colour and size both grow with the value, and its legend grows the same way.
+- **Ranked bars, sparklines, legends:** 10px pills, semicircle sparkline tops, round legend keys.
 
 ## Components added for account setup
 
