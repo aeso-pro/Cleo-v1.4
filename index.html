@@ -41,8 +41,9 @@
 <meta name="description" content="Cleo POS: Terminal, Owner Dashboard and Back Office for Philippine businesses.">
 <meta name="theme-color" content="#0d0d0e">
 <!-- ASSET: favicon, home-screen icon and install manifest -->
-<link rel="icon" type="image/png" href="assets/brand/cleo-emblem.png">
-<link rel="apple-touch-icon" href="assets/brand/cleo-emblem.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/brand/cleo-icon-32.png">
+<link rel="icon" type="image/svg+xml" href="assets/brand/cleo-emblem.svg">
+<link rel="apple-touch-icon" href="assets/brand/cleo-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <!-- ASSET: Phosphor icons 2.1.1 (regular, fill, bold), served locally -->
 <link rel="stylesheet" href="assets/icons/phosphor/regular/style.css">
@@ -91,11 +92,17 @@
   --accent-glow: rgb(212 0 0 / .55);
   --on-accent: #fff8f6;
 
-  --good: #34c77b;  --good-soft: rgb(52 199 123 / .16);
-  --warn: #f5a524;  --warn-soft: rgb(245 165 36 / .16);
+  /* status in Apple's dark-mode system colours (green, orange, red, blue) */
+  --good: #30d158;  --good-soft: rgb(48 209 88 / .16);
+  --warn: #ff9f0a;  --warn-soft: rgb(255 159 10 / .16);
   --serious: #ef8a5d; --serious-soft: rgb(239 138 93 / .16);
-  --bad: #ff6159;   --bad-soft: rgb(255 97 89 / .16);
-  --info: #6aa8ff;  --info-soft: rgb(106 168 255 / .16);
+  --bad: #ff453a;   --bad-soft: rgb(255 69 58 / .16);
+  --info: #0a84ff;  --info-soft: rgb(10 132 255 / .18);
+  /* system fills, as Apple uses them: tracks and toggles (fill-2), fields and segmented tracks (fill-3) */
+  --fill-2: rgb(120 120 128 / .32);
+  --fill-3: rgb(118 118 128 / .24);
+  --switch-on: #30d158;
+  --seg-thumb: #636366;
 
   --glass: rgb(28 28 31 / .46);
   --glass-thick: rgb(22 22 25 / .72);
@@ -104,16 +111,20 @@
   --glass-rim: rgb(255 255 255 / .10);
   --glass-hi: rgb(255 255 255 / .17);
   --glass-lo: rgb(255 255 255 / .03);
-  --spec: rgb(255 255 255 / .10);
-  --lens-tint: rgb(255 255 255 / .04); /* sign-in lens (core.js loginScreen) */
+  /* the embossed rim of every glass panel (see "Glass materials"): a hairline edge, light along the
+     upper-left bevel, and a softer catch of light refracted through to the lower-right */
+  --rim-edge: rgb(255 255 255 / .13);
+  --rim-light: rgb(255 255 255 / .42);
+  --rim-catch: rgb(255 255 255 / .15);
   --shadow-lg: 0 30px 70px -18px rgb(0 0 0 / .62), 0 3px 10px rgb(0 0 0 / .28);
   --shadow-md: 0 14px 34px -12px rgb(0 0 0 / .55), 0 1px 4px rgb(0 0 0 / .24);
   --shadow-sm: 0 4px 12px -4px rgb(0 0 0 / .45);
   --scrim: rgb(6 6 7 / .55);
 
-  --amb-1: rgb(212 0 0 / .55);
-  --amb-2: rgb(122 6 16 / .65);
-  --amb-3: rgb(255 112 52 / .20);
+  /* the red stays a quiet presence behind the app (the landing keeps its own, stronger light) */
+  --amb-1: rgb(212 0 0 / .26);
+  --amb-2: rgb(122 6 16 / .34);
+  --amb-3: rgb(255 112 52 / .10);
   --amb-4: rgb(54 62 84 / .45);
   --grain-opacity: .035;
 
@@ -155,6 +166,10 @@
   --serious: #9c4519; --serious-soft: rgb(239 138 93 / .18);
   --bad: #b3241d;   --bad-soft: rgb(198 42 34 / .10);
   --info: #1f63c4;  --info-soft: rgb(31 99 196 / .10);
+  --fill-2: rgb(120 120 128 / .16);
+  --fill-3: rgb(118 118 128 / .12);
+  --switch-on: #34c759;
+  --seg-thumb: #ffffff;
 
   --glass: rgb(255 255 255 / .6);
   --glass-thick: rgb(255 255 255 / .78);
@@ -163,17 +178,18 @@
   --glass-rim: rgb(20 20 20 / .07);
   --glass-hi: rgb(255 255 255 / 1);
   --glass-lo: rgb(20 20 20 / .04);
-  --spec: rgb(255 255 255 / .5);
-  --lens-tint: rgb(255 255 255 / .18);
+  --rim-edge: rgb(20 20 20 / .09);
+  --rim-light: rgb(255 255 255 / 1);
+  --rim-catch: rgb(255 255 255 / .8);
   --shadow-lg: 0 26px 52px -28px rgb(28 24 32 / .26), 0 2px 6px rgb(28 24 32 / .05);
   --shadow-md: 0 12px 28px -18px rgb(28 24 32 / .22), 0 1px 3px rgb(28 24 32 / .05);
   --shadow-sm: 0 3px 10px -6px rgb(28 24 32 / .2);
   --scrim: rgb(16 16 20 / .30);
 
   /* still, faint lights behind the glass (see "Ambient world"); applyBrand follows the brand colour */
-  --amb-1: rgb(212 0 0 / .09);
-  --amb-2: rgb(255 150 120 / .16);
-  --amb-3: rgb(255 205 170 / .22);
+  --amb-1: rgb(212 0 0 / .045);
+  --amb-2: rgb(255 150 120 / .09);
+  --amb-3: rgb(255 205 170 / .13);
   --amb-4: rgb(120 138 190 / .16);
   --grain-opacity: 0;
 
@@ -261,7 +277,6 @@ i.ph, i.ph-fill, i.ph-bold { line-height: 1; display: inline-block; flex: none; 
 /* light mode: the lights stand still and stay faint, with no glows or grain behind the panels */
 :root[data-theme="light"] .ambient b { opacity: .9; animation-play-state: paused; }
 :root[data-theme="light"] .boot-glow,
-:root[data-theme="light"] .art-emblem::before,
 :root[data-theme="light"] body::after { display: none; }
 body::after {
   content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none;
@@ -272,45 +287,35 @@ body::after {
 /* ---------- Glass materials ----------
    glass        floating functional layer (nav, toolbars, cards that hold controls)
    glass-thick  surfaces that carry dense data; more opaque so text stays crisp
-   glass-thin   chips and buttons sitting on top of other material (no blur)    */
-.glass, .glass-thick {
+   glass-thin   chips and buttons sitting on top of other material (no blur)
+   The fill is one flat tint over the blurred backdrop: no sheen gradient. What makes it read as glass
+   is the edge. LiquidGlass (core.js) bends the backdrop inside a narrow rim, the way the curved edge of
+   a real slab refracts what is behind it (Chromium; it sets --refract), and ::before draws the embossed
+   stroke: a hairline edge, light along the upper-left bevel and a softer catch on the lower-right. */
+.glass, .glass-thick, .lg {
   position: relative; isolation: isolate;
   background: var(--glass);
   -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
-  backdrop-filter: blur(var(--blur)) saturate(var(--sat));
+  backdrop-filter: blur(var(--blur)) saturate(var(--sat)) var(--refract,);
   border-radius: var(--r-lg);
-  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 0 var(--glass-lo), inset 0 0 0 1px var(--glass-rim), var(--shadow-lg);
+  box-shadow: var(--shadow-lg);
 }
-.glass-thick { background: var(--glass-thick); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim), var(--shadow-md); }
-.glass::before, .glass-thick::before {
+.glass-thick { background: var(--glass-thick); box-shadow: var(--shadow-md); }
+.glass::before, .glass-thick::before, .lg::before {
   content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  background:
-    radial-gradient(130% 70% at 12% -12%, var(--spec), transparent 52%),
-    linear-gradient(180deg, var(--spec), transparent 22%);
-  opacity: .9;
+  box-shadow:
+    inset 0 0 0 1px var(--rim-edge),
+    inset 1.5px 1.5px 0 -0.5px var(--rim-light),
+    inset -1.5px -1.5px 0 -0.5px var(--rim-catch);
 }
-.glass-thick::before { opacity: .55; }
 .glass-thin {
   background: var(--glass-thin);
-  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim);
+  box-shadow: inset 0 0 0 1px var(--rim-edge), inset 1px 1px 0 -0.5px var(--rim-light);
 }
-
-/* Liquid layer injected by LiquidGlass.attach(). The element keeps its tint;
-   the fx layer carries the blurred, refracted backdrop. */
-.lg { position: relative; isolation: isolate; background: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-.lg > .lg-fx, .lg > .lg-tint, .lg > .lg-rim {
-  position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-}
-.lg > .lg-fx { z-index: -3; -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat)); backdrop-filter: blur(var(--blur)) saturate(var(--sat)); }
-.lg > .lg-tint { z-index: -2; background: var(--lg-tint, var(--glass)); }
-.lg > .lg-rim {
-  z-index: -1;
-  box-shadow:
-    inset 1.5px 1.5px 0 -0.5px rgb(255 255 255 / .38),
-    inset -1px -1px 0 -0.5px rgb(255 255 255 / .16),
-    inset 0 0 0 1px var(--glass-rim);
-}
-:root[data-theme="light"] .lg > .lg-rim { box-shadow: inset 1.5px 1.5px 0 -0.5px rgb(255 255 255 / .95), inset 0 0 0 1px var(--glass-rim); }
+/* LiquidGlass.attach(el, { tint }) gives a surface its own tint over the same material */
+.lg { background: var(--lg-tint, var(--glass)) !important; }
+/* each surface carries its own rim map; a nested panel must never borrow its parent's */
+@property --refract { syntax: '*'; inherits: false; }
 
 /* Pointer sheen for small interactive glass */
 .sheen { position: relative; overflow: hidden; }
@@ -325,7 +330,8 @@ body::after {
 /* ---------- Type ---------- */
 .t-hero { font-size: 52px; line-height: 1; font-weight: 300; letter-spacing: -.035em; }
 .t-display { font-size: 36px; line-height: 1.08; font-weight: 500; letter-spacing: -.025em; }
-.t-title { font-size: 26px; line-height: 1.15; font-weight: 500; letter-spacing: -.02em; }
+/* titles are bold, as Apple's large titles are; section heads stay medium */
+.t-title { font-size: 26px; line-height: 1.15; font-weight: 700; letter-spacing: -.022em; }
 .t-h3 { font-size: 18px; line-height: 1.25; font-weight: 500; letter-spacing: -.01em; }
 .t-h4 { font-size: 15px; line-height: 1.3; font-weight: 500; letter-spacing: -.005em; }
 .t-body { font-size: 14px; line-height: 1.5; }
@@ -337,7 +343,7 @@ body::after {
   --h: 40px;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   height: var(--h); padding: 0 18px; border-radius: var(--r-pill);
-  font-size: 14px; font-weight: 500; letter-spacing: 0; white-space: nowrap;
+  font-size: 14px; font-weight: 500; letter-spacing: 0; white-space: nowrap; text-decoration: none;
   color: var(--ink); background: var(--wash-2);
   box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim);
   transition: transform var(--t-press) var(--ease-out), background-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease, color 160ms ease;
@@ -348,9 +354,10 @@ body::after {
 .btn:active:not(:disabled) { transform: scale(.97); }
 @media (hover: hover) and (pointer: fine) { .btn:hover:not(:disabled) { background: var(--line-2); } }
 .btn:disabled { opacity: .42; cursor: not-allowed; }
+/* a filled button, as Apple draws one: flat colour, a fine top light, a small grounded shadow (no glow) */
 .btn-primary {
   color: var(--on-accent); background: var(--accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .28), inset 0 -1px 0 rgb(0 0 0 / .18), 0 8px 22px -8px var(--accent-glow);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 2px rgb(0 0 0 / .14), 0 4px 12px -6px var(--accent-glow);
 }
 @media (hover: hover) and (pointer: fine) { .btn-primary:hover:not(:disabled) { background: var(--accent-hover); } }
 .btn-primary:active:not(:disabled) { background: var(--accent-press); }
@@ -388,16 +395,17 @@ body::after {
 .field { display: grid; gap: 7px; }
 .field > label, .label { font-size: 13px; font-weight: 500; color: var(--ink-2); }
 .input-wrap { position: relative; display: flex; align-items: center; }
+/* fields are filled, as on iOS and in System Settings: a quiet system fill, no outline until focus */
 .input, .select, .textarea {
   width: 100%; height: 46px; padding: 0 14px; border-radius: var(--r-sm); border: 0;
-  background: var(--wash); color: var(--ink); font-size: 15px;
-  box-shadow: inset 0 0 0 1px var(--line-2), inset 0 1px 2px rgb(0 0 0 / .12);
+  background: var(--fill-3); color: var(--ink); font-size: 15px;
+  box-shadow: inset 0 0 0 1px transparent;
   transition: box-shadow 160ms ease, background-color 160ms ease;
 }
 .textarea { height: auto; min-height: 84px; padding: 12px 14px; resize: vertical; line-height: 1.45; }
 .input::placeholder, .textarea::placeholder { color: var(--ink-3); }
-.input:hover, .select:hover, .textarea:hover { box-shadow: inset 0 0 0 1px var(--ink-4); }
-.input:focus, .select:focus, .textarea:focus { outline: none; background: var(--wash-2); box-shadow: inset 0 0 0 1.5px var(--focus), 0 0 0 4px var(--focus-soft); }
+@media (hover: hover) and (pointer: fine) { .input:hover, .select:hover, .textarea:hover { background: var(--fill-2); } }
+.input:focus, .select:focus, .textarea:focus { outline: none; background: var(--fill-3); box-shadow: inset 0 0 0 1.5px var(--focus), 0 0 0 4px var(--focus-soft); }
 .input-wrap .input { padding-right: 44px; }
 .input-wrap .lead-icon { position: absolute; left: 13px; color: var(--ink-3); font-size: 18px; pointer-events: none; }
 .input-wrap .lead-icon ~ .input { padding-left: 40px; }
@@ -407,7 +415,10 @@ body::after {
 .field-opt { margin-left: 4px; font-weight: 400; color: var(--ink-3); }
 .field .err { display: none; align-items: center; gap: 6px; font-size: 12.5px; color: var(--bad); }
 .field.invalid .err { display: flex; }
-.select { appearance: none; -webkit-appearance: none; padding-right: 36px; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+/* a popup button: the up-and-down chevron Apple uses for menus that pick one value */
+.select { appearance: none; -webkit-appearance: none; padding-right: 38px; background-image: var(--chevrons); background-position: calc(100% - 14px) 50%; background-size: 10px 14px; background-repeat: no-repeat; }
+:root, :root[data-theme="dark"] { --chevrons: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 14'%3E%3Cpath d='M1.5 5 5 1.5 8.5 5M1.5 9 5 12.5 8.5 9' fill='none' stroke='%23f3f1ee' stroke-opacity='.7' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-theme="light"] { --chevrons: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 14'%3E%3Cpath d='M1.5 5 5 1.5 8.5 5M1.5 9 5 12.5 8.5 9' fill='none' stroke='%23141414' stroke-opacity='.62' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 .select option { background: var(--glass-solid); color: var(--ink); }
 
 .check { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13.5px; color: var(--ink-2); user-select: none; }
@@ -416,10 +427,15 @@ body::after {
 .check input:checked { background: var(--accent); box-shadow: none; }
 .check input:checked::after { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
 
-.switch { appearance: none; -webkit-appearance: none; margin: 0; width: 40px; height: 24px; border-radius: 99px; background: var(--wash-2); box-shadow: inset 0 0 0 1px var(--line-2); position: relative; cursor: pointer; transition: background-color 200ms ease; flex: none; }
-.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); box-shadow: 0 2px 6px rgb(0 0 0 / .3); transition: transform 240ms var(--ease-out); }
-.switch:checked { background: var(--good); box-shadow: none; }
-.switch:checked::after { transform: translateX(16px); background: #fff; }
+/* the iOS switch: a white knob on a grey track that turns green; the knob stretches while pressed and
+   springs across */
+.switch { appearance: none; -webkit-appearance: none; margin: 0; width: 46px; height: 28px; border-radius: 99px; background: var(--fill-2); position: relative; cursor: pointer; transition: background-color 240ms ease; flex: none; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 99px; background: #fff; box-shadow: 0 3px 8px rgb(0 0 0 / .15), 0 1px 1px rgb(0 0 0 / .16); transition: transform 360ms var(--spring), width 200ms var(--ease-out); }
+.switch:checked { background: var(--switch-on); }
+.switch:checked::after { transform: translateX(18px); }
+.switch:active:not(:disabled)::after { width: 30px; }
+.switch:checked:active:not(:disabled)::after { transform: translateX(12px); }
+.switch:disabled { opacity: .45; cursor: not-allowed; }
 
 /* one-time code */
 .otp { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
@@ -429,12 +445,12 @@ body::after {
 .otp.invalid input { box-shadow: inset 0 0 0 1.5px var(--bad); }
 
 /* ---------- Segmented control (sliding thumb) ---------- */
-.seg { position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 3px; border-radius: var(--r-pill); background: var(--wash); box-shadow: inset 0 0 0 1px var(--line); }
+/* Apple's segmented control: a system-fill track, a raised thumb that springs between segments */
+.seg { position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 3px; border-radius: var(--r-pill); background: var(--fill-3); }
 .seg button { position: relative; z-index: 1; height: 32px; padding: 0 14px; border-radius: var(--r-pill); font-size: 13px; font-weight: 500; color: var(--ink-3); transition: color 200ms ease; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .seg button[aria-pressed="true"], .seg button[aria-selected="true"] { color: var(--ink); }
 @media (hover: hover) and (pointer: fine) { .seg button:hover { color: var(--ink-2); } }
-.seg .thumb { position: absolute; z-index: 0; top: 3px; left: 0; height: calc(100% - 6px); border-radius: var(--r-pill); background: var(--wash-2); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim), var(--shadow-sm); transition: transform var(--t-fast) var(--ease-out); }
-:root[data-theme="light"] .seg .thumb { background: rgb(255 255 255 / .9); }
+.seg .thumb { position: absolute; z-index: 0; top: 3px; left: 0; height: calc(100% - 6px); border-radius: var(--r-pill); background: var(--seg-thumb); box-shadow: 0 3px 8px rgb(0 0 0 / .12), 0 3px 1px rgb(0 0 0 / .04), inset 0 0 0 .5px rgb(0 0 0 / .04); transition: transform 380ms var(--spring), width 380ms var(--spring); }
 .seg button:disabled { opacity: .45; cursor: not-allowed; }
 
 /* ---------- Chips, badges, status ---------- */
@@ -543,6 +559,15 @@ button.chip:active { transform: scale(.96); }
 .drawer-head { padding: 22px 24px 16px; display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--line); }
 .drawer-body { flex: 1; overflow: auto; padding: 20px 24px 24px; }
 .drawer-foot { padding: 14px 24px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--line); }
+/* phones: dialogs and side panels rise from the bottom as sheets and leave the same way, as iOS presents
+   them. Only overlays on the web page change; the Terminal's stage keeps its own fixed size. */
+@media (max-width: 720px) {
+  body > #overlays > .overlay { place-items: end stretch; padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
+  body > #overlays > .overlay .dialog { width: 100%; max-height: calc(100dvh - 56px); border-radius: 28px; padding: 24px 20px; transform: translateY(calc(100% + 24px)); transition: opacity 200ms ease, transform 460ms var(--ease-drawer); }
+  body > #overlays > .overlay.as-drawer .drawer { width: 100%; height: calc(100dvh - 56px); align-self: end; transform: translateY(calc(100% + 24px)); }
+  body > #overlays > .overlay[data-open] .dialog, body > #overlays > .overlay[data-open] .drawer { transform: none; }
+  body > #overlays > .overlay[data-closing] .dialog { transition-duration: 180ms; }
+}
 
 .popover {
   position: fixed; z-index: 70; min-width: 240px; max-width: 340px; border-radius: var(--r-md); padding: 6px;
@@ -577,11 +602,13 @@ button.chip:active { transform: scale(.96); }
 ::view-transition-group(cleo-mark) { animation-duration: 260ms; animation-timing-function: var(--ease-in-out); }
 ::view-transition-group(branch-chip) { animation-duration: 240ms; animation-timing-function: var(--ease-in-out); }
 
-/* Brand lockup */
-.lockup { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
-.lockup img { height: 22px; width: auto; }
-.lockup .word { font-size: 21px; font-weight: 400; letter-spacing: -.02em; line-height: 1; }
-.lockup .app { margin-left: 4px; }
+/* Brand lockup: the emblem, then the wordmark (assets/brand/cleo-wordmark.svg, drawn as a mask so it takes
+   the ink colour). Proportions follow the brand lockup: the wordmark stands at .6 of the emblem's height,
+   about a quarter of that height away. Size a lockup with the img height and the word's font-size. */
+.lockup { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); text-decoration: none; }
+.lockup img { height: 22px; width: auto; flex: none; }
+.lockup .word { display: block; flex: none; font-size: 21px; height: .64em; aspect-ratio: 1890 / 746; background: currentColor; -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
+.lockup .app { margin-left: 6px; }
 .aeso { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-3); }
 /* ASSET: assets/brand/aeso-mark.png, used as a mask so it takes the colour below */
 .aeso .mark { width: 18px; height: 15px; background: #d9541a; -webkit-mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; }
@@ -590,14 +617,17 @@ button.chip:active { transform: scale(.96); }
 /* ---------- Boot screen ---------- */
 .boot { display: grid; place-items: center; position: relative; overflow: hidden; }
 .boot-center { display: grid; justify-items: center; gap: 26px; }
-.boot-mark { position: relative; width: 168px; height: 139px; view-transition-name: cleo-mark; }
-/* ASSET: assets/brand/cleo-emblem.png, split in two halves for the opening animation */
-.boot-mark .half { position: absolute; inset: 0; background: url("assets/brand/cleo-emblem.png") center / contain no-repeat; }
-.boot-mark .half.l { clip-path: inset(0 50% 0 0); }
-.boot-mark .half.r { clip-path: inset(0 0 0 50%); }
+.boot-mark { position: relative; width: 168px; aspect-ratio: 1330.77 / 980.27; view-transition-name: cleo-mark; }
+/* ASSET: assets/brand/cleo-emblem.svg, in three parts, one per node, that come together in the opening
+   animation. Each part reaches a little past the lines where they meet, so no seam shows once joined. */
+.boot-mark .part { position: absolute; inset: 0; background: url("assets/brand/cleo-emblem.svg") center / contain no-repeat; }
+.boot-mark .part.tl { clip-path: polygon(51% 41.7%, 51% 0, 0 0, 0 86%); }
+.boot-mark .part.tr { clip-path: polygon(49% 41.7%, 49% 0, 100% 0, 100% 86%); }
+.boot-mark .part.b { clip-path: polygon(50% 39%, 0 84%, 0 100%, 100% 100%, 100% 84%); }
 .boot-glow { position: absolute; left: 50%; top: 50%; width: 560px; height: 560px; margin: -280px 0 0 -280px; border-radius: 50%; background: radial-gradient(closest-side, var(--accent-glow), transparent 70%); opacity: 0; pointer-events: none; }
-.boot-word { display: flex; align-items: baseline; gap: 12px; clip-path: inset(0 100% 0 0); }
-.boot-word .w { font-size: 44px; font-weight: 400; letter-spacing: -.03em; line-height: 1; }
+.boot-word { display: flex; align-items: baseline; gap: 14px; clip-path: inset(0 100% 0 0); }
+/* the wordmark sits on the app name's baseline (a box without text aligns by its bottom edge) */
+.boot-word .w { display: block; height: 30px; aspect-ratio: 1890 / 746; background: var(--ink); -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
 .boot-word .a { font-size: 17px; color: var(--ink-3); font-weight: 400; letter-spacing: -.005em; }
 /* loading progress: a grid of rounded boxes (boot() in core.js lights them as steps finish) */
 .boot-grid { display: grid; grid-template-columns: repeat(16, 10px); grid-auto-rows: 10px; gap: 4px; opacity: 0; }
@@ -624,7 +654,7 @@ button.chip:active { transform: scale(.96); }
 .login-card .step { transition: opacity 260ms ease, transform 420ms var(--ease-out), filter 260ms ease; }
 .login-card .step[aria-hidden="true"] { position: absolute; inset: 0 0 auto 0; opacity: 0; pointer-events: none; transform: translateX(-20px); filter: blur(2px); visibility: hidden; transition: opacity 200ms ease, transform 420ms var(--ease-out), filter 200ms ease, visibility 0s 420ms; }
 .login-card .step.ahead[aria-hidden="true"] { transform: translateX(24px); }
-.login-card h1 { font-size: 28px; font-weight: 500; letter-spacing: -.025em; line-height: 1.1; }
+.login-card h1 { font-size: 28px; font-weight: 700; letter-spacing: -.028em; line-height: 1.1; }
 .login-card .lede { margin-top: 8px; color: var(--ink-2); font-size: 14px; }
 .login-card form { display: grid; gap: 16px; margin-top: 26px; }
 .login-card .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -633,17 +663,12 @@ button.chip:active { transform: scale(.96); }
 .link-btn { color: var(--accent-ink); font-size: 13px; font-weight: 500; border-radius: 6px; }
 @media (hover: hover) and (pointer: fine) { .link-btn:hover { text-decoration: underline; text-underline-offset: 3px; } }
 .login-art { position: relative; overflow: hidden; display: grid; place-items: center; }
-.art-emblem { position: relative; width: min(46vw, 620px); aspect-ratio: 720 / 594; view-transition-name: cleo-mark; }
-.art-emblem .em { position: absolute; inset: 0; background: url("assets/brand/cleo-emblem.png") center / contain no-repeat; }
-.art-emblem::before { content: ""; position: absolute; inset: -30%; background: radial-gradient(closest-side, var(--accent-glow), transparent 70%); opacity: .55; }
-.lens {
-  position: absolute; width: 300px; height: 300px; border-radius: 50%; left: 50%; top: 50%;
-  touch-action: none; cursor: grab; will-change: transform;
-  --lg-tint: rgb(255 255 255 / .04);
-  box-shadow: var(--shadow-lg);
-}
-.lens:active { cursor: grabbing; }
-.lens-hint { position: absolute; bottom: 28px; right: 32px; font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; }
+/* the Cleo mark in lit boxes (gridMark in core.js draws it on this canvas and makes it respond to the pointer) */
+.art-grid { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.art-grid.grabbing { cursor: grabbing; }
+/* where the mark sits, so the loading screen's mark can glide into it */
+.art-mark { position: absolute; pointer-events: none; view-transition-name: cleo-mark; }
+.art-hint { position: absolute; bottom: 28px; right: 32px; font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; pointer-events: none; }
 .login-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .shake { animation: shake 420ms var(--ease-out); }
 @keyframes shake { 15% { transform: translateX(-9px); } 35% { transform: translateX(7px); } 55% { transform: translateX(-4px); } 75% { transform: translateX(2px); } }
@@ -755,7 +780,9 @@ button.chip:active { transform: scale(.96); }
 .set-sub { font-size: 15px; font-weight: 500; margin-top: 6px; }
 .set-list { display: grid; border-radius: 18px; background: var(--wash); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
 .set-row { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 12px 16px; min-height: 64px; }
-.set-row + .set-row { border-top: 1px solid var(--line); }
+/* separators start where the text does, as in iOS lists */
+.set-row + .set-row { position: relative; }
+.set-row + .set-row::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 1px; background: var(--line); }
 .set-row .set-c { flex: none; display: flex; align-items: center; gap: 8px; }
 .set-row .seg button { height: 34px; }
 
@@ -820,8 +847,9 @@ button.chip:active { transform: scale(.96); }
 }
 @media (max-width: 900px) {
   .login { grid-template-columns: 1fr; }
-  .login-art { position: fixed; inset: 0; z-index: 0; opacity: .5; }
-  .login-art .lens, .lens-hint { display: none; }
+  /* behind the card on phones: a quiet backdrop that leaves touches to the page */
+  .login-art { position: fixed; inset: 0; z-index: 0; opacity: .5; pointer-events: none; }
+  .art-hint { display: none; }
   .login-left { padding: 20px 16px; }
   .login-card { padding: 28px 22px 24px; }
 }
@@ -847,10 +875,10 @@ button.chip:active { transform: scale(.96); }
 a.plan-tab:active { transform: scale(.98); }
 @media (hover: hover) and (pointer: fine) { a.plan-tab.t-plain:hover { background: var(--wash-2); } }
 .plan-tab .pt-name { position: relative; font-size: 15px; font-weight: 500; letter-spacing: -.01em; }
-/* ASSET: assets/brand/cleo-emblem.png */
-.plan-tab .pt-logo { position: relative; width: 26px; height: 22px; flex: none; background: url("assets/brand/cleo-emblem.png") center / contain no-repeat; }
+/* ASSET: assets/brand/cleo-emblem.svg */
+.plan-tab .pt-logo { position: relative; width: 28px; height: 21px; flex: none; background: url("assets/brand/cleo-emblem.svg") center / contain no-repeat; }
 .plan-tab.compact { width: 66px; height: 58px; min-height: 0; padding: 0; justify-content: center; }
-.plan-tab.compact .pt-logo { width: 28px; height: 23px; }
+.plan-tab.compact .pt-logo { width: 30px; height: 22px; }
 @property --pt-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 /* the edge: a hairline with light running around it (a ring cut out by a mask) */
 .plan-tab.t-animated::before, .plan-tab.t-premium::before {
@@ -956,11 +984,10 @@ a.plan-tab:active { transform: scale(.98); }
   .input, .select, .textarea { font-size: 16px; }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .glass, .glass-thick, .lg > .lg-tint { background: var(--glass-solid) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-  .lg > .lg-fx { display: none; }
+  .glass, .glass-thick, .lg { background: var(--glass-solid) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 }
 @media (prefers-contrast: more) {
-  :root { --glass: var(--glass-solid); --glass-thick: var(--glass-solid); --glass-rim: var(--ink-3); --ink-3: var(--ink-2); }
+  :root { --glass: var(--glass-solid); --glass-thick: var(--glass-solid); --glass-rim: var(--ink-3); --rim-edge: var(--ink-3); --ink-3: var(--ink-2); }
 }
 
 /* ---------- subscription payment methods (Cleo.billing in core.js): the plan pages, Owner Dashboard ›
@@ -2062,8 +2089,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .dp .input { height: 50px; font-size: 16px; }
 .dp .seg button { height: 38px; font-size: 14px; padding: 0 16px; }
 .dp .chip { height: 36px; font-size: 13.5px; padding: 0 14px; }
-.dp .login .lens { width: 240px; height: 240px; }
-.dp .boot-mark { width: 140px; height: 116px; }
+.dp .boot-mark { width: 140px; }
 
 /* ---------- status bar ---------- */
 .t-shell { display: grid; grid-template-rows: 46px 1fr; height: 800px; }
@@ -2515,9 +2541,8 @@ body.is-terminal { overflow: hidden; background: #050506; }
    so restore their desktop layout regardless of the browser window. */
 .dp .login { grid-template-columns: minmax(420px, 500px) 1fr; }
 .dp .login-left { padding: 26px 36px; }
-.dp .login-art { position: relative; inset: auto; z-index: auto; opacity: 1; }
-.dp .login-art .lens { display: block; }
-.dp .lens-hint { display: flex; }
+.dp .login-art { position: relative; inset: auto; z-index: auto; opacity: 1; pointer-events: auto; }
+.dp .art-hint { display: flex; }
 .dp .login-card { padding: 32px 30px 28px; }
 .dp .branches { padding: 26px 36px 40px; }
 .dp .branches-top { margin-bottom: 34px; }
@@ -3356,9 +3381,10 @@ const Cleo = (() => {
     st.setProperty('--accent-soft', css(c, dark ? 0.2 : 0.12));
     st.setProperty('--accent-glow', css(c, dark ? 0.5 : 0.32));
     st.setProperty('--on-accent', css(contrast(onDark, c) >= contrast(onLight, c) ? onDark : onLight));
-    st.setProperty('--amb-1', css(c, dark ? 0.5 : 0.1));
-    st.setProperty('--amb-2', dark ? css(mix(c, K, 0.55), 0.65) : css(mix(c, W, 0.55), 0.18));
-    st.setProperty('--amb-3', dark ? css(mix(c, W, 0.25), 0.2) : css(mix(c, W, 0.75), 0.24));
+    // the ambient light stays quiet in any brand colour, as it does in Cleo red (core.css tokens)
+    st.setProperty('--amb-1', css(c, dark ? 0.24 : 0.05));
+    st.setProperty('--amb-2', dark ? css(mix(c, K, 0.55), 0.34) : css(mix(c, W, 0.55), 0.1));
+    st.setProperty('--amb-3', dark ? css(mix(c, W, 0.25), 0.1) : css(mix(c, W, 0.75), 0.13));
   }
   applyBrand();
   document.addEventListener('cleo:theme', applyBrand);
@@ -3608,19 +3634,31 @@ const Cleo = (() => {
     el._cu = requestAnimationFrame(step);
   }
 
-  /* ---------- liquid glass: edge refraction via SVG displacement ---------- */
+  /* ---------- liquid glass: every glass surface refracts at its rim ----------
+     Each surface's backdrop is blurred, then bent inside a narrow rim by an SVG displacement map: the way
+     the curved edge of a real glass slab refracts what lies behind it, light from just past the edge is
+     drawn into the rim while the middle stays still. The fill is a flat tint and ::before draws the
+     embossed stroke (core.css "Glass materials"); there is no sheen gradient.
+     Every .glass, .glass-thick and .lg element (and [data-lg]) is picked up on its own, including ones
+     added later, so new screens need nothing. attach(el, { bezel, scale, tint }) still works for a surface
+     that wants a wider rim or its own tint. Chromium only (an SVG filter inside backdrop-filter); elsewhere,
+     and with reduced transparency, surfaces keep the plain blur.
+     Performance: maps are drawn small (the filter stretches them), built a few per frame, and shared
+     between surfaces of the same size and corner radius; a surface that leaves the page releases its map. */
   const LiquidGlass = (() => {
     const brands = navigator.userAgentData?.brands?.map((b) => b.brand).join(' ') || '';
     const chromium = /Chromium|Google Chrome|Microsoft Edge|Opera/.test(brands) || (!!window.chrome && !/Firefox/.test(navigator.userAgent));
     const enabled = chromium && !mq('(prefers-reduced-transparency: reduce)').matches;
     if (enabled) document.documentElement.classList.add('has-refraction');
+    const NS = 'http://www.w3.org/2000/svg';
+    const SEL = '.glass, .glass-thick, .lg, [data-lg]';
     let defs, uid = 0;
     const ensureDefs = () => {
-      if (defs) return defs;
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      if (defs?.isConnected) return defs;
+      const svg = document.createElementNS(NS, 'svg');
       svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.setAttribute('aria-hidden', 'true');
       svg.style.position = 'absolute';
-      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      defs = document.createElementNS(NS, 'defs');
       svg.appendChild(defs); document.body.appendChild(svg);
       return defs;
     };
@@ -3629,87 +3667,137 @@ const Cleo = (() => {
       if (r.endsWith('%')) return (Math.min(w, h) * parseFloat(r)) / 100;
       return Math.min(parseFloat(r) || 0, Math.min(w, h) / 2);
     };
+    // the rim: neutral (128, 128) inside; within `bezel` of the edge a push outward along the edge's normal,
+    // strongest at the edge and easing to nothing, so the backdrop just beyond the edge bends into the rim
     function buildMap(w, h, radius, bezel) {
-      const S = Math.min(1, 700 / Math.max(w, h));
+      const S = Math.min(1, Math.max(6 / bezel, 360 / Math.max(w, h)));
       const cw = Math.max(8, Math.round(w * S)), ch = Math.max(8, Math.round(h * S));
       const c = document.createElement('canvas'); c.width = cw; c.height = ch;
       const ctx = c.getContext('2d'); const img = ctx.createImageData(cw, ch); const d = img.data;
-      const r = radius * S, bz = Math.max(2, bezel * S), hx = cw / 2, hy = ch / 2;
-      for (let y = 0; y < ch; y++) {
-        for (let x = 0; x < cw; x++) {
-          const px = x + 0.5 - hx, py = y + 0.5 - hy;
-          const qx = Math.abs(px) - (hx - r), qy = Math.abs(py) - (hy - r);
-          const ox = Math.max(qx, 0), oy = Math.max(qy, 0);
-          const sd = Math.hypot(ox, oy) + Math.min(Math.max(qx, qy), 0) - r;
+      const r = radius * (cw / w), bz = Math.max(2, bezel * (cw / w)), hx = cw / 2, hy = ch / 2;
+      for (let y = 0, i = 0; y < ch; y++) {
+        const py = y + 0.5 - hy, qy = Math.abs(py) - (hy - r);
+        for (let x = 0; x < cw; x++, i += 4) {
           let R = 128, G = 128;
-          const inside = -sd;
+          const px = x + 0.5 - hx, qx = Math.abs(px) - (hx - r);
+          const inside = -(Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - r);
           if (inside >= 0 && inside < bz) {
-            const k = 1 - inside / bz;
-            const mag = k * k * (3 - 2 * k) * 0.95;
+            const m = (1 - inside / bz) ** 2.2 * 127;
             let nx, ny;
             if (qx > 0 && qy > 0) { const l = Math.hypot(qx, qy) || 1; nx = (qx / l) * Math.sign(px); ny = (qy / l) * Math.sign(py); }
             else if (qx > qy) { nx = Math.sign(px); ny = 0; } else { nx = 0; ny = Math.sign(py); }
-            R = 128 - nx * mag * 127; G = 128 - ny * mag * 127;
+            R = 128 + nx * m; G = 128 + ny * m;
           }
-          const i = (y * cw + x) * 4; d[i] = R; d[i + 1] = G; d[i + 2] = 128; d[i + 3] = 255;
+          d[i] = R; d[i + 1] = G; d[i + 2] = 128; d[i + 3] = 255;
         }
       }
       ctx.putImageData(img, 0, 0);
       return c.toDataURL();
     }
-    function refresh(el) {
-      const st = el._lg; if (!st?.filter) return;
-      const w = el.offsetWidth, h = el.offsetHeight;
-      if (!w || !h || (w === st.w && h === st.h)) return;
-      st.w = w; st.h = h;
-      const radius = parseRadius(el, w, h);
-      const NS = 'http://www.w3.org/2000/svg';
-      const f = st.filter;
-      f.setAttribute('width', w); f.setAttribute('height', h);
-      st.img.setAttribute('width', w); st.img.setAttribute('height', h);
-      st.img.setAttribute('href', buildMap(w, h, radius, st.bezel));
-      st.disp.setAttribute('scale', st.scale);
-      void NS;
+    const maps = new Map();     // size key -> { id, filter, users }
+    const surfaces = new Map(); // element -> { bezel, scale, key }
+    function acquire(w, h, r, bezel, scale) {
+      const key = `${w}x${h}r${Math.round(r)}b${bezel}s${scale}`;
+      let m = maps.get(key);
+      if (!m) {
+        const id = 'lgf' + ++uid;
+        const filter = document.createElementNS(NS, 'filter');
+        for (const [k, v] of Object.entries({ id, x: 0, y: 0, width: w, height: h, filterUnits: 'userSpaceOnUse', primitiveUnits: 'userSpaceOnUse', 'color-interpolation-filters': 'sRGB' })) filter.setAttribute(k, v);
+        const img = document.createElementNS(NS, 'feImage');
+        for (const [k, v] of Object.entries({ x: 0, y: 0, width: w, height: h, preserveAspectRatio: 'none', result: 'rim', href: buildMap(w, h, r, bezel) })) img.setAttribute(k, v);
+        const disp = document.createElementNS(NS, 'feDisplacementMap');
+        for (const [k, v] of Object.entries({ in: 'SourceGraphic', in2: 'rim', scale, xChannelSelector: 'R', yChannelSelector: 'G' })) disp.setAttribute(k, v);
+        filter.append(img, disp); ensureDefs().appendChild(filter);
+        m = { id, filter, users: 0 }; maps.set(key, m);
+      }
+      m.users++;
+      return key;
     }
-    const ro = 'ResizeObserver' in window ? new ResizeObserver((entries) => {
-      for (const e of entries) { clearTimeout(e.target._lgT); e.target._lgT = setTimeout(() => refresh(e.target), 90); }
+    function release(key) {
+      const m = maps.get(key); if (!m) return;
+      if (--m.users <= 0) { m.filter.remove(); maps.delete(key); }
+    }
+    // a narrow rim on small controls, up to 20px on large panels; the push reaches about one bezel past the edge
+    const autoBezel = (r, w, h) => Math.max(4, Math.round(Math.min(clamp(r * 0.8, 8, 20), Math.min(w, h) / 4)));
+    function refresh(el) {
+      const s = surfaces.get(el); if (!s) return;
+      const w = el.offsetWidth, h = el.offsetHeight;
+      if (!w || !h) return; // not laid out yet: the ResizeObserver brings it back
+      const r = parseRadius(el, w, h);
+      const bezel = s.bezel ?? autoBezel(r, w, h), scale = s.scale ?? Math.round(bezel * 1.9);
+      const key = `${w}x${h}r${Math.round(r)}b${bezel}s${scale}`;
+      if (key === s.key) return;
+      if (s.key) release(s.key);
+      s.key = acquire(w, h, r, bezel, scale);
+      el.style.setProperty('--refract', `url(#${maps.get(s.key).id})`);
+    }
+    // maps are built a few per frame so a new screen never stalls
+    const queue = new Set(); let qRaf = 0;
+    function flush() {
+      qRaf = 0; const t0 = performance.now();
+      for (const el of queue) {
+        queue.delete(el);
+        if (el.isConnected) refresh(el);
+        if (performance.now() - t0 > 6) break;
+      }
+      if (queue.size) qRaf = requestAnimationFrame(flush);
+    }
+    const schedule = (el) => { queue.add(el); if (!qRaf) qRaf = requestAnimationFrame(flush); };
+    const ro = enabled && 'ResizeObserver' in window ? new ResizeObserver((entries) => {
+      for (const e of entries) { clearTimeout(e.target._lgT); e.target._lgT = setTimeout(() => schedule(e.target), 90); }
     }) : null;
-    function attach(el, { bezel = 18, scale, tint } = {}) {
-      if (!el || el._lg) return;
+    function register(el, { bezel, scale } = {}) {
+      if (!enabled || !el) return;
+      const s = surfaces.get(el);
+      if (s) {
+        if (bezel == null && scale == null) return;
+        s.bezel = bezel ?? s.bezel; s.scale = scale ?? s.scale;
+        if (s.key) { release(s.key); s.key = null; }
+      } else {
+        const lg = el.dataset?.lg ? +el.dataset.lg : undefined;
+        surfaces.set(el, { bezel: bezel ?? lg, scale, key: null });
+        ro?.observe(el);
+      }
+      schedule(el);
+    }
+    function unregister(el) {
+      const s = surfaces.get(el); if (!s) return;
+      ro?.unobserve(el); clearTimeout(el._lgT); queue.delete(el);
+      if (s.key) release(s.key);
+      surfaces.delete(el); el.style.removeProperty('--refract');
+    }
+    function scan(root = document) {
+      if (!enabled) return;
+      if (root.matches?.(SEL)) register(root);
+      root.querySelectorAll?.(SEL).forEach((el) => register(el));
+    }
+    const prune = () => surfaces.forEach((s, el) => { if (!el.isConnected) unregister(el); });
+    if (enabled) {
+      const added = new Set(); let mRaf = 0, removed = false;
+      const mo = new MutationObserver((records) => {
+        for (const r of records) {
+          r.addedNodes.forEach((n) => { if (n.nodeType === 1) added.add(n); });
+          if (r.removedNodes.length) removed = true;
+        }
+        if (!mRaf) mRaf = requestAnimationFrame(() => {
+          mRaf = 0;
+          added.forEach((n) => { if (n.isConnected) scan(n); }); added.clear();
+          if (removed) { removed = false; prune(); }
+        });
+      });
+      const start = () => { mo.observe(document.body, { childList: true, subtree: true }); scan(document); };
+      if (document.body) start(); else document.addEventListener('DOMContentLoaded', start, { once: true });
+    }
+    // kept for surfaces that want a wider rim, a stronger push or their own tint
+    function attach(el, { bezel, scale, tint } = {}) {
+      if (!el) return;
       el.classList.add('lg');
       if (tint) el.style.setProperty('--lg-tint', tint);
-      const fx = document.createElement('span'); fx.className = 'lg-fx';
-      const tn = document.createElement('span'); tn.className = 'lg-tint';
-      const rim = document.createElement('span'); rim.className = 'lg-rim';
-      el.prepend(fx, tn, rim);
-      el._lg = { bezel, scale: scale ?? Math.round(bezel * 1.7) };
-      if (!enabled) return;
-      const NS = 'http://www.w3.org/2000/svg';
-      const id = 'lgf' + ++uid;
-      const filter = document.createElementNS(NS, 'filter');
-      filter.setAttribute('id', id);
-      filter.setAttribute('x', '0'); filter.setAttribute('y', '0');
-      filter.setAttribute('filterUnits', 'userSpaceOnUse'); filter.setAttribute('primitiveUnits', 'userSpaceOnUse');
-      filter.setAttribute('color-interpolation-filters', 'sRGB');
-      const img = document.createElementNS(NS, 'feImage');
-      img.setAttribute('x', '0'); img.setAttribute('y', '0'); img.setAttribute('preserveAspectRatio', 'none'); img.setAttribute('result', 'map');
-      const disp = document.createElementNS(NS, 'feDisplacementMap');
-      disp.setAttribute('in', 'SourceGraphic'); disp.setAttribute('in2', 'map');
-      disp.setAttribute('xChannelSelector', 'R'); disp.setAttribute('yChannelSelector', 'G');
-      filter.append(img, disp); ensureDefs().appendChild(filter);
-      Object.assign(el._lg, { filter, img, disp, id });
-      fx.style.filter = `url(#${id})`;
-      refresh(el);
-      ro?.observe(el);
+      register(el, { bezel, scale });
     }
-    // an element leaving for good (a closed dialog) drops its filter and stops being observed
-    function detach(el) {
-      const st = el?._lg; if (!st) return;
-      ro?.unobserve(el); clearTimeout(el._lgT);
-      st.filter?.remove(); delete el._lg;
-    }
-    function scan(root = document) { $$('[data-lg]', root).forEach((el) => attach(el, { bezel: +el.dataset.lg || 18 })); }
-    return { attach, detach, scan, enabled, refresh };
+    // an element leaving for good (a closed dialog) drops its map at once
+    const detach = (el) => unregister(el);
+    return { attach, detach, scan, enabled, refresh: (el) => schedule(el) };
   })();
 
   /* ---------- pointer sheen (one delegated listener) ---------- */
@@ -4070,8 +4158,9 @@ const Cleo = (() => {
   }
 
   /* ---------- shared brand bits ----------
-     ASSET: assets/brand/cleo-emblem.png (Cleo emblem) and assets/brand/aeso-mark.png (used as a CSS mask in core.css). */
-  const lockup = (app) => `<span class="lockup"><img src="assets/brand/cleo-emblem.png" alt="" width="27" height="22"><span class="word">Cleo</span>${app ? `<span class="badge app">${esc(app)}</span>` : ''}</span>`;
+     ASSET: assets/brand/cleo-emblem.svg (the Cleo emblem), assets/brand/cleo-wordmark.svg (the wordmark, a CSS
+     mask in core.css) and assets/brand/aeso-mark.png (also a mask). */
+  const lockup = (app) => `<span class="lockup"><img src="assets/brand/cleo-emblem.svg" alt="" width="30" height="22"><span class="word" role="img" aria-label="Cleo"></span>${app ? `<span class="badge app">${esc(app)}</span>` : ''}</span>`;
   const aeso = () => `<span class="aeso">Built by <span class="mark" aria-hidden="true"></span><b>Aeso</b></span>`;
   /* ---------- one name and one icon per action ----------
      Actions that appear in more than one place (or more than one mode) take their label and icon from
@@ -4084,7 +4173,7 @@ const Cleo = (() => {
     darkMode: ['Dark mode', 'moon'], lightMode: ['Light mode', 'sun'],
     switchMode: ['Switch mode', 'swap'], switchBranch: ['Switch branch', 'storefront'], signOut: ['Sign out', 'sign-out'],
     lock: ['Lock and switch user', 'lock-simple'], account: ['Account and security', 'user-circle'], settings: ['Settings', 'gear-six'],
-    notifications: ['Notifications', 'bell'], close: ['Close', 'x'], back: ['Back', 'arrow-left'],
+    notifications: ['Notifications', 'bell'], close: ['Close', 'x'], back: ['Back', 'caret-left'],
     add: ['Add', 'plus'], edit: ['Edit', 'pencil-simple'], remove: ['Remove', 'trash'], delete: ['Delete', 'trash'],
     export: ['Export', 'download-simple'], import: ['Import CSV', 'upload-simple'], print: ['Print', 'printer'],
     search: ['Search', 'magnifying-glass'], customize: ['Customize', 'sliders-horizontal'],
@@ -4122,15 +4211,15 @@ const Cleo = (() => {
       <section class="screen boot" aria-label="Loading Cleo ${esc(app)}">
         <div class="boot-glow"></div>
         <div class="boot-center">
-          <div class="boot-mark" role="img" aria-label="Cleo"><span class="half l"></span><span class="half r"></span></div>
-          <div class="boot-word"><span class="w">Cleo</span><span class="a">${esc(app)}</span></div>
+          <div class="boot-mark" role="img" aria-label="Cleo"><span class="part tl"></span><span class="part tr"></span><span class="part b"></span></div>
+          <div class="boot-word"><span class="w" aria-hidden="true"></span><span class="a">${esc(app)}</span></div>
           <div class="boot-grid" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${Array.from({ length: BOOT_ROWS * BOOT_COLS }, (_, i) => `<i style="--c:${i % BOOT_COLS};--r:${Math.floor(i / BOOT_COLS)}"></i>`).join('')}</div>
           <p class="boot-status" aria-live="polite"><span>${esc(steps[0])}</span></p>
         </div>
         <div class="boot-foot">${aeso()}</div>
       </section>`);
     root().replaceChildren(node);
-    const L = $('.half.l', node), R = $('.half.r', node), glow = $('.boot-glow', node), word = $('.boot-word', node);
+    const parts = $$('.boot-mark .part', node), glow = $('.boot-glow', node), word = $('.boot-word', node);
     const prog = $('.boot-grid', node), cells = $$('i', prog), status = $('.boot-status', node), statusSpan = $('span', status), foot = $('.boot-foot', node);
     // lighting order: column by column, left to right, each column from the bottom row up
     const order = cells.map((x, i) => i).sort((a, b) => (a % BOOT_COLS) - (b % BOOT_COLS) || Math.floor(b / BOOT_COLS) - Math.floor(a / BOOT_COLS));
@@ -4143,13 +4232,14 @@ const Cleo = (() => {
     const ripple = () => { const r = mark.getBoundingClientRect(); ambient.pulse(r.left + r.width / 2, r.top + r.height / 2); };
     const t0 = performance.now();
     if (red) {
-      [L, R].forEach((x) => x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'both' }));
+      parts.forEach((x) => x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'both' }));
       word.style.clipPath = 'none'; [prog, status, foot].forEach((x) => (x.style.opacity = 1));
     } else {
+      // the three nodes arrive from their own corners and join at the centre
       const opts = { duration: 950, easing: SPRING_BOUNCE, fill: 'both' };
-      L.animate([{ transform: 'translate(-70px, 22px) rotate(-6deg)', opacity: 0, filter: 'blur(10px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], opts);
-      R.animate([{ transform: 'translate(70px, -22px) rotate(-6deg)', opacity: 0, filter: 'blur(10px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { ...opts, delay: 90 });
-      glow.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: .85, transform: 'scale(1.05)', offset: .55 }, { opacity: .5, transform: 'scale(1)' }], { duration: 1500, delay: 380, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
+      const from = ['translate(-46px, -34px) rotate(-8deg)', 'translate(46px, -34px) rotate(8deg)', 'translate(0, 54px)'];
+      parts.forEach((x, i) => x.animate([{ transform: from[i], opacity: 0, filter: 'blur(10px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { ...opts, delay: i * 80 }));
+      glow.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: .45, transform: 'scale(1.05)', offset: .55 }, { opacity: .26, transform: 'scale(1)' }], { duration: 1500, delay: 380, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
       word.animate([{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-10px)' }, { clipPath: 'inset(0 0% 0 0)', transform: 'none' }], { duration: 620, delay: 620, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
       [prog, status].forEach((x, i) => x.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 900 + i * 60, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' }));
       foot.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 1100, fill: 'both' });
@@ -4177,61 +4267,183 @@ const Cleo = (() => {
     return node;
   }
 
-  /* ---------- draggable refracting lens (login art) ---------- */
-  function lens(lensEl, area) {
-    const red = reduced();
-    let x = 0, y = 0, vx = 0, vy = 0, tx = 0, ty = 0, drag = null, idle = true, t = Math.random() * 10, last = performance.now(), alive = true;
-    const hist = [];
-    const bounds = () => ({ w: area.offsetWidth / 2 - lensEl.offsetWidth / 2 - 24, h: area.offsetHeight / 2 - lensEl.offsetHeight / 2 - 24 });
-    // pointer coordinates are in screen pixels; the lens may sit inside a scaled stage
-    let k = 1;
-    const rubber = (o, dim) => (o * dim * 0.55) / (dim + 0.55 * Math.abs(o));
-    lensEl.addEventListener('pointerdown', (e) => {
-      lensEl.setPointerCapture(e.pointerId);
-      k = lensEl.getBoundingClientRect().width / lensEl.offsetWidth || 1;
-      drag = { ox: e.clientX / k - x, oy: e.clientY / k - y }; idle = false; hist.length = 0;
-    });
-    lensEl.addEventListener('pointermove', (e) => {
-      if (!drag) return;
-      const b = bounds();
-      let nx = e.clientX / k - drag.ox, ny = e.clientY / k - drag.oy;
-      if (Math.abs(nx) > b.w) nx = Math.sign(nx) * (b.w + rubber(Math.abs(nx) - b.w, b.w));
-      if (Math.abs(ny) > b.h) ny = Math.sign(ny) * (b.h + rubber(Math.abs(ny) - b.h, b.h));
-      x = nx; y = ny; vx = vy = 0;
-      hist.push({ x, y, t: performance.now() }); if (hist.length > 6) hist.shift();
-    });
-    const release = () => {
-      if (!drag) return; drag = null;
-      if (hist.length > 1) {
-        const a = hist[0], z = hist[hist.length - 1], dt = Math.max(16, z.t - a.t);
-        vx = ((z.x - a.x) / dt) * 1000; vy = ((z.y - a.y) / dt) * 1000;
+  /* ---------- the Cleo mark in lit boxes (sign-in art) ----------
+     The emblem drawn on Cleo's box grid: 18px rounded boxes, the same grid the background lights in dark
+     mode and aligned to it, lit in Cleo red. It answers the pointer:
+       - a light follows the pointer and warms the boxes under it;
+       - press and drag parts the boxes around the pointer, like a magnet; they spring home on release,
+         with a little bounce because the drag carried momentum;
+       - a tap sends a ring of light through the grid, and each box hops as the ring passes.
+     At rest every box shimmers on its own beat and a soft band of light sweeps across the mark now and
+     then. Light mode draws its own faint grid around the mark (the background grid is dark mode only).
+     With reduced motion the mark is drawn once and holds still. It stops when its screen leaves.
+     ASSET: assets/brand/cleo-emblem.svg, sampled into boxes. */
+  function gridMark(area) {
+    const CELL = 18, GAP = 5, RAD = 3.5, BOX = CELL - GAP;
+    const canvas = document.createElement('canvas'); canvas.className = 'art-grid';
+    area.prepend(canvas);
+    const ctx = canvas.getContext('2d'); if (!ctx) return () => {};
+    const slot = $('.art-mark', area);
+    const still = reduced();
+    const emblem = new Image(); let ready = false;
+    emblem.onload = () => { ready = true; layout(); }; emblem.src = 'assets/brand/cleo-emblem.svg';
+    let W = 0, H = 0, dpr = 1, ox = 0, oy = 0, k = 1, dark = true, cells = [], ghost = null, raf = 0, last = 0, drawnAt = 0;
+    let brand = [212, 0, 0], ink = [255, 255, 255];
+    const HOT = [255, 106, 82];
+    let t = Math.random() * 6, sweepAt = 2.5;
+    const ptr = { x: -1e4, y: -1e4, a: 0, down: false, id: null, sx: 0, sy: 0, travel: 0, seen: -1e4 };
+    const rings = []; // { x, y, t0 }
+    const rgbOf = (v, d) => { const m = String(v).match(/\d+(\.\d+)?/g); return m && m.length >= 3 ? m.slice(0, 3).map(Number) : d; };
+    function readColours() {
+      const s = getComputedStyle(document.documentElement);
+      dark = document.documentElement.dataset.theme !== 'light';
+      const probe = document.createElement('i'); probe.style.color = s.getPropertyValue('--brand').trim() || '#d40000';
+      document.body.appendChild(probe); brand = rgbOf(getComputedStyle(probe).color, [212, 0, 0]); probe.remove();
+      ink = dark ? [255, 255, 255] : [20, 20, 24];
+    }
+    // the mark's boxes: the emblem sampled at four points per side of every box, kept where it covers enough
+    function layout() {
+      const w = area.offsetWidth, h = area.offsetHeight;
+      if (!w || !h) return;
+      readColours();
+      dpr = Math.min(2, devicePixelRatio || 1); W = w; H = h;
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      // align to the background grid (it starts at the corner of the .ambient layer); the Terminal stage is scaled
+      const amb = area.closest('.dp')?.querySelector('.ambient') || document.querySelector('.ambient');
+      const r = area.getBoundingClientRect(); k = r.width / w || 1;
+      const ar = amb ? amb.getBoundingClientRect() : { left: 0, top: 0 };
+      ox = (CELL - (((r.left - ar.left) / k) % CELL) + CELL) % CELL; oy = (CELL - (((r.top - ar.top) / k) % CELL) + CELL) % CELL;
+      ghost = null; cells = [];
+      if (!ready) { draw(); return; }
+      const ratio = emblem.naturalHeight / emblem.naturalWidth || 0.7366;
+      const cols = Math.round(clamp(Math.min(w * 0.62, (h * 0.62) / ratio, 640) / CELL, 12, 36)), rows = Math.round(cols * ratio);
+      const S = 4, c = document.createElement('canvas'); c.width = cols * S; c.height = rows * S;
+      const x = c.getContext('2d'); x.drawImage(emblem, 0, 0, c.width, c.height);
+      const a = x.getImageData(0, 0, c.width, c.height).data;
+      const c0 = Math.round((w / 2 - (cols * CELL) / 2 - ox) / CELL), r0 = Math.round((h / 2 - (rows * CELL) / 2 - oy) / CELL);
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+        let sum = 0;
+        for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += a[(((j * S + yy) * c.width) + i * S + xx) * 4 + 3];
+        const cov = sum / (S * S * 255);
+        if (cov < 0.22) continue;
+        const hx = ox + (c0 + i) * CELL + GAP / 2, hy = oy + (r0 + j) * CELL + GAP / 2;
+        cells.push({ hx, hy, cx: hx + BOX / 2, cy: hy + BOX / 2, a: Math.min(1, (cov - 0.22) / 0.45), dx: 0, dy: 0, vx: 0, vy: 0, ph: Math.random() * Math.PI * 2 });
       }
-      const proj = (v) => ((v / 1000) * 0.998) / (1 - 0.998);
-      const b = bounds();
-      tx = clamp(x + proj(vx) * 0.35, -b.w, b.w); ty = clamp(y + proj(vy) * 0.35, -b.h, b.h);
-      setTimeout(() => (idle = true), 2600);
-    };
-    lensEl.addEventListener('pointerup', release); lensEl.addEventListener('pointercancel', release);
-    lensEl.addEventListener('keydown', (e) => {
-      const k = { ArrowLeft: [-40, 0], ArrowRight: [40, 0], ArrowUp: [0, -40], ArrowDown: [0, 40] }[e.key];
-      if (!k) return; e.preventDefault(); idle = false; const b = bounds();
-      tx = clamp(tx + k[0], -b.w, b.w); ty = clamp(ty + k[1], -b.h, b.h);
-    });
-    const tick = (now) => {
-      if (!alive || !lensEl.isConnected) return;
-      const dt = Math.min(0.033, (now - last) / 1000); last = now;
-      if (!drag) {
-        if (idle && !red) { t += dt * 0.16; const b = bounds(); tx = Math.sin(t * 1.3) * b.w * 0.55; ty = Math.sin(t * 0.9 + 1.2) * b.h * 0.45; }
-        // critically damped follow (response ~0.5s); a flick's velocity carries in
-        const k = 60, c = 2 * Math.sqrt(k) * 0.82;
-        vx += (k * (tx - x) - c * vx) * dt; vy += (k * (ty - y) - c * vy) * dt;
-        x += vx * dt; y += vy * dt;
+      if (slot) Object.assign(slot.style, { left: `${ox + c0 * CELL}px`, top: `${oy + r0 * CELL}px`, width: `${cols * CELL}px`, height: `${rows * CELL}px` });
+      draw(); request();
+    }
+    // light mode: a faint grid around the mark that fades out toward the edges (drawn once per layout)
+    function ghostLayer() {
+      const g = document.createElement('canvas'); g.width = canvas.width; g.height = canvas.height;
+      const x = g.getContext('2d'); x.scale(dpr, dpr);
+      const cxm = W / 2, cym = H / 2, reach = Math.min(W, H) * 0.62;
+      for (let y = oy - CELL; y < H; y += CELL) for (let xx = ox - CELL; xx < W; xx += CELL) {
+        const d = Math.hypot(xx + CELL / 2 - cxm, (y + CELL / 2 - cym) * 1.15) / reach;
+        const al = 0.055 * Math.max(0, 1 - d * d);
+        if (al < 0.004) continue;
+        x.fillStyle = `rgb(${ink[0]} ${ink[1]} ${ink[2]} / ${al.toFixed(3)})`;
+        x.beginPath(); x.roundRect(xx + GAP / 2, y + GAP / 2, BOX, BOX, RAD); x.fill();
       }
-      lensEl.style.transform = `translate(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px))`;
-      requestAnimationFrame(tick);
+      return g;
+    }
+    function draw() {
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!W) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (!dark) { ghost ||= ghostLayer(); ctx.drawImage(ghost, 0, 0, W, H); }
+      // unlit boxes near the pointer catch its light (dark mode: on top of the background grid)
+      if (ptr.a > 0.01 && !still) {
+        const R = 130, c0 = Math.floor((ptr.x - R - ox) / CELL), c1 = Math.ceil((ptr.x + R - ox) / CELL), r0 = Math.floor((ptr.y - R - oy) / CELL), r1 = Math.ceil((ptr.y + R - oy) / CELL);
+        for (let j = r0; j <= r1; j++) for (let i = c0; i <= c1; i++) {
+          const bx = ox + i * CELL + GAP / 2, by = oy + j * CELL + GAP / 2, d = Math.hypot(bx + BOX / 2 - ptr.x, by + BOX / 2 - ptr.y);
+          const al = (dark ? 0.16 : 0.1) * ptr.a * Math.exp(-(d * d) / (2 * 56 * 56));
+          if (al < 0.004) continue;
+          ctx.fillStyle = `rgb(${ink[0]} ${ink[1]} ${ink[2]} / ${al.toFixed(3)})`;
+          ctx.beginPath(); ctx.roundRect(bx, by, BOX, BOX, RAD); ctx.fill();
+        }
+      }
+      const sweep = still ? -9 : (t - sweepAt) / 1.7; // 0 to 1 while the band crosses the mark
+      const span = cells.length ? cells[cells.length - 1].cx - cells[0].cx + 1 : 1, left = cells.length ? cells[0].cx : 0;
+      for (const c of cells) {
+        const x = c.cx + c.dx, y = c.cy + c.dy;
+        let heat = 0, hop = 0;
+        if (!still) {
+          if (ptr.a > 0.01) { const d = Math.hypot(x - ptr.x, y - ptr.y); heat += 0.6 * ptr.a * Math.exp(-(d * d) / (2 * 64 * 64)); }
+          if (sweep > -0.2 && sweep < 1.2) { const u = (x - left) / span * 0.8 + (y - cells[0].cy) / span * 0.4; heat += 0.42 * Math.exp(-((u - sweep * 1.3 + 0.1) ** 2) / (2 * 0.05 * 0.05)); }
+          for (const g of rings) { const age = t - g.t0, rad = age * 640, d = Math.hypot(x - g.x, y - g.y) - rad, f = (1 - age / 1.5) ** 1.5 * Math.exp(-(d * d) / (2 * 24 * 24)); heat += 0.7 * f; hop = Math.max(hop, f); }
+        }
+        heat = Math.min(1, heat);
+        const shimmer = still ? 1 : 0.84 + 0.16 * Math.sin(t * 1.3 + c.ph);
+        const al = Math.min(1, c.a * shimmer + heat * 0.35);
+        const col = brand.map((v, n) => Math.round(v + (HOT[n] - v) * heat));
+        const s = BOX * (1 + 0.28 * hop), off = (s - BOX) / 2;
+        ctx.fillStyle = `rgb(${col[0]} ${col[1]} ${col[2]} / ${al.toFixed(3)})`;
+        ctx.beginPath(); ctx.roundRect(c.hx + c.dx - off, c.hy + c.dy - off, s, s, RAD * (1 + 0.28 * hop)); ctx.fill();
+      }
+    }
+    // the boxes' springs: home is where the emblem puts them; a held pointer pushes them aside
+    function step(dt) {
+      const stiff = (2 * Math.PI / 0.34) ** 2, damp = 2 * 0.74 * Math.sqrt(stiff);
+      let moving = false;
+      for (const c of cells) {
+        let fx = 0, fy = 0;
+        if (ptr.a > 0.01) {
+          const ddx = c.cx - ptr.x, ddy = c.cy - ptr.y, d = Math.hypot(ddx, ddy) || 1;
+          const push = (ptr.down ? 34 : 4) * ptr.a * Math.exp(-(d * d) / (2 * (ptr.down ? 86 : 60) ** 2));
+          fx = (ddx / d) * push; fy = (ddy / d) * push;
+        }
+        c.vx += (stiff * (fx - c.dx) - damp * c.vx) * dt; c.vy += (stiff * (fy - c.dy) - damp * c.vy) * dt;
+        c.dx += c.vx * dt; c.dy += c.vy * dt;
+        if (Math.abs(c.vx) + Math.abs(c.vy) > 0.5 || Math.abs(c.dx) + Math.abs(c.dy) > 0.3) moving = true;
+      }
+      return moving;
+    }
+    function frame(now) {
+      raf = 0;
+      if (!canvas.isConnected) { stop(); return; }
+      if (document.hidden) return;
+      const dt = Math.min(1 / 30, last ? (now - last) / 1000 : 1 / 60);
+      const active = ptr.down || rings.length || ptr.a > 0.01;
+      // at rest the shimmer needs no more than about 30 frames a second
+      if (!active && last && now - drawnAt < 30) { raf = requestAnimationFrame(frame); return; }
+      last = now; drawnAt = now; t += dt;
+      if (t - sweepAt > 2.2) sweepAt = t + 4 + Math.random() * 3;
+      ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.25));
+      while (rings.length && t - rings[0].t0 > 1.5) rings.shift();
+      step(dt); draw();
+      raf = requestAnimationFrame(frame);
+    }
+    function request() { if (!still && !raf && canvas.isConnected) raf = requestAnimationFrame(frame); }
+    // pointer coordinates are screen pixels; the art may sit inside the Terminal's scaled stage
+    const local = (e) => { const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / k, (e.clientY - r.top) / k]; };
+    canvas.addEventListener('pointermove', (e) => {
+      if (still) return;
+      [ptr.x, ptr.y] = local(e); ptr.seen = performance.now();
+      if (ptr.down && e.pointerId === ptr.id) ptr.travel = Math.max(ptr.travel, Math.hypot(ptr.x - ptr.sx, ptr.y - ptr.sy));
+      request();
+    });
+    canvas.addEventListener('pointerdown', (e) => {
+      if (still || e.button > 0) return;
+      canvas.setPointerCapture(e.pointerId); canvas.classList.add('grabbing');
+      [ptr.x, ptr.y] = local(e); ptr.sx = ptr.x; ptr.sy = ptr.y; ptr.travel = 0; ptr.down = true; ptr.id = e.pointerId; ptr.seen = performance.now();
+      request();
+    });
+    const release = (e) => {
+      if (!ptr.down || (e && e.pointerId !== ptr.id)) return;
+      ptr.down = false; canvas.classList.remove('grabbing');
+      // a tap (no real drag) sends the ring of light
+      if (ptr.travel < 10) { rings.push({ x: ptr.x, y: ptr.y, t0: t }); if (rings.length > 4) rings.shift(); }
+      ptr.seen = performance.now(); request();
     };
-    requestAnimationFrame(tick);
-    return () => (alive = false);
+    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+    canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.seen = performance.now() - 1500; });
+    const ro = new ResizeObserver(() => layout()); ro.observe(area);
+    const onTheme = () => setTimeout(() => { readColours(); ghost = null; draw(); request(); }, 30);
+    document.addEventListener('cleo:theme', onTheme);
+    document.addEventListener('visibilitychange', request);
+    function stop() { cancelAnimationFrame(raf); raf = 0; ro.disconnect(); document.removeEventListener('cleo:theme', onTheme); document.removeEventListener('visibilitychange', request); }
+    layout();
+    return stop;
   }
 
   /* ---------- Terms and Conditions, Privacy Policy ----------
@@ -4618,9 +4830,8 @@ const Cleo = (() => {
           <div class="login-meta">${cloudStatus()}${aeso()}</div>
         </div>
         <div class="login-art" aria-hidden="true">
-          <div class="art-emblem"><span class="em"></span></div>
-          <div class="lens" data-lens tabindex="-1"></div>
-          <p class="lens-hint"><i class="ph ph-hand-grabbing"></i>Drag the glass</p>
+          <div class="art-mark"></div>
+          <p class="art-hint"><i class="ph ph-hand-pointing"></i>Drag across the mark</p>
         </div>
       </section>`);
     const card = $('.login-card', node), stepsEl = $('.steps', node);
@@ -4948,10 +5159,7 @@ const Cleo = (() => {
 
     requestAnimationFrame(() => {
       LiquidGlass.attach(card, { bezel: 24, tint: 'var(--glass)' });
-      const l = $('[data-lens]', node);
-      LiquidGlass.attach(l, { bezel: 70, scale: 120, tint: 'var(--lens-tint)' });
-      l.style.setProperty('--blur', '0.6px'); l.style.setProperty('--sat', '135%');
-      lens(l, $('.login-art', node));
+      gridMark($('.login-art', node));
       if (!mq('(pointer: coarse)').matches) focusFirst(cur);
     });
     if (!CleoEnv.demo) $('[data-backup-line]', node).hidden = true;
@@ -14289,7 +14497,7 @@ Cleo.bir = (() => {
       body.innerHTML = `${head(`Looking for ${conn} printers`, conn === 'Network' ? 'Searching this network on port 9100. You can also type the IP address.' : 'Turn the printer on. Hold its feed button to make it visible if it is not found.')}
         <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start"><div class="radar small" aria-hidden="true"><span></span><span></span><span></span><i class="ph-fill ph-printer"></i></div>
         <div style="display:grid;gap:10px">${conn === 'Network' ? '<div style="display:flex;gap:8px"><input class="input num" placeholder="192.168.1.50" data-ip aria-label="Printer IP address"><button class="btn" data-ipgo>Connect</button></div>' : ''}<div class="found" data-found role="list"></div></div></div>
-        <div class="sheet-foot"><button class="btn btn-ghost" data-back><i class="ph ph-arrow-left"></i>Back</button><span></span></div>`;
+        <div class="sheet-foot"><button class="btn btn-ghost" data-back><i class="ph ph-caret-left"></i>Back</button><span></span></div>`;
       bindX(); $('[data-back]', body).addEventListener('click', step1);
       const FOUND = { Bluetooth: [['Epson TM-m30III', 'BT · 00:11:62:5C:02:7A', 80, 3], ['Xprinter XP-P323B', 'BT · 66:22:3F:91:0C:1B', 58, 2]], USB: [['Epson TM-T20III', 'USB · 04b8:0e28', 80, 3]], Network: [['Epson TM-T82III', '192.168.1.44:9100', 80, 3], ['Star mC-Print3', '192.168.1.52:9100', 80, 2]] }[conn];
       const list = $('[data-found]', body);
@@ -14306,7 +14514,7 @@ Cleo.bir = (() => {
         <div class="field"><label for="ap-n">Name</label><input id="ap-n" class="input" value="${roles.has('receipt') ? 'Front counter' : 'Kitchen 2'}"></div>
         <div class="opt-group"><h3>Paper width</h3><div class="opts" data-pw>${[58, 80].map((w) => `<button class="opt" data-v="${w}" aria-pressed="${paper === w}" style="min-width:120px">${w} mm</button>`).join('')}</div></div>
         <div class="opt-group"><h3>Prints <span>Pick any</span></h3><div class="opts" data-roles>${Object.entries(ROLE).map(([k, l]) => `<button class="opt" data-v="${k}" aria-pressed="${roles.has(k)}">${l}</button>`).join('')}</div></div>
-        <div class="sheet-foot"><button class="btn btn-ghost" data-back><i class="ph ph-arrow-left"></i>Back</button><button class="btn btn-primary btn-lg" data-save><i class="ph ph-receipt"></i>Print test page and save</button></div>`;
+        <div class="sheet-foot"><button class="btn btn-ghost" data-back><i class="ph ph-caret-left"></i>Back</button><button class="btn btn-primary btn-lg" data-save><i class="ph ph-receipt"></i>Print test page and save</button></div>`;
       bindX(); $('[data-back]', body).addEventListener('click', () => step2(conn));
       $('[data-pw]', body).addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (!b) return; paper = +b.dataset.v; $$('[data-pw] [data-v]', body).forEach((x) => x.setAttribute('aria-pressed', String(x === b))); });
       $('[data-roles]', body).addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (!b) return; roles.has(b.dataset.v) ? roles.delete(b.dataset.v) : roles.add(b.dataset.v); b.setAttribute('aria-pressed', String(roles.has(b.dataset.v))); });
@@ -14733,7 +14941,7 @@ Cleo.bir = (() => {
           : st.kind === 'cart'
             ? `<div class="cd-lines">${d.lines.map((l) => `<div class="cd-line"><span class="q num">${l.q}</span><span class="n"><b>${esc(l.n)}</b>${l.m ? `<small>${esc(l.m)}</small>` : ''}</span><span class="a num">${P2(l.a)}</span></div>`).join('')}</div>
                <div class="cd-sums">${(d.t.promos || []).map((p) => `<div class="r good"><span><i class="ph-fill ph-tag"></i>${esc(p.name)}</span><span>-${P2(p.amount)}</span></div>`).join('')}${d.t.disc ? `<div class="r good"><span>Discounts</span><span>-${P2(d.t.disc)}</span></div>` : ''}${d.t.svc ? `<div class="r"><span>Service charge</span><span>${P2(d.t.svc)}</span></div>` : ''}${d.t.del ? `<div class="r"><span>Delivery fee</span><span>${P2(d.t.del)}</span></div>` : ''}<div class="cd-total"><span>Total</span><b class="num">${P2(d.t.total)}</b></div></div>`
-            : `<div class="cd-idle"><img src="assets/brand/cleo-emblem.png" alt="" class="cd-mark"><p>${esc(biz)}</p></div>`;
+            : `<div class="cd-idle"><img src="assets/brand/cleo-emblem.svg" alt="" class="cd-mark"><p>${esc(biz)}</p></div>`;
       $('#app').replaceChildren(el(`<section class="screen cdisp">
         <aside class="cd-brand glass"><span class="cd-logo">${esc(biz.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase())}</span><div><h1>${msg[0]}</h1><p>${msg[1]}</p></div>
           ${promoLine().length ? `<div class="cd-promos"><p class="t-cap">Today</p>${promoLine().map((p) => `<span><i class="ph-fill ph-tag"></i>${esc(p.name)}</span>`).join('')}</div>` : '<span></span>'}

@@ -6,7 +6,9 @@
 <meta name="color-scheme" content="dark light">
 <meta name="description" content="Cleo Terms and Conditions for Cleo POS by Aeso Technologies Inc. Effective October 6, 2026, version 1.0.">
 <title>Cleo Terms and Conditions · Aeso</title>
-<link rel="icon" href="../assets/brand/cleo-emblem.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/cleo-icon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/cleo-emblem.svg">
+<link rel="apple-touch-icon" href="../assets/brand/cleo-touch-icon.png">
 <style>
 @font-face{font-family:"Cleo Sans";src:url("../assets/fonts/HelveticaNeueRoman.otf") format("opentype");font-weight:400;font-display:swap}
 @font-face{font-family:"Cleo Sans";src:url("../assets/fonts/HelveticaNeueMedium.otf") format("opentype");font-weight:500;font-display:swap}
@@ -20,8 +22,9 @@ a{color:var(--red-ink);text-underline-offset:3px}
 a:focus-visible{outline:2px solid var(--red-ink);outline-offset:4px;border-radius:4px}
 .wrap{width:min(760px,calc(100% - 32px));margin-inline:auto}
 header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:28px;border-bottom:1px solid var(--line)}
-.brand{display:inline-flex;align-items:center;gap:9px;color:var(--ink);text-decoration:none;font-size:21px;font-weight:500;letter-spacing:-.03em}
-.brand img{width:26px;height:22px;object-fit:contain}
+.brand{display:inline-flex;align-items:center;gap:6px;color:var(--ink);text-decoration:none}
+.brand img{width:30px;height:22px}
+.brand .word{display:block;height:13.4px;aspect-ratio:1890/746;background:currentColor;-webkit-mask:url("../assets/brand/cleo-wordmark.svg") center/contain no-repeat;mask:url("../assets/brand/cleo-wordmark.svg") center/contain no-repeat;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 header nav{display:flex;gap:20px;font-size:14px}
 header nav a{color:var(--muted);text-decoration:none}
 header nav a:hover{color:var(--ink)}
@@ -44,7 +47,7 @@ footer{padding-block:28px 40px;border-top:1px solid var(--line);font-size:13px;c
 <body>
 <div class="wrap">
 <header>
- <a class="brand" href="../"><img src="../assets/brand/cleo-emblem.png" alt="" width="26" height="22">Cleo</a>
+ <a class="brand" href="../" aria-label="Cleo POS home"><img src="../assets/brand/cleo-emblem.svg" alt="" width="30" height="22"><span class="word"></span></a>
  <nav aria-label="Legal"><a href="privacy.html">Privacy Policy</a><a href="../">Back to Cleo</a></nav>
 </header>
 <main>
