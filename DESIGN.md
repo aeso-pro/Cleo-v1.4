@@ -15,12 +15,20 @@ An operational POS for Philippine businesses with an Apple-like glass language: 
 
 ## Materials (glass)
 
-- `.glass`: floating functional layers (cards that hold controls, the plan cards, the sign-up card). Blur 26px, saturation 165%, a bright top edge (`--glass-hi`), a hairline rim (`--glass-rim`), a soft top sheen (`--spec`) and `--shadow-lg`.
+- `.glass`: floating functional layers (cards that hold controls, the plan cards, the sign-up card). A flat tint (`--glass`) over a 26px blur at 165% saturation, `--shadow-lg`, and an embossed stroke drawn by `::before`: a hairline (`--rim-edge`), light along the top and left edge (`--rim-light`) and a fainter catch along the bottom and right (`--rim-catch`). There is no sheen gradient; the rim gives the depth.
 - `.glass-thick`: dense data surfaces; more opaque so text stays crisp.
 - `.glass-thin`: chips and buttons on top of other material; no blur. Never stack light glass on light glass.
-- `LiquidGlass.attach()`: an SVG displacement refraction (Chromium) for hero surfaces: the sign-in card, the recommended plan, dialogs.
-- **Backdrop:** dark mode has drifting ambient light and, on sign-in screens, the lit box grid. Light mode has a few faint, still lights (`--amb-1` to `--amb-4`) so its glass reads as glass; no glows, grain or motion.
+- **Refraction** (`LiquidGlass`, core.js): every `.glass`, `.glass-thick`, `.lg` and `[data-lg]` surface bends its backdrop inside a narrow rim with an SVG displacement map, the way the curved edge of real glass draws in light from just past it, while the middle stays still. The rim is about 0.8 of the corner radius (8 to 20px), applied through `--refract` inside `backdrop-filter`. New screens are picked up on their own; `LiquidGlass.attach(el, { bezel, scale, tint })` widens the rim or sets a tint on a hero surface (the sign-in card). Chromium only; elsewhere, and with reduced transparency, glass keeps the plain blur.
+- **Backdrop:** dark mode has drifting ambient light and, on sign-in screens, the lit box grid. The red light is kept subtle, about half its earlier strength (`--amb-1` to `--amb-3`), so it tints the ground without glowing; the landing keeps its own full-strength light. Light mode has a few faint, still lights so its glass reads as glass; no glows, grain or motion.
 - **Fallbacks:** `prefers-reduced-transparency` makes glass solid; `prefers-contrast: more` makes it solid with a stronger rim.
+
+## Brand
+
+- **Emblem** (`assets/brand/cleo-emblem.svg`): three round nodes joined by concave fillets, in Cleo red. It is the one source; the PNG icons are rendered from it.
+- **Wordmark** (`assets/brand/cleo-wordmark.svg`): "Cleo" in Helvetica Neue Light, drawn as a CSS mask so it takes the text colour.
+- **Lockup** (`lockup()` in core.js): the emblem, then the wordmark at 0.61 of the emblem's height, 0.24 of that height apart, centred on each other.
+- **Opening** (the boot screen): the three nodes fly in from the upper left, the upper right and below, 80ms apart, and settle together on a slightly bouncy spring.
+- **Sign-in mark** (`gridMark`): the emblem drawn in the backdrop's own lit boxes, on the same 18px grid. The pointer lights the boxes it passes, a drag pushes them aside and they spring back, a tap sends a ring through them, and an idle sweep passes every few seconds. Under reduced motion it is drawn once, still.
 
 ## Type
 
@@ -33,6 +41,19 @@ Radii `--r-xs` 8 to `--r-xl` 32; buttons and chips are pills; cards 24 to 32; in
 ## Motion
 
 Custom curves: `--ease-out` for entrances, `--ease-in-out` for movement, `--ease-drawer` for sheets. UI motion stays under about 300ms; presses scale to .97 instantly; lists rise with a 45ms stagger. Screens change with opacity and transform only. Reduced motion removes movement and keeps fades.
+
+## Controls
+
+Controls follow Apple's platforms, so people already know them:
+
+- **Switch:** the iOS switch, 46 × 28 with a white 24px knob that stretches while pressed and springs across; green (`--switch-on`) when on.
+- **Segmented control:** a grey track (`--fill-3`) with a raised thumb (`--seg-thumb`) that springs to the selection.
+- **Fields:** filled rather than outlined (`--fill-3`, `--fill-2` on hover); selects show up-and-down chevrons.
+- **Buttons:** the filled primary button has a fine top light and a small grounded shadow, no glow. Links styled as buttons are never underlined.
+- **Titles and navigation:** large titles are bold (700) with tight tracking; Back uses a left chevron.
+- **Lists:** settings rows are divided by inset separators that start 16px in.
+- **Sheets:** on phones (720px and below) dialogs and drawers rise from the bottom as sheets with 28px corners and leave the same way.
+- **Status colours:** the system set; in dark mode green `#30d158`, orange `#ff9f0a`, red `#ff453a` and blue `#0a84ff`.
 
 ## Components added for account setup
 
@@ -70,7 +91,7 @@ The landing's full feature comparison opens in a native dialog over pricing. Kee
 
 This section applies only to the standalone marketing surface (`source/landing.html` and its landing partials, styles and script). It extends Cleo's sign-in box grid and glass materials; the app, setup and plan guidance above remains in force for those surfaces. The approved surface direction stays in `.impeccable/surfaces/source-landing-html.md`. Values below come from the implementation, including the final control-size, recommendation-label and offline-panel fixes.
 
-**The Same Cleo Rule.** Use the original Cleo emblem and Aeso artwork, the existing Cleo typeface, and actual Terminal, Owner Dashboard and Back Office captures. The illuminated opening and closing marks sample the original emblem; they are not new brand marks. Keep sample-data captions visible.
+**The Same Cleo Rule.** Use the Cleo emblem and wordmark from `assets/brand` (the 2026 rebrand), the Aeso artwork, the existing Cleo typeface, and actual Terminal, Owner Dashboard and Back Office captures. The illuminated opening and closing marks sample the emblem itself; they are not new brand marks. Keep sample-data captions visible.
 
 ### Colors
 
@@ -80,7 +101,7 @@ This section applies only to the standalone marketing surface (`source/landing.h
 
 ### Typography
 
-Cleo Sans loads on the landing from the app's own files in `assets/fonts` (300, 400 and 500 are preloaded), so the opening never waits for the screen captures. The copies embedded in the capture CSS are registered only for a weight whose file fails to load. Preserve those font files and weights rather than introducing a separate display family. The body is 400 at 16px/1.55; large headings use weight 300 and balanced wrapping; peso figures use tabular numerals.
+Cleo Sans loads on the landing from the app's own files in `assets/fonts` (300, 400 and 500 are preloaded), so the opening never waits for the screen captures. The copies embedded in the capture CSS are registered only for a weight whose file fails to load; they are WOFF2 subsets (Latin, punctuation, the peso sign, arrows) that cover the page's own text as well as the captures. Preserve those font files and weights rather than introducing a separate display family. The body is 400 at 16px/1.55; large headings use weight 300 and balanced wrapping; peso figures use tabular numerals.
 
 - **Hero:** `clamp(50px,6.4vw,96px)`, line-height `.98`, tracking `-.04em`; at 540px and below, `clamp(44px,12.4vw,56px)`.
 - **Section headings:** `clamp(40px,4.5vw,64px)`, line-height `1.02`, tracking `-.035em`; 38px at 540px and below. Workspace headings use `clamp(30px,2.6vw,38px)` with line-height `1.05`.
@@ -94,7 +115,7 @@ Workspace rows reserve a central channel for the trace: copy / 96px channel / sc
 
 ### Elevation & Depth
 
-Glass uses 26px blur, 165% saturation, a one-pixel rim, an inset top highlight and diffuse shadows. Landing fills are `rgb(22 22 26/.52)` in dark mode and `rgb(255 255 255/.56)` in light mode; the denser fill is `rgb(17 17 21/.76)` or `rgb(255 255 255/.8)`. Keep the readable pane distinct from the illuminated ground; this landing does not attach the app's SVG glass-refraction effect. Reduced transparency removes backdrop blur and uses the denser fill; the enlarged-screen dialog uses the ground color. Increased contrast strengthens text and rims and removes glass blur.
+Glass is the app's material: 26px blur at 165% saturation, a flat fill, a one-pixel rim with an embossed stroke (light along the top and left inner edge, a fainter catch along the bottom and right: `--rim-light`, `--rim-catch`) and diffuse shadows. There is no sheen gradient on panels or device frames. Landing fills are `rgb(22 22 26/.52)` in dark mode and `rgb(255 255 255/.56)` in light mode; the denser fill is `rgb(17 17 21/.76)` or `rgb(255 255 255/.8)`. Keep the readable pane distinct from the illuminated ground. Every glass panel and the enlarged-screen dialog refract at the rim with the app's displacement maps (the "liquid glass" script; Chromium only). Reduced transparency removes backdrop blur and refraction and uses the denser fill; the enlarged-screen dialog uses the ground color. Increased contrast strengthens text and rims and removes glass blur.
 
 ### Shapes
 
@@ -105,7 +126,7 @@ Device frames and desktop content panes use 30px corners, with 20px corners arou
 ### Components
 
 - **Controls:** regular actions are at least 50px high. Small actions and billing-cycle buttons are at least 44px high; icon and terminal-stepper buttons are 44px square, and the numeric input is at least 44px high. Focus uses a 2px text-safe red outline with 4px offset. Button state transitions use 200ms; the landing easing is `cubic-bezier(.23,1,.32,1)`. Fine-pointer hover lifts actions 2px; a press scales to `.97`.
-- **Real screens:** the hero eagerly loads a Terminal capture; later workspace captures load near the viewport. Each is a scaled 1440-by-960 DOM capture in an empty-sandbox iframe, with an inert body, disabled pointer interaction and animation, no app scripts, and a restrictive CSP. The parent supplies the accessible enlarge button and native dialog, including fit and full-size zoom. The captures are visual evidence, not interactive app sessions; fonts are shared from their CSS with the landing.
+- **Real screens:** the hero eagerly loads a Terminal capture; later workspace captures load near the viewport. Each is a scaled 1440-by-960 DOM capture in an empty-sandbox iframe, with an inert body, disabled pointer interaction and animation, no app scripts, and a restrictive CSP. The parent supplies the accessible enlarge button and native dialog, including fit and full-size zoom. The captures are visual evidence, not interactive app sessions; fonts are shared from their CSS with the landing. Re-capture them from the running app whenever its look changes (dark theme, 1440 × 960, 3:45 PM Manila so the afternoon promo shows); they carry no refraction maps of their own, because the glass frames around them already refract.
 - **Offline illustration:** place the connection heading and status icon together in a flex row, without an eyebrow. The labeled switch changes the explanatory text and dims the cloud's slate light while retaining the counter's red. Preserve the illustration/backend qualification; this is not a live connection test.
 - **Pricing:** reuse monochrome circuit-tree marks and data-derived plan content. The landing renders the recommendation badge as “Recommended” without changing the plan data. Billing and terminal controls update the visible peso figures and quote handoff; keep sample-pricing qualifications with them. This presentation does not replace the app's plan tabs, comparison or setup flow.
 - **Trace and motion:** the marketing trace connects the hero Terminal, three workspaces, local panes and pricing ports. It advances to a reading line at 62% of viewport height; running motion adds traveling light, fine-pointer illumination and ripples on open ground. The opening uses eased fades/rises and a 1.6s device entrance; it can finish early on user input, ends with its last animation rather than on a timer, and is skipped when the page opens scrolled. The lit mark is timed from the headline's own animation, so it leads even when the script runs after first paint. The screen captures (about 4 MB) sit at the end of the page, after its scripts, so the page paints before they arrive. The hero capture is built once the mark has handed over (1.6s in). The other captures load one at a time while the page is idle, or as soon as one nears the viewport, so building one rarely coincides with scrolling. The ambient grid draws at about 30 fps on its own; scrolling and other requests draw on the next frame. These story timings and scroll effects belong to this marketing page, not the app's operational motion system.
@@ -115,6 +136,6 @@ Device frames and desktop content panes use 30px corners, with 20px corners arou
 ### Do's and Don'ts
 
 - **Do** keep the grid, trace and ports aligned through responsive layout and font loading, and maintain readable screen enlargement and sample-data captions.
-- **Do** retain original Cleo/Aeso identity assets and the existing circuit-tree plan marks; all foreground imagery must remain evidence from Cleo.
+- **Do** use the Cleo emblem and wordmark from `assets/brand`, the Aeso artwork and the existing circuit-tree plan marks; all foreground imagery must remain evidence from Cleo.
 - **Don't** turn the marketing story, longer entrances, illuminated light theme or landing-specific colors into global app rules.
 - **Don't** present captured screens, the offline illustration or proposed pricing as live services, customer results or validated accreditation. Product constraints remain in `PRODUCT.md`.

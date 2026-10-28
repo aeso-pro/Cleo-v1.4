@@ -21,6 +21,24 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-10-28 · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**Rebrand (commit `2ed4396`).** The design team's new emblem and wordmark replace every Cleo logo: the app, the landing page, the legal pages, the favicons and the install icons.
+
+- New files in `assets/brand/`: `cleo-emblem.svg`, `cleo-wordmark.svg`, `cleo-icon-32.png`, `cleo-icon-192.png`, `cleo-icon-512.png`, `cleo-maskable-512.png` and `cleo-touch-icon.png`. `cleo-emblem.png` is redrawn from the new emblem. `assets/README.md` has the details.
+- `manifest.webmanifest` lists the new icons. `sw.js` caches the new files under a new cache name, so installed copies pick them up on their next online visit.
+- Every glass surface now refracts its backdrop at the edge and has an embossed rim. The sheen gradients are gone. Chromium shows the refraction; other browsers keep the plain blur.
+- The red backdrop light in the app is about half as strong. The landing page keeps its own.
+- Controls follow Apple's conventions: the iOS switch, segmented controls, filled fields, bold titles, back chevrons, and bottom sheets on phones.
+- The sign-in screen's right panel is now the emblem drawn in the lit box grid. People can drag across it or tap it.
+- The landing page's embedded app screenshots were captured again from the rebranded app. The embedded fonts are now subsets, so `landing.html` went from 4.2 MB to 0.87 MB.
+
+All 23 demo routes still fit at 320, 360, 390 and 1440 px, with no console errors. The key screens were checked in both themes. The service worker installs and the app opens offline.
+
+Nothing on the backend side changed: no edits to the `backend/*`, `api.js` or `env.js` sections of `index.html`, and none to `supabase/`. The line endings in `backend/supabase.js` are kept as they were.
+
+- [ ] **Optional: logo in the sign-up email.** `supabase/templates/confirm-signup.html` is text only. To add the emblem, use the PNG `https://<production-host>/assets/brand/cleo-icon-192.png`, shown at 48 px. Many mail clients block SVG images.
+
 ### 2026-10-17 · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
 
 **Restored the files the pages load (commit `334937b`).** Everything under `assets/`, plus `legal/` and `content/plans.md`, was missing from the repo, so on the host:
