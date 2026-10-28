@@ -267,13 +267,15 @@ i.ph, i.ph-fill, i.ph-bold { line-height: 1; display: inline-block; flex: none; 
 @keyframes drift-c { to { transform: translate3d(-12vmax, 9vmax, 0) scale(1.1); } }
 /* dark mode, loading and sign-in screens: a grid of boxes lit by moving light (the ambient module in
    core.js draws it). It fades in over the drifting lights and fades out when the app opens.
-   Light mode never shows it. */
+   Light mode shows it only behind the loading screen, where its ripples carry the wait. */
 .ambient canvas.amb-grid { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1000ms var(--ease-out); }
 :root.amb-on .ambient canvas.amb-grid { opacity: 1; transition-duration: 500ms; }
+/* behind the loading screen's logo the grid stays low, so the ripples read as a backdrop */
+:root.amb-on.amb-boot .ambient canvas.amb-grid { opacity: .55; }
 :root.amb-on .ambient b { opacity: 0; }
 /* Still ambient light gives the glass its depth without motion during long shifts. */
 :root:not(.amb-on) .ambient b { opacity: .48; animation-play-state: paused; }
-:root[data-theme="light"] .ambient canvas.amb-grid { display: none; }
+:root[data-theme="light"]:not(.amb-boot) .ambient canvas.amb-grid { display: none; }
 /* light mode: the lights stand still and stay faint, with no glows or grain behind the panels */
 :root[data-theme="light"] .ambient b { opacity: .9; animation-play-state: paused; }
 :root[data-theme="light"] .boot-glow,
@@ -629,19 +631,7 @@ button.chip:active { transform: scale(.96); }
 /* the wordmark sits on the app name's baseline (a box without text aligns by its bottom edge) */
 .boot-word .w { display: block; height: 30px; aspect-ratio: 1890 / 746; background: var(--ink); -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
 .boot-word .a { font-size: 17px; color: var(--ink-3); font-weight: 400; letter-spacing: -.005em; }
-/* loading progress: a grid of rounded boxes (boot() in core.js lights them as steps finish) */
-.boot-grid { display: grid; grid-template-columns: repeat(16, 10px); grid-auto-rows: 10px; gap: 4px; opacity: 0; }
-.boot-grid i { display: block; border-radius: 3px; background: var(--ink); opacity: .1; animation: boot-scan 1.8s ease-in-out infinite; animation-delay: calc(var(--c) * 70ms + var(--r) * 45ms); }
-/* lit boxes keep a slow glint running across them, so the whole grid stays alive while loading */
-.boot-grid i.on { background: var(--accent); opacity: 1; animation: boot-on 420ms var(--ease-out) var(--od, 0ms) both, boot-glint 2.4s var(--ease-in-out) calc(var(--od, 0ms) + 420ms + var(--c) * 80ms) infinite; }
-.boot-grid.done i.on { animation: boot-done 640ms var(--ease-in-out) calc(var(--c) * 22ms + var(--r) * 34ms) both; }
-@keyframes boot-scan { 0%, 100% { opacity: .07; } 45% { opacity: .28; } }
-@keyframes boot-on { from { background: var(--ink); opacity: .14; transform: none; } 55% { background: var(--accent); opacity: 1; transform: scale(1.22); } to { background: var(--accent); opacity: 1; transform: none; } }
-@keyframes boot-glint { 0%, 100% { filter: none; } 50% { filter: brightness(1.3); } }
-@keyframes boot-done { 0%, 100% { filter: none; transform: none; } 45% { filter: brightness(1.45); transform: scale(.8); } }
-.boot-status { height: 20px; font-size: 13px; color: var(--ink-3); text-align: center; opacity: 0; }
-.boot-status span { display: inline-block; transition: opacity 180ms ease, filter 180ms ease, transform 220ms var(--ease-out); }
-.boot-status span.swap { opacity: 0; filter: blur(3px); transform: translateY(-4px); }
+/* there is no progress bar: organic ripples from behind the mark (the background grid) carry the wait */
 .boot-foot { position: absolute; bottom: 28px; left: 0; right: 0; display: flex; justify-content: center; opacity: 0; }
 
 /* ---------- Login (web) ---------- */
@@ -669,6 +659,14 @@ button.chip:active { transform: scale(.96); }
 /* where the mark sits, so the loading screen's mark can glide into it */
 .art-mark { position: absolute; pointer-events: none; view-transition-name: cleo-mark; }
 .art-hint { position: absolute; bottom: 28px; right: 32px; font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; pointer-events: none; }
+/* the Cleo mark in 3D (emblem3d in core.js draws it with WebGL2 and turns it with the pointer). Behind it,
+   a soft accent glow in dark mode and a faint grid in light mode (the art-ghost canvas). */
+.art-3d, .art-ghost { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.art-3d { touch-action: none; cursor: grab; }
+.art-3d.grabbing { cursor: grabbing; }
+.art-ghost { pointer-events: none; }
+.login-art.is-3d::before { content: ""; position: absolute; left: 50%; top: 50%; width: min(78%, 760px); aspect-ratio: 1.3; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, var(--accent-glow), transparent 72%); opacity: .3; pointer-events: none; }
+:root[data-theme="light"] .login-art.is-3d::before { top: 74%; aspect-ratio: 3.2; width: min(60%, 560px); background: radial-gradient(closest-side, rgb(20 20 24 / .13), transparent 74%); opacity: 1; }
 .login-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .shake { animation: shake 420ms var(--ease-out); }
 @keyframes shake { 15% { transform: translateX(-9px); } 35% { transform: translateX(7px); } 55% { transform: translateX(-4px); } 75% { transform: translateX(2px); } }
@@ -1493,7 +1491,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .feed .row-item.new { animation: feed-in 200ms ease both; }
 @keyframes feed-in { from { opacity: .4; } to { opacity: 1; } }
 
-/* Charts (charts.js): solid marks with rounded data ends, a quiet grid, one tooltip */
+/* Charts (charts.js): round marks (semicircle data ends, round-capped rings, dots), a quiet grid, one tooltip */
 .viz { display: block; max-width: 100%; overflow: visible; font-family: var(--font); }
 .viz:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 8px; }
 .viz .grid { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
@@ -1501,21 +1499,27 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .viz .tick { fill: var(--ink-3); font-size: 11.5px; font-variant-numeric: tabular-nums; }
 .viz .col-top { fill: var(--ink-2); font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .viz .link { stroke: var(--ink-4); stroke-width: 1; stroke-dasharray: 3 3; shape-rendering: crispEdges; }
-/* columns grow from the baseline one after another; their labels and connectors fade in after */
-.viz .mk { transition: opacity 220ms ease; }
-.viz .mk.grow, .viz .late { animation: none; }
+/* columns rise from the baseline one after another on a spring; their labels and connectors fade in after */
+.viz .mk { transition: opacity 220ms ease, filter 220ms ease; }
+.viz .mk.grow { animation: col-rise 820ms var(--spring) backwards; animation-delay: var(--d, 0ms); }
+/* revealed from the baseline up rather than stretched, so the round ends stay round while they rise */
+@keyframes col-rise { from { clip-path: inset(100% -4px 0 -4px); } to { clip-path: inset(0 -4px 0 -4px); } }
+.viz .late { animation: mark-fade 420ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
 /* one column at a time under the pointer or arrow keys: a soft band behind it, the others step back */
 .viz .band { fill: var(--wash); opacity: 0; transition: opacity 200ms ease; }
 .viz .col.on .band { opacity: 1; }
 .viz.hot .col:not(.on) .mk { opacity: .38; }
+.viz .col.on .mk { filter: drop-shadow(0 6px 12px rgb(0 0 0 / .22)); }
 /* donut: a ring of arcs, the figure in the middle */
 .donut { position: relative; width: var(--size); height: var(--size); flex: none; }
 .donut svg { display: block; overflow: visible; }
 .donut svg:focus-visible { outline: 2px solid var(--focus); outline-offset: 6px; border-radius: 50%; }
 .donut .ring { fill: none; stroke: var(--wash); }
-.donut .arc { fill: none; transition: opacity 220ms ease; }
+.donut .arc { fill: none; transition: opacity 220ms ease, stroke-width 260ms var(--ease-out); }
 .donut svg.hot .arc:not(.on) { opacity: .3; }
-.donut .sweep.in { animation: none; }
+/* the part under the pointer swells out of the ring, a round lozenge */
+.donut svg.hot .arc.on { stroke-width: calc(var(--sw) + 6px); }
+.donut .sweep.in { animation: donut-sweep 1100ms var(--ease-out) 120ms backwards; }
 @keyframes donut-sweep { from { stroke-dashoffset: var(--len); } }
 .donut-c { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; text-align: center; line-height: 1.2; pointer-events: none; }
 .donut-c b { font-size: 22px; font-weight: 500; letter-spacing: -.02em; }
@@ -1528,7 +1532,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .viz-tip .th { font-weight: 500; margin-bottom: 6px; color: var(--ink); }
 .viz-tip .tr { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; color: var(--ink-2); padding: 2px 0; }
 .viz-tip .tr b { color: var(--ink); font-weight: 500; }
-.viz-key { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.viz-key { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
 
 /* ranked rows: a rounded bar on a faint track, scaled inside the room left after the value */
 .hbars { display: grid; gap: 14px; }
@@ -1537,7 +1541,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .hb-label span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hb-label small { display: block; font-size: 11.5px; color: var(--ink-3); }
 .hb-track { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; min-width: 0; }
-.hb-meter { position: relative; display: block; height: 8px; border-radius: var(--r-pill); background: var(--wash); }
+.hb-meter { position: relative; display: block; height: 10px; border-radius: var(--r-pill); background: var(--wash); }
 .hb-fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--r, 0) * 100%); border-radius: inherit; background: var(--c); }
 .hb-fill.some { min-width: 8px; }
 .hb-fill.in { animation: bar-in 820ms var(--ease-out) backwards; animation-delay: calc(60ms + var(--i, 0) * 55ms); }
@@ -1545,35 +1549,36 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .hb-val { font-size: 12.5px; color: var(--ink-2); white-space: nowrap; min-width: 56px; text-align: right; }
 .hbar.hl .hb-label span { font-weight: 500; color: var(--ink); }
 
-/* heatmap: tiles shaded from the faint wash to the sequential colour */
+/* heatmap: a dot per cell, shaded from the faint wash to the sequential colour and growing with the value */
 .heat { display: grid; grid-template-columns: 40px repeat(var(--cols), minmax(0, 1fr)); gap: 3px; align-items: center; }
 .heat .hx { font-size: 11px; color: var(--ink-3); text-align: center; padding-bottom: 4px; white-space: nowrap; }
 .heat .hy { font-size: 11.5px; color: var(--ink-3); }
-.heat .hc { display: block; height: 24px; border-radius: 5px; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); transition: box-shadow 160ms ease; }
-.heat .hc.in { animation: tile-in 560ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
-@keyframes tile-in { from { opacity: 0; transform: scale(.88); } }
-@media (hover: hover) and (pointer: fine) { .heat .hc:hover { box-shadow: 0 0 0 1.5px var(--ink-2); } }
+.heat .hc { display: grid; place-items: center; height: 26px; min-width: 0; }
+.heat .hc::before { content: ""; width: calc(min(100%, 24px) * var(--s, 1)); aspect-ratio: 1; border-radius: 50%; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); transition: box-shadow 160ms ease, transform 200ms var(--ease-out); }
+.heat .hc.in::before { animation: dot-in 560ms var(--spring) backwards; animation-delay: var(--d, 0ms); }
+@keyframes dot-in { from { opacity: 0; transform: scale(.3); } }
+@media (hover: hover) and (pointer: fine) { .heat .hc:hover::before { box-shadow: 0 0 0 1.5px var(--ink-2); transform: scale(1.12); } }
 .heat-legend { display: flex; align-items: center; gap: 3px; margin-top: 14px; font-size: 11.5px; color: var(--ink-3); justify-content: flex-end; }
 .heat-legend span:first-child { margin-right: 6px; } .heat-legend span:last-child { margin-left: 6px; }
-.heat-legend i { width: 14px; height: 10px; border-radius: 3px; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); }
+.heat-legend i { width: calc(14px * var(--s, 1)); aspect-ratio: 1; border-radius: 50%; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); }
 
-/* calendar: a tile per day, a column per week */
+/* calendar: a dot per day, a column per week */
 .cal { --cg: 3px; display: grid; gap: 6px; width: 100%; max-width: calc(var(--w) * 24px); }
 .cal-m, .cal-g { display: grid; grid-template-columns: repeat(var(--w), minmax(0, 1fr)); column-gap: var(--cg); }
 .cal-m { height: 14px; font-size: 11px; line-height: 14px; color: var(--ink-3); }
 .cal-m span { white-space: nowrap; }
 .cal-g { grid-template-rows: repeat(7, auto); grid-auto-flow: column; row-gap: var(--cg); }
-.cd { display: block; aspect-ratio: 1; border-radius: 3px; background: var(--wash-2); transition: opacity 360ms ease, box-shadow 160ms ease; }
+.cd { display: block; aspect-ratio: 1; border-radius: 50%; background: var(--wash-2); transition: opacity 360ms ease, box-shadow 160ms ease; }
 .cd.l1 { background: color-mix(in oklab, var(--seq) 30%, var(--wash-2)); }
 .cd.l2 { background: color-mix(in oklab, var(--seq) 54%, var(--wash-2)); }
 .cd.l3 { background: color-mix(in oklab, var(--seq) 78%, var(--wash-2)); }
 .cd.l4 { background: var(--seq); }
 .cd.nil { background: none; }
 .cd.out { opacity: .28; }
-.cd.in { animation: tile-in 520ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
+.cd.in { animation: dot-in 520ms var(--spring) backwards; animation-delay: var(--d, 0ms); }
 @media (hover: hover) and (pointer: fine) { .cal-g .cd:not(.nil):hover { box-shadow: 0 0 0 1.5px var(--ink-2); } }
 .cal-key { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
-.cal-key .cd { width: 10px; height: 10px; aspect-ratio: auto; border-radius: 2.5px; }
+.cal-key .cd { width: 10px; height: 10px; aspect-ratio: auto; border-radius: 50%; }
 .cal-key .cd:first-of-type { margin-left: 5px; } .cal-key .cd:last-of-type { margin-right: 5px; }
 
 .empty { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 28px 12px; color: var(--ink-3); }
@@ -3390,13 +3395,69 @@ const Cleo = (() => {
   document.addEventListener('cleo:theme', applyBrand);
   config.onChange(({ path }) => { if (path === '*' || path.startsWith('brand')) applyBrand(); });
 
+  /* ---------- ripples: an organic wavefront, never a perfect circle ----------
+     A ripple widens from where it started, but its edge wobbles with direction (a few slow harmonics with
+     random phases that drift as it travels), it runs further one way than another, its front breaks into
+     brighter and fainter stretches, a fainter echo follows it, and boxes just behind the front twinkle on
+     their own. Most ripples also throw two or three smaller ones nearby a moment later, like a splash. Every
+     ripple draws a fresh shape, so no two look alike. Distances are in the caller's units (screen pixels
+     for the background grid, grid cells for the 3D mark).
+       make(x, y, t0, { speed, life, band, splash })  the ripple and its splash, as a list
+       prepare(r, t)   once per frame: where its front has reached in every direction (false when over)
+       at(r, dx, dy, ph)  0 to 1: how strongly it lights a point dx, dy from its start (ph: that point's own phase) */
+  const Ripple = (() => {
+    const TAU = Math.PI * 2, BINS = 96, rnd = Math.random;
+    const one = (x, y, t0, speed, life, band, k) => ({
+      x, y, t0, speed: speed * (0.82 + rnd() * 0.36), life, band, k,
+      harm: [2, 3, 4, 6].map((n, i) => [n, (0.05 + rnd() * 0.1) / (1 + i * 0.45), rnd() * TAU, (rnd() - 0.5) * 2.4]),
+      dir: rnd() * TAU, skew: 0.06 + rnd() * 0.2, lobes: 2 + Math.floor(rnd() * 3), lp: [rnd() * TAU, rnd() * TAU],
+      echo: 0.48 + rnd() * 0.2, sh: new Float32Array(BINS), pa: new Float32Array(BINS),
+    });
+    function make(x, y, t0, { speed = 620, life = 1.9, band = 20, splash = true } = {}) {
+      const out = [one(x, y, t0, speed, life, band, 1)];
+      if (splash && rnd() < 0.75) for (let i = 0, n = 1 + Math.floor(rnd() * 3); i < n; i++) {
+        const a = rnd() * TAU, d = band * (2.5 + rnd() * 5);
+        out.push(one(x + Math.cos(a) * d, y + Math.sin(a) * d, t0 + 0.1 + rnd() * 0.35, speed * (0.4 + rnd() * 0.3), life * (0.5 + rnd() * 0.2), band * 0.7, 0.5 + rnd() * 0.25));
+      }
+      return out;
+    }
+    function prepare(r, t) {
+      const age = t - r.t0; r.age = age;
+      if (age <= 0 || age >= r.life) return false;
+      let hi = 0, lo = 9;
+      for (let b = 0; b < BINS; b++) {
+        const th = (b / BINS) * TAU - Math.PI;
+        let s = 1 + r.skew * Math.cos(th - r.dir);
+        for (const [n, a, p, w] of r.harm) s += a * Math.sin(n * th + p + w * age);
+        r.sh[b] = s; if (s > hi) hi = s; if (s < lo) lo = s;
+        // brighter and fainter stretches along the front, drifting as it travels
+        r.pa[b] = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(r.lobes * th + r.lp[0] + age * 1.4)) * (0.6 + 0.4 * Math.sin((r.lobes + 3) * th + r.lp[1] - age * 0.9));
+      }
+      r.reach = r.speed * age; r.sig = r.band * (1 + age * 0.35); r.fade = (1 - age / r.life) ** 1.5 * r.k;
+      r.max = r.reach * hi + r.sig * 3; r.min = Math.max(0, r.reach * lo * Math.min(r.echo, 0.45) - r.sig * 3);
+      return true;
+    }
+    function at(r, dx, dy, ph = 0) {
+      let dist = Math.hypot(dx, dy);
+      if (dist > r.max || dist < r.min) return 0;
+      dist += Math.sin(ph * 3.7) * r.band * 0.35; // a ragged edge: each point is reached a little early or late
+      const f = ((Math.atan2(dy, dx) + Math.PI) / TAU) * BINS, i0 = Math.floor(f) % BINS, i1 = (i0 + 1) % BINS, u = f - Math.floor(f);
+      const R = r.reach * (r.sh[i0] + (r.sh[i1] - r.sh[i0]) * u), pa = r.pa[i0] + (r.pa[i1] - r.pa[i0]) * u, s2 = 2 * r.sig * r.sig;
+      let v = Math.exp(-((dist - R) ** 2) / s2) + 0.38 * Math.exp(-((dist - R * r.echo) ** 2) / (s2 * 0.7));
+      if (dist < R && dist > R * 0.45) v += 0.32 * (0.5 + 0.5 * Math.sin(ph * 5.3 + r.age * 21)) ** 6 * ((dist - R * 0.45) / (R * 0.55));
+      return Math.min(1, v * pa * r.fade);
+    }
+    return { make, prepare, at };
+  })();
+
   /* ---------- background: a grid of boxes lit by moving light ----------
-     Dark mode only, and only behind the loading screen and the sign-in screens (the web sign-in and the
-     Terminal's staff PIN screen). Everywhere else the grid fades away and dark mode keeps its slowly
-     drifting colour (the .ambient lights in core.css). Light mode never shows the grid: it stays flat.
-       - loading (mode 'boot', set by boot()): four soft lights in the ambient colours drift across the
-         grid, and a ripple of accent light spreads from the Cleo mark each time a step finishes (pulse()).
-       - sign-in (mode 'login', a screen with data-amb="login"; show() reads it): the same, a step quieter.
+     Dark mode, behind the loading screen and the sign-in screens (the web sign-in and the Terminal's staff
+     PIN screen). Everywhere else the grid fades away and dark mode keeps its slowly drifting colour (the
+     .ambient lights in core.css). Light mode shows it only while loading, as faint ink boxes.
+       - loading (mode 'boot', set by boot()): the grid stays low behind the logo (core.css dims it), and
+         organic ripples of accent light spread from behind the mark, now and then and at every step (pulse()).
+       - sign-in (mode 'login', a screen with data-amb="login"; show() reads it): dimmer still, so the mark
+         and the form lead.
      Every box takes part: lit boxes shimmer on their own beat and the unlit grid breathes softly, so
      no part of the screen sits still. With a mouse, a faint light follows the pointer.
      Performance: the light is computed on a tiny canvas with one pixel per box, then drawn scaled up
@@ -3408,11 +3469,11 @@ const Cleo = (() => {
     const CELL = 18, GAP = 5, RAD = 3.5;
     // lights: [colour index, centre x, sway x, period x (s), centre y, sway y, period y (s), radius (share of the long side), strength]
     const LIGHTS = [[0, 0.16, 0.16, 23, 0.10, 0.12, 29, 0.44, 0.95], [1, 0.84, 0.14, 31, 0.88, 0.12, 37, 0.48, 1], [2, 0.70, 0.20, 19, 0.16, 0.16, 26, 0.30, 0.9], [3, 0.38, 0.22, 34, 0.94, 0.10, 24, 0.42, 0.85]];
-    // each level: [light gain, brightest box, unlit grid]. Kept low so the text on top always reads first.
-    const LEVEL = { boot: [0.34, 0.26, 0.026], login: [0.26, 0.19, 0.02] };
+    // each level: [light gain, brightest box, unlit grid, ripple strength]. Kept low so the text on top always reads first.
+    const LEVEL = { boot: [0.3, 0.24, 0.026, 1.25], login: [0.15, 0.11, 0.013, 0.85] };
     const views = new Map(); let colours = [], accent = [212, 0, 0, 1], raf = 0, last = 0, scanAt = 0;
     let on = false, target = 'boot', cur = LEVEL.boot.slice(), offUntil = 0, settleT = 0;
-    const ripples = []; // { x, y (client px), t0 (s) }
+    const ripples = []; // Ripple.make() entries, in client px
     const pointer = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4, a: 0, seen: 0 };
     const probe = document.createElement('i');
     const rgba = (v) => {
@@ -3426,8 +3487,8 @@ const Cleo = (() => {
       accent = rgba(s.getPropertyValue('--accent').trim() || '#d40000'); probe.remove();
     };
     const dark = () => theme.get() === 'dark';
-    // light mode has no grid: nothing is drawn, and a switch to dark mode on a sign-in screen brings it in
-    const running = (now) => dark() && (on || now < offUntil);
+    // light mode draws the grid only while loading; a switch to dark mode on a sign-in screen brings it in
+    const running = (now) => (dark() || target === 'boot') && (on || now < offUntil);
     function attach(el) {
       const canvas = document.createElement('canvas'); canvas.className = 'amb-grid';
       el.prepend(canvas);
@@ -3454,15 +3515,17 @@ const Cleo = (() => {
     function render(v, t) {
       if (!v.cols || !v.pattern) return;
       const { cols, rows, w, h, img, phase } = v; const d = img.data; const L = Math.max(w, h);
-      const [gain, cap, ghost] = cur;
+      const [gain, cap, ghost, rgain] = cur;
+      const ink = dark() ? 255 : 24; // the unlit grid: faint white in dark mode, faint ink in light mode
       const lights = LIGHTS.map(([ci, cx, sx, px, cy, sy, py, rr, k]) => {
         const c = colours[ci] || [0, 0, 0, 0];
         return [(cx + sx * Math.sin((t / px) * Math.PI * 2 + ci)) * w, (cy + sy * Math.cos((t / py) * Math.PI * 2 + ci * 1.7)) * h, (rr * L) ** 2, c[0], c[1], c[2], c[3] * k * (0.85 + 0.15 * Math.sin(t * 0.35 + ci))];
       });
       if (pointer.a > 0.01) { const c = colours[2] || [0, 0, 0, 0]; lights.push([pointer.x, pointer.y, 180 ** 2, c[0], c[1], c[2], Math.min(1, c[3] * 2.2) * pointer.a]); }
-      // ripples: a ring of accent light that widens from where it started and fades as it goes
+      // ripples start in screen pixels; measure them from this element's corner (the Terminal stage is scaled)
       const rect = v.el.getBoundingClientRect(), sx = w / (rect.width || w), sy = h / (rect.height || h);
-      const rings = ripples.map((p) => { const age = t - p.t0; return [(p.x - rect.left) * sx, (p.y - rect.top) * sy, age * 820, (1 - age / 1.8) ** 1.6]; }).filter((r) => r[3] > 0.01);
+      const live = ripples.filter((r) => Ripple.prepare(r, t));
+      live.forEach((r) => { r.lx = (r.x - rect.left) * sx; r.ly = (r.y - rect.top) * sy; });
       for (let y = 0, i = 0; y < rows; y++) {
         const py = (y + 0.5) * CELL;
         for (let x = 0; x < cols; x++, i++) {
@@ -3475,20 +3538,22 @@ const Cleo = (() => {
           const tw = 0.82 + 0.18 * Math.sin(t * 1.1 + phase[i]); // each lit box shimmers on its own beat
           // colour of the light on this box, and how strongly the box is lit
           let cr = Wt ? R / Wt : 0, cg = Wt ? G / Wt : 0, cb = Wt ? B / Wt : 0, lit = Math.min(cap, Wt * tw * gain);
-          for (let k = 0; k < rings.length; k++) {
-            const rg = rings[k]; const dist = Math.hypot(px - rg[0], py - rg[1]) - rg[2];
-            const a = Math.min(0.5, rg[3] * Math.exp(-(dist * dist) / (2 * 42 * 42)) * 0.4);
-            if (a < 0.004) continue;
-            const sum = lit + a; // blend the accent over the light already here, weighted by strength
-            cr = (cr * lit + accent[0] * a) / sum; cg = (cg * lit + accent[1] * a) / sum; cb = (cb * lit + accent[2] * a) / sum;
-            lit = Math.min(0.8, sum);
+          for (let k = 0; k < live.length; k++) {
+            const r = live[k], s = Ripple.at(r, px - r.lx, py - r.ly, phase[i]);
+            if (s < 0.01) continue;
+            // accent light, blended over the light already here by strength; its brightest stretches run warmer
+            const a = Math.min(0.62, 0.5 * s * rgain), warm = Math.max(0, s - 0.55) * 0.55, sum = lit + a;
+            cr = (cr * lit + (accent[0] + (255 - accent[0]) * warm) * a) / sum;
+            cg = (cg * lit + (accent[1] + (120 - accent[1]) * warm) * a) / sum;
+            cb = (cb * lit + (accent[2] + (90 - accent[2]) * warm) * a) / sum;
+            lit = Math.min(0.85, sum);
           }
-          // the unlit grid (faint white) breathes softly under the light
+          // the unlit grid breathes softly under the light
           const gh = ghost * (1 + 0.32 * Math.sin(t * 0.8 + phase[i] * 1.7));
           const tot = lit + gh, o = i * 4;
-          d[o] = (cr * lit + 255 * gh) / tot;
-          d[o + 1] = (cg * lit + 255 * gh) / tot;
-          d[o + 2] = (cb * lit + 255 * gh) / tot;
+          d[o] = (cr * lit + ink * gh) / tot;
+          d[o + 1] = (cg * lit + ink * gh) / tot;
+          d[o + 2] = (cb * lit + ink * gh) / tot;
           d[o + 3] = Math.min(255, tot * 255);
         }
       }
@@ -3515,7 +3580,7 @@ const Cleo = (() => {
       // the pointer light eases toward the pointer, and fades out two seconds after it stops
       pointer.x += (pointer.tx - pointer.x) * ease(0.12); pointer.y += (pointer.ty - pointer.y) * ease(0.12);
       pointer.a += ((now - pointer.seen < 2000 ? 1 : 0) - pointer.a) * ease(0.5);
-      while (ripples.length && now / 1000 - ripples[0].t0 > 1.8) ripples.shift();
+      for (let k = ripples.length - 1; k >= 0; k--) if (now / 1000 - ripples[k].t0 > ripples[k].life) ripples.splice(k, 1);
       views.forEach((v) => render(v, now / 1000));
       raf = requestAnimationFrame(frame);
     }
@@ -3534,12 +3599,19 @@ const Cleo = (() => {
         if (!on) cur = LEVEL[name].slice(); // appearing: start at this level (the fade-in covers it)
         on = true; target = name; root.classList.add('amb-on');
       } else if (on) { on = false; offUntil = performance.now() + 1200; root.classList.remove('amb-on'); }
+      root.classList.toggle('amb-boot', on && name === 'boot');
       start();
     }
     // after loading, the next screen sets the level; if none does in a moment, the grid fades away
     function settle() { clearTimeout(settleT); settleT = setTimeout(() => mode('off'), 900); }
-    // a ripple of light from a point on screen (client coordinates), e.g. the centre of the Cleo mark
-    function pulse(x, y) { if (reduced() || !on) return; ripples.push({ x, y, t0: performance.now() / 1000 }); if (ripples.length > 6) ripples.shift(); start(); }
+    // an organic ripple of light from a point on screen (client coordinates), e.g. behind the Cleo mark;
+    // opts tune it (Ripple.make): the loading screen sends slower, wider ones
+    function pulse(x, y, opts) {
+      if (reduced() || !on) return;
+      ripples.push(...Ripple.make(x, y, performance.now() / 1000, opts));
+      if (ripples.length > 18) ripples.splice(0, ripples.length - 18);
+      start();
+    }
     if (mq('(pointer: fine)').matches) addEventListener('pointermove', (e) => {
       if (!on) return;
       // the stage of the Terminal is scaled; map the pointer into the element the light is drawn on
@@ -4198,12 +4270,11 @@ const Cleo = (() => {
   /* ---------- boot / loading screen ----------
      BACKEND: the step labels are cosmetic. Real start-up work (session check, config, catalog,
      the terminal's local database) can run while this plays; await it before the caller continues. */
-  /* progress is a grid of rounded boxes, the same mark as the charts: unlit boxes shimmer as a light
-     sweeps across, each finished step lights the next run of boxes column by column (bottom up), and the
-     grid pulses once when everything is ready */
-  const BOOT_ROWS = 3, BOOT_COLS = 16;
-  /* work: optional [[label, async fn], ...]. Each step shows while its task runs (no step is faked); a task that
-     fails ends the loading screen early and boot() resolves { node, error }. Without work, steps are the labels
+  /* The loading screen is the logo alone: the emblem and wordmark, with organic ripples of light spreading
+     through the background grid from behind the mark, now and then and at every finished step. There is
+     no visible progress bar; the progress and the current step are announced to assistive technology.
+     work: optional [[label, async fn], ...]. Each step runs its task (no step is faked); a task that fails
+     ends the loading screen early and boot() resolves { node, error }. Without work, steps are the labels
      of start-up that happens elsewhere (the demo's own data loads instantly). */
   async function boot({ app, steps, minTotal = 2600, work = null }) {
     if (work) steps = work.map((w) => w[0]);
@@ -4213,27 +4284,28 @@ const Cleo = (() => {
         <div class="boot-center">
           <div class="boot-mark" role="img" aria-label="Cleo"><span class="part tl"></span><span class="part tr"></span><span class="part b"></span></div>
           <div class="boot-word"><span class="w" aria-hidden="true"></span><span class="a">${esc(app)}</span></div>
-          <div class="boot-grid" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${Array.from({ length: BOOT_ROWS * BOOT_COLS }, (_, i) => `<i style="--c:${i % BOOT_COLS};--r:${Math.floor(i / BOOT_COLS)}"></i>`).join('')}</div>
-          <p class="boot-status" aria-live="polite"><span>${esc(steps[0])}</span></p>
         </div>
+        <div class="sr-only" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress></div>
+        <p class="sr-only" aria-live="polite" data-step>${esc(steps[0])}</p>
         <div class="boot-foot">${aeso()}</div>
       </section>`);
     root().replaceChildren(node);
-    const parts = $$('.boot-mark .part', node), glow = $('.boot-glow', node), word = $('.boot-word', node);
-    const prog = $('.boot-grid', node), cells = $$('i', prog), status = $('.boot-status', node), statusSpan = $('span', status), foot = $('.boot-foot', node);
-    // lighting order: column by column, left to right, each column from the bottom row up
-    const order = cells.map((x, i) => i).sort((a, b) => (a % BOOT_COLS) - (b % BOOT_COLS) || Math.floor(b / BOOT_COLS) - Math.floor(a / BOOT_COLS));
-    let litCount = 0;
-    const lightTo = (n) => { for (let j = litCount; j < n; j++) { const box = cells[order[j]]; box.style.setProperty('--od', `${(j - litCount) * 18}ms`); box.classList.add('on'); } litCount = Math.max(litCount, n); };
+    const parts = $$('.boot-mark .part', node), glow = $('.boot-glow', node), word = $('.boot-word', node), foot = $('.boot-foot', node);
+    const prog = $('[data-progress]', node), status = $('[data-step]', node), mark = $('.boot-mark', node);
     const red = reduced();
-    // the background grid shows while loading, with a ripple from the mark at every step
+    // the background grid shows while loading, kept low behind the logo (core.css), with ripples from the mark
     ambient.mode('boot');
-    const mark = $('.boot-mark', node);
-    const ripple = () => { const r = mark.getBoundingClientRect(); ambient.pulse(r.left + r.width / 2, r.top + r.height / 2); };
+    // each ripple starts somewhere behind the mark, not always its centre, so the patterns never repeat
+    const ripple = (big = false) => {
+      const r = mark.getBoundingClientRect(), a = Math.random() * Math.PI * 2, d = Math.random() * (big ? 0.12 : 0.3);
+      ambient.pulse(r.left + r.width * (0.5 + Math.cos(a) * d), r.top + r.height * (0.5 + Math.sin(a) * d), { speed: big ? 560 : 440, life: big ? 2.3 : 2, band: big ? 22 : 17 });
+    };
+    let idle = 0;
+    const drift = () => { if (!mark.isConnected) return; ripple(); idle = setTimeout(drift, 1100 + Math.random() * 1000); };
     const t0 = performance.now();
     if (red) {
       parts.forEach((x) => x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'both' }));
-      word.style.clipPath = 'none'; [prog, status, foot].forEach((x) => (x.style.opacity = 1));
+      word.style.clipPath = 'none'; foot.style.opacity = 1;
     } else {
       // the three nodes arrive from their own corners and join at the centre
       const opts = { duration: 950, easing: SPRING_BOUNCE, fill: 'both' };
@@ -4241,39 +4313,36 @@ const Cleo = (() => {
       parts.forEach((x, i) => x.animate([{ transform: from[i], opacity: 0, filter: 'blur(10px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { ...opts, delay: i * 80 }));
       glow.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: .45, transform: 'scale(1.05)', offset: .55 }, { opacity: .26, transform: 'scale(1)' }], { duration: 1500, delay: 380, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
       word.animate([{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-10px)' }, { clipPath: 'inset(0 0% 0 0)', transform: 'none' }], { duration: 620, delay: 620, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
-      [prog, status].forEach((x, i) => x.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 900 + i * 60, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' }));
       foot.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 1100, fill: 'both' });
     }
-    await wait(red ? 200 : 1000);
-    ripple();
+    // the first ripple as the nodes join, then a quiet drift of them until loading ends
+    await wait(red ? 200 : 820);
+    ripple(true); idle = setTimeout(drift, 700);
+    const done = () => { clearTimeout(idle); ambient.settle(); };
     const per = Math.max(260, (minTotal - (performance.now() - t0)) / steps.length);
     for (let i = 0; i < steps.length; i++) {
-      if (i > 0) {
-        statusSpan.classList.add('swap'); await wait(160);
-        statusSpan.textContent = steps[i]; statusSpan.classList.remove('swap');
-      }
+      if (i > 0) status.textContent = steps[i];
       if (work) {
         try { await Promise.all([work[i][1](), wait(Math.min(per, 400))]); }
-        catch (error) { ambient.settle(); return { node, error }; }
+        catch (error) { done(); return { node, error }; }
       }
-      const pct = Math.round(((i + 1) / steps.length) * 100);
-      lightTo(Math.round((pct / 100) * cells.length)); prog.setAttribute('aria-valuenow', pct); ripple();
+      prog.setAttribute('aria-valuenow', Math.round(((i + 1) / steps.length) * 100)); ripple(true);
       if (!work) await wait(per);
     }
-    if (!red) { prog.classList.add('done'); ripple(); await wait(520); }
-    await wait(160);
+    status.textContent = 'Ready';
+    await wait(red ? 160 : 420);
     // the next screen decides whether the grid stays (sign-in) or fades away (show() reads data-amb)
-    ambient.settle();
+    done();
     return node;
   }
 
-  /* ---------- the Cleo mark in lit boxes (sign-in art) ----------
+  /* ---------- the Cleo mark in lit boxes (sign-in art on narrow screens, and wherever WebGL2 is missing) ----------
      The emblem drawn on Cleo's box grid: 18px rounded boxes, the same grid the background lights in dark
      mode and aligned to it, lit in Cleo red. It answers the pointer:
        - a light follows the pointer and warms the boxes under it;
        - press and drag parts the boxes around the pointer, like a magnet; they spring home on release,
          with a little bounce because the drag carried momentum;
-       - a tap sends a ring of light through the grid, and each box hops as the ring passes.
+       - a tap sends an organic ripple of light through the grid (Ripple), and each box hops as it passes.
      At rest every box shimmers on its own beat and a soft band of light sweeps across the mark now and
      then. Light mode draws its own faint grid around the mark (the background grid is dark mode only).
      With reduced motion the mark is drawn once and holds still. It stops when its screen leaves.
@@ -4283,6 +4352,7 @@ const Cleo = (() => {
     const canvas = document.createElement('canvas'); canvas.className = 'art-grid';
     area.prepend(canvas);
     const ctx = canvas.getContext('2d'); if (!ctx) return () => {};
+    const hint = $('.art-hint', area); if (hint?.lastChild) hint.lastChild.textContent = 'Drag across the mark';
     const slot = $('.art-mark', area);
     const still = reduced();
     const emblem = new Image(); let ready = false;
@@ -4292,7 +4362,7 @@ const Cleo = (() => {
     const HOT = [255, 106, 82];
     let t = Math.random() * 6, sweepAt = 2.5;
     const ptr = { x: -1e4, y: -1e4, a: 0, down: false, id: null, sx: 0, sy: 0, travel: 0, seen: -1e4 };
-    const rings = []; // { x, y, t0 }
+    const rings = []; // Ripple.make() entries, in this canvas's pixels
     const rgbOf = (v, d) => { const m = String(v).match(/\d+(\.\d+)?/g); return m && m.length >= 3 ? m.slice(0, 3).map(Number) : d; };
     function readColours() {
       const s = getComputedStyle(document.documentElement);
@@ -4363,6 +4433,7 @@ const Cleo = (() => {
         }
       }
       const sweep = still ? -9 : (t - sweepAt) / 1.7; // 0 to 1 while the band crosses the mark
+      const live = still ? [] : rings.filter((r) => Ripple.prepare(r, t));
       const span = cells.length ? cells[cells.length - 1].cx - cells[0].cx + 1 : 1, left = cells.length ? cells[0].cx : 0;
       for (const c of cells) {
         const x = c.cx + c.dx, y = c.cy + c.dy;
@@ -4370,7 +4441,7 @@ const Cleo = (() => {
         if (!still) {
           if (ptr.a > 0.01) { const d = Math.hypot(x - ptr.x, y - ptr.y); heat += 0.6 * ptr.a * Math.exp(-(d * d) / (2 * 64 * 64)); }
           if (sweep > -0.2 && sweep < 1.2) { const u = (x - left) / span * 0.8 + (y - cells[0].cy) / span * 0.4; heat += 0.42 * Math.exp(-((u - sweep * 1.3 + 0.1) ** 2) / (2 * 0.05 * 0.05)); }
-          for (const g of rings) { const age = t - g.t0, rad = age * 640, d = Math.hypot(x - g.x, y - g.y) - rad, f = (1 - age / 1.5) ** 1.5 * Math.exp(-(d * d) / (2 * 24 * 24)); heat += 0.7 * f; hop = Math.max(hop, f); }
+          for (const g of live) { const f = Ripple.at(g, x - g.x, y - g.y, c.ph); heat += 0.75 * f; hop = Math.max(hop, f); }
         }
         heat = Math.min(1, heat);
         const shimmer = still ? 1 : 0.84 + 0.16 * Math.sin(t * 1.3 + c.ph);
@@ -4409,7 +4480,7 @@ const Cleo = (() => {
       last = now; drawnAt = now; t += dt;
       if (t - sweepAt > 2.2) sweepAt = t + 4 + Math.random() * 3;
       ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.25));
-      while (rings.length && t - rings[0].t0 > 1.5) rings.shift();
+      for (let k = rings.length - 1; k >= 0; k--) if (t - rings[k].t0 > rings[k].life) rings.splice(k, 1);
       step(dt); draw();
       raf = requestAnimationFrame(frame);
     }
@@ -4431,8 +4502,8 @@ const Cleo = (() => {
     const release = (e) => {
       if (!ptr.down || (e && e.pointerId !== ptr.id)) return;
       ptr.down = false; canvas.classList.remove('grabbing');
-      // a tap (no real drag) sends the ring of light
-      if (ptr.travel < 10) { rings.push({ x: ptr.x, y: ptr.y, t0: t }); if (rings.length > 4) rings.shift(); }
+      // a tap (no real drag) sends an organic ripple of light through the boxes
+      if (ptr.travel < 10) { rings.push(...Ripple.make(ptr.x, ptr.y, t, { speed: 520, life: 1.6, band: 16 })); if (rings.length > 14) rings.splice(0, rings.length - 14); }
       ptr.seen = performance.now(); request();
     };
     canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
@@ -4444,6 +4515,352 @@ const Cleo = (() => {
     function stop() { cancelAnimationFrame(raf); raf = 0; ro.disconnect(); document.removeEventListener('cleo:theme', onTheme); document.removeEventListener('visibilitychange', request); }
     layout();
     return stop;
+  }
+
+  /* ---------- the Cleo mark in 3D (sign-in art beside the form) ----------
+     The emblem built from the grid's own rounded boxes, each one a block with depth and a bevelled face,
+     turned onto its side in perspective and lit like glossy glass, over the dimmed background grid.
+     WebGL2, one instanced draw per frame.
+       - Arrival: the boxes fly in from deep behind and from every side, the centre first, and lock into
+         the emblem, warm as they land, while the whole mark turns from facing you onto its side.
+       - At rest it sways and floats, a slow wave of depth rolls through the boxes, light glints across
+         their faces now and then, and every few seconds a quiet ripple runs through it.
+       - Pointer: the mark leans toward it, and the boxes under it rise toward you and warm.
+       - Drag turns it, 1:1. Let go and it keeps the throw, spinning if flung, then settles back onto its
+         side: the throw is projected and the nearest resting turn is chosen, so it never lands backwards.
+       - A tap sends an organic ripple (Ripple) through the boxes and through the background grid.
+     With reduced motion it is drawn once, at rest. Where WebGL2 is missing or would run in software, or its
+     context is lost, the 2D mark takes over (fallback). It stops when its screen leaves.
+     ASSET: assets/brand/cleo-emblem.svg, sampled into boxes. */
+  function emblem3d(area, fallback) {
+    const canvas = document.createElement('canvas'); canvas.className = 'art-3d';
+    let gl = null;
+    // no software WebGL: a computer without graphics acceleration keeps the 2D mark instead of a slow 3D one
+    try { gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true, powerPreference: 'low-power', failIfMajorPerformanceCaveat: true }); } catch { gl = null; }
+    if (!gl) return null;
+    const TAU = Math.PI * 2, RAD = Math.PI / 180;
+    const COLS = 28, D0 = 1.6, BREATH = 0.5, BEV = 0.08, FOV = 30 * RAD;
+    const REST_YAW = -34, REST_PITCH = 13;
+    // ---- shaders: blocks lit by a key, a fill and a rim light, with glints, in linear light ----
+    const VS = `#version 300 es
+      layout(location = 0) in vec3 aPos; layout(location = 1) in vec3 aNor;
+      layout(location = 2) in vec4 aCell; layout(location = 3) in vec4 aMove; layout(location = 4) in vec2 aState;
+      uniform mat4 uProj, uView, uModel; uniform float uBevel, uBack;
+      out vec3 vNor; out vec3 vWorld; out vec3 vModel; out float vHeat; out float vFront;
+      void main() {
+        float depth = aMove.w, s = aState.y;
+        float z = (aPos.z > 0.5 ? depth - uBevel : 0.0) + (aPos.z > 1.5 ? uBevel : 0.0);
+        vec3 p = vec3(aPos.xy * s, uBack + z * s) + vec3(aCell.xy + aMove.xy, aMove.z);
+        vec4 w = uModel * vec4(p, 1.0);
+        vWorld = w.xyz; vModel = p; vNor = mat3(uModel) * aNor; vHeat = aState.x; vFront = aNor.z;
+        gl_Position = uProj * uView * w;
+      }`;
+    const FS = `#version 300 es
+      precision highp float;
+      in vec3 vNor; in vec3 vWorld; in vec3 vModel; in float vHeat; in float vFront;
+      uniform vec3 uCam, uBase, uHot, uKey, uFill; uniform float uAmb, uEmis, uGlint, uSpan;
+      out vec4 o;
+      void main() {
+        vec3 N = normalize(vNor), V = normalize(uCam - vWorld);
+        float d = max(dot(N, uKey), 0.0), f = max(dot(N, uFill), 0.0);
+        float sp = pow(max(dot(N, normalize(uKey + V)), 0.0), 70.0);
+        float fr = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+        vec3 base = mix(uBase, uHot, clamp(vHeat, 0.0, 1.0));
+        vec3 c = base * (uAmb + 0.85 * d + 0.25 * f) + base * (uEmis + vHeat * 0.7);
+        c += vec3(1.0, 0.94, 0.9) * sp * (0.7 + vHeat * 0.4);
+        c += mix(base, vec3(1.0), 0.45) * fr * 0.45;
+        float u = (vModel.x * 0.8 + vModel.y * 0.5) / uSpan;
+        c += vec3(1.0, 0.9, 0.85) * exp(-pow(u - uGlint, 2.0) / 0.0016) * smoothstep(0.6, 1.0, vFront) * 0.5;
+        c = c / (1.0 + c * 0.35);
+        o = vec4(pow(c, vec3(1.0 / 2.2)), 1.0);
+      }`;
+    const shader = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
+    const vs = shader(gl.VERTEX_SHADER, VS), fs = shader(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) return null;
+    const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+    const U = {}; ['uProj', 'uView', 'uModel', 'uBevel', 'uBack', 'uCam', 'uBase', 'uHot', 'uKey', 'uFill', 'uAmb', 'uEmis', 'uGlint', 'uSpan'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
+    // ---- one box: a rounded square (the grid's box) extruded, with a 45° bevel round its face ----
+    // z codes: 0 the back, 1 where the bevel starts, 2 the face; the shader turns them into depth
+    const mesh = (() => {
+      const hb = 13 / 36, rc = 3.5 / 18, c = hb - rc, ring = [], v = [], idx = [], k45 = Math.SQRT1_2;
+      [[c, c, 0], [-c, c, 90], [-c, -c, 180], [c, -c, 270]].forEach(([cx, cy, a0]) => {
+        for (let k = 0; k <= 5; k++) { const a = (a0 + k * 18) * RAD; ring.push([cx + rc * Math.cos(a), cy + rc * Math.sin(a), Math.cos(a), Math.sin(a)]); }
+      });
+      const add = (x, y, z, nx, ny, nz) => { v.push(x, y, z, nx, ny, nz); return v.length / 6 - 1; };
+      const M = ring.length;
+      for (let j = 0; j < M; j++) {
+        const [x0, y0, nx0, ny0] = ring[j], [x1, y1, nx1, ny1] = ring[(j + 1) % M];
+        const a = add(x0, y0, 0, nx0, ny0, 0), b = add(x1, y1, 0, nx1, ny1, 0), cc = add(x1, y1, 1, nx1, ny1, 0), d = add(x0, y0, 1, nx0, ny0, 0);
+        idx.push(a, b, cc, a, cc, d);
+        const e = add(x0, y0, 1, nx0 * k45, ny0 * k45, k45), f = add(x1, y1, 1, nx1 * k45, ny1 * k45, k45);
+        const g = add(x1 - nx1 * BEV, y1 - ny1 * BEV, 2, nx1 * k45, ny1 * k45, k45), h = add(x0 - nx0 * BEV, y0 - ny0 * BEV, 2, nx0 * k45, ny0 * k45, k45);
+        idx.push(e, f, g, e, g, h);
+      }
+      const fc = add(0, 0, 2, 0, 0, 1), bc = add(0, 0, 0, 0, 0, -1);
+      const front = ring.map(([x, y, nx, ny]) => add(x - nx * BEV, y - ny * BEV, 2, 0, 0, 1)), back = ring.map(([x, y]) => add(x, y, 0, 0, 0, -1));
+      for (let j = 0; j < M; j++) { idx.push(fc, front[j], front[(j + 1) % M], bc, back[(j + 1) % M], back[j]); }
+      return { v: new Float32Array(v), i: new Uint16Array(idx) };
+    })();
+    // ---- small matrix helpers (column-major) ----
+    const mul = (a, b) => { const o = new Float32Array(16); for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3]; return o; };
+    const trans = (x, y, z) => new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1]);
+    const rotX = (a) => { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]); };
+    const rotY = (a) => { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]); };
+    const persp = (fy, asp, n, f) => { const t = 1 / Math.tan(fy / 2); return new Float32Array([t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) / (n - f), -1, 0, 0, (2 * f * n) / (n - f), 0]); };
+    const norm = (x, y, z) => { const l = Math.hypot(x, y, z) || 1; return [x / l, y / l, z / l]; };
+    const lin = (c) => c.map((v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+    // ---- buffers ----
+    const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+    const vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo); gl.bufferData(gl.ARRAY_BUFFER, mesh.v, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
+    gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12);
+    const ibo = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.i, gl.STATIC_DRAW);
+    const cellBuf = gl.createBuffer(), moveBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(2, 1);
+    gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf);
+    gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 4, gl.FLOAT, false, 24, 0); gl.vertexAttribDivisor(3, 1);
+    gl.enableVertexAttribArray(4); gl.vertexAttribPointer(4, 2, gl.FLOAT, false, 24, 16); gl.vertexAttribDivisor(4, 1);
+    gl.bindVertexArray(null);
+    area.prepend(canvas);
+    const ghost = document.createElement('canvas'); ghost.className = 'art-ghost'; area.prepend(ghost);
+    area.classList.add('is-3d');
+    const hint = $('.art-hint', area); if (hint?.lastChild) hint.lastChild.textContent = 'Drag to turn the mark';
+    const slot = $('.art-mark', area);
+    const still = reduced();
+    // ---- state ----
+    let n = 0, rows = 0, X, Y, SEED, DELAY, OFF, VEL, HEAT, move = new Float32Array(0), span = 1;
+    let W = 0, H = 0, dpr = 1, dist = 60, proj, view, camZ = 60, dark = true, base = lin([212, 0, 0]), hot = lin([255, 106, 82]);
+    let t = still ? 99 : 0, raf = 0, last = 0, drawnAt = 0, stopped = false, glintAt = 2.6, nextRipple = 5;
+    const pose = { yaw: still ? REST_YAW : 0, pitch: still ? REST_PITCH : 0, vy: 0, vp: 0, rest: REST_YAW, flung: false };
+    const ptr = { a: 0, nx: 0, ny: 0, mx: 0, my: 0, hit: false, down: false, drag: false, id: null, sx: 0, sy: 0, last: [], seen: -1e4 };
+    const ripples = [];
+    const key = norm(-0.5, 0.7, 0.55), fill = norm(0.65, -0.25, 0.5);
+    function readColours() {
+      dark = document.documentElement.dataset.theme !== 'light';
+      const probe = document.createElement('i'); probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#d40000';
+      document.body.appendChild(probe); const m = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g); probe.remove();
+      if (m && m.length >= 3) base = lin(m.slice(0, 3).map(Number));
+    }
+    // the emblem's boxes: sampled at four points per side of every box, kept where it covers enough
+    const emblem = new Image();
+    emblem.onload = () => {
+      const ratio = emblem.naturalHeight / emblem.naturalWidth || 0.7366, S = 4; rows = Math.round(COLS * ratio);
+      const c = document.createElement('canvas'); c.width = COLS * S; c.height = rows * S;
+      const x = c.getContext('2d'); x.drawImage(emblem, 0, 0, c.width, c.height);
+      const a = x.getImageData(0, 0, c.width, c.height).data, cells = [];
+      for (let j = 0; j < rows; j++) for (let i = 0; i < COLS; i++) {
+        let sum = 0;
+        for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += a[((j * S + yy) * c.width + i * S + xx) * 4 + 3];
+        const cov = sum / (S * S * 255);
+        if (cov >= 0.22) cells.push([i - (COLS - 1) / 2, (rows - 1) / 2 - j]);
+      }
+      n = cells.length; X = new Float32Array(n); Y = new Float32Array(n); SEED = new Float32Array(n); DELAY = new Float32Array(n);
+      OFF = new Float32Array(n * 3); VEL = new Float32Array(n * 3); HEAT = new Float32Array(n); move = new Float32Array(n * 6);
+      const far = Math.hypot(COLS / 2, rows / 2), stat = new Float32Array(n * 4);
+      cells.forEach(([cx, cy], k) => {
+        X[k] = cx; Y[k] = cy; SEED[k] = Math.random();
+        // the centre lands first; each box starts deep behind and off to one side
+        DELAY[k] = 0.12 + (Math.hypot(cx, cy) / far) * 0.75 + Math.random() * 0.18;
+        if (!still) { const a2 = Math.random() * TAU, r2 = 4 + Math.random() * 9; OFF[k * 3] = Math.cos(a2) * r2; OFF[k * 3 + 1] = Math.sin(a2) * r2; OFF[k * 3 + 2] = -(12 + Math.random() * 22); }
+        stat.set([cx, cy, SEED[k], 1], k * 4);
+      });
+      span = COLS * 0.8 + rows * 0.5;
+      gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf); gl.bufferData(gl.ARRAY_BUFFER, stat, gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.bufferData(gl.ARRAY_BUFFER, move.byteLength, gl.DYNAMIC_DRAW);
+      layout(); update(0); draw(); request();
+    };
+    emblem.src = 'assets/brand/cleo-emblem.svg';
+    // ---- size, camera and the faint grid behind the mark in light mode ----
+    function layout() {
+      const w = area.offsetWidth, h = area.offsetHeight;
+      if (!w || !h) return;
+      readColours();
+      W = w; H = h; dpr = Math.min(2, devicePixelRatio || 1);
+      if (w * h * dpr * dpr > 3.6e6) dpr = Math.sqrt(3.6e6 / (w * h));
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      const asp = w / h, ty = Math.tan(FOV / 2), hw = COLS / 2 + 1, hh = (rows || 21) / 2 + 1;
+      dist = Math.max(hw / (ty * asp * 0.72), hh / (ty * 0.66)) + D0;
+      camZ = dist; proj = persp(FOV, asp, 0.5, dist * 4); view = trans(0, 0, -dist);
+      ghostGrid();
+      // where the mark rests on screen, so the loading screen's mark can glide into it
+      if (slot && n) {
+        const m = mul(proj, mul(view, model(REST_YAW, REST_PITCH, 0)));
+        let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+        for (const [cx, cy, cz] of [[-COLS / 2, -rows / 2, 0], [COLS / 2, -rows / 2, 0], [-COLS / 2, rows / 2, 0], [COLS / 2, rows / 2, 0]]) {
+          const px = m[0] * cx + m[4] * cy + m[8] * cz + m[12], py = m[1] * cx + m[5] * cy + m[9] * cz + m[13], pw = m[3] * cx + m[7] * cy + m[11] * cz + m[15];
+          const sx = (px / pw * 0.5 + 0.5) * w, sy = (0.5 - py / pw * 0.5) * h;
+          x0 = Math.min(x0, sx); y0 = Math.min(y0, sy); x1 = Math.max(x1, sx); y1 = Math.max(y1, sy);
+        }
+        Object.assign(slot.style, { left: `${x0}px`, top: `${y0}px`, width: `${x1 - x0}px`, height: `${y1 - y0}px` });
+      }
+    }
+    function ghostGrid() {
+      ghost.width = Math.round(W * dpr); ghost.height = Math.round(H * dpr);
+      const x = ghost.getContext('2d'); x.clearRect(0, 0, ghost.width, ghost.height);
+      if (dark) return; // dark mode: the background grid itself, dimmed on sign-in screens
+      x.scale(dpr, dpr);
+      const CELL = 18, BOX = 13, amb = document.querySelector('.ambient'), r = area.getBoundingClientRect(), ar = amb ? amb.getBoundingClientRect() : { left: 0, top: 0 };
+      const ox = (CELL - ((r.left - ar.left) % CELL) + CELL) % CELL, oy = (CELL - ((r.top - ar.top) % CELL) + CELL) % CELL, reach = Math.min(W, H) * 0.7;
+      for (let yy = oy - CELL; yy < H; yy += CELL) for (let xx = ox - CELL; xx < W; xx += CELL) {
+        const d = Math.hypot(xx + CELL / 2 - W / 2, (yy + CELL / 2 - H / 2) * 1.15) / reach, al = 0.035 * Math.max(0, 1 - d * d);
+        if (al < 0.004) continue;
+        x.fillStyle = `rgb(20 20 24 / ${al.toFixed(3)})`; x.beginPath(); x.roundRect(xx + 2.5, yy + 2.5, BOX, BOX, 3.5); x.fill();
+      }
+    }
+    const model = (yaw, pitch, bob) => mul(trans(0, bob, 0), mul(rotX(pitch * RAD), rotY(yaw * RAD)));
+    // ---- motion ----
+    const springStep = (x, v, target, dt, response, damping) => { const k = (TAU / response) ** 2, c = 2 * damping * Math.sqrt(k); v += (k * (target - x) - c * v) * dt; return [x + v * dt, v]; };
+    function update(dt) {
+      const intro = still ? 1 : Math.min(1, t / 2.2), calm = still ? 0 : clamp((t - 1.8) / 1.2, 0, 1);
+      // the pose: facing you at first, then onto its side; it sways, floats and leans toward the pointer
+      if (!ptr.drag) {
+        const turn = t > 0.35 || still;
+        const yawT = turn ? pose.rest + 7 * Math.sin((TAU * t) / 12) * calm + ptr.a * ptr.nx * 14 : 0;
+        const pitchT = turn ? REST_PITCH + 3 * Math.sin((TAU * t) / 8.6) * calm + ptr.a * ptr.ny * 9 : 0;
+        if (still) { pose.yaw = yawT; pose.pitch = pitchT; }
+        else {
+          [pose.yaw, pose.vy] = springStep(pose.yaw, pose.vy, yawT, dt, pose.flung ? 0.9 : 1.1, pose.flung ? 0.8 : 0.78);
+          [pose.pitch, pose.vp] = springStep(pose.pitch, pose.vp, pitchT, dt, 0.9, 0.8);
+          if (pose.flung && Math.abs(pose.yaw - yawT) < 2 && Math.abs(pose.vy) < 20) pose.flung = false;
+        }
+      }
+      pose.bob = 0.25 * Math.sin((TAU * t) / 6.5) * calm;
+      // a glint now and then, and a quiet ripple every few seconds
+      if (!still && t > glintAt + 1.6) glintAt = t + 4 + Math.random() * 3;
+      if (!still && t > nextRipple && n) { const k = Math.floor(Math.random() * n); ripples.push(...Ripple.make(X[k], Y[k], t, { speed: 7, life: 1.8, band: 0.8, splash: false }).map((r) => ({ ...r, k: 0.45 }))); nextRipple = t + 5 + Math.random() * 4; }
+      for (let k = ripples.length - 1; k >= 0; k--) if (t - ripples[k].t0 > ripples[k].life) ripples.splice(k, 1);
+      const live = ripples.filter((r) => Ripple.prepare(r, t));
+      for (let k = 0; k < n; k++) {
+        const x = X[k], y = Y[k], o = k * 3, since = t - DELAY[k];
+        // depth: a slow wave rolling through the boxes
+        const wave = 0.5 + 0.5 * Math.sin(t * 0.85 - (x * 0.28 + y * 0.2) + SEED[k] * 0.8);
+        let zt = 0, ht = since > 0 && !still ? Math.max(0, 1 - since / 0.7) * 0.9 : 0;
+        if (ptr.a > 0.01 && ptr.hit) { const p = ptr.a * Math.exp(-((x - ptr.mx) ** 2 + (y - ptr.my) ** 2) / (2 * 2.4 * 2.4)); zt += p * (ptr.down ? 1.9 : 1.4); ht += 0.55 * p; }
+        for (const r of live) { const s = Ripple.at(r, x - r.x, y - r.y, SEED[k] * TAU); if (s > 0.01) { zt += 2 * s; ht += 0.9 * s; } }
+        if (still) { OFF[o] = OFF[o + 1] = 0; OFF[o + 2] = 0; }
+        else if (since > 0) {
+          for (let d = 0; d < 3; d++) [OFF[o + d], VEL[o + d]] = springStep(OFF[o + d], VEL[o + d], d === 2 ? zt : 0, dt, 0.55, 0.62);
+        }
+        HEAT[k] += (Math.min(1, ht) - HEAT[k]) * (still ? 1 : 1 - Math.exp(-dt / 0.16));
+        const s = still ? 1 : since <= 0 ? 0 : 1 - (1 - Math.min(1, since / 0.32)) ** 3;
+        move.set([OFF[o], OFF[o + 1], OFF[o + 2], D0 + BREATH * wave * wave * calm, HEAT[k], s], k * 6);
+      }
+      return intro < 1 || ptr.down || pose.flung || live.length > 0;
+    }
+    function draw() {
+      if (!n || !W) return;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
+      gl.useProgram(prog);
+      gl.uniformMatrix4fv(U.uProj, false, proj); gl.uniformMatrix4fv(U.uView, false, view);
+      gl.uniformMatrix4fv(U.uModel, false, model(pose.yaw, pose.pitch, pose.bob || 0));
+      gl.uniform1f(U.uBevel, BEV); gl.uniform1f(U.uBack, -D0 / 2); gl.uniform3f(U.uCam, 0, 0, camZ);
+      gl.uniform3fv(U.uBase, base); gl.uniform3fv(U.uHot, hot); gl.uniform3fv(U.uKey, key); gl.uniform3fv(U.uFill, fill);
+      gl.uniform1f(U.uAmb, dark ? 0.2 : 0.32); gl.uniform1f(U.uEmis, dark ? 0.12 : 0.04);
+      gl.uniform1f(U.uGlint, still ? -9 : ((t - glintAt) / 1.6) * 1.6 - 0.3); gl.uniform1f(U.uSpan, span);
+      gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, move);
+      gl.bindVertexArray(vao); gl.drawElementsInstanced(gl.TRIANGLES, mesh.i.length, gl.UNSIGNED_SHORT, 0, n); gl.bindVertexArray(null);
+    }
+    function frame(now) {
+      raf = 0;
+      if (stopped) return;
+      if (!canvas.isConnected) { stop(); return; }
+      if (document.hidden) return;
+      const dt = Math.min(1 / 30, last ? (now - last) / 1000 : 1 / 60);
+      // at rest the slow sway needs no more than about 30 frames a second
+      if (!busy && last && now - drawnAt < 30) { raf = requestAnimationFrame(frame); return; }
+      last = now; drawnAt = now; t += dt;
+      ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.3));
+      busy = update(dt) || ptr.a > 0.01;
+      draw();
+      raf = requestAnimationFrame(frame);
+    }
+    let busy = true;
+    function request() { if (!still && !raf && !stopped && canvas.isConnected) raf = requestAnimationFrame(frame); }
+    // ---- pointer: lean, push, drag to turn, tap to ripple ----
+    const scale = () => { const r = canvas.getBoundingClientRect(); return [r, r.width / (W || 1) || 1]; };
+    function aim(e) {
+      const [r] = scale(), ndx = ((e.clientX - r.left) / r.width) * 2 - 1, ndy = 1 - ((e.clientY - r.top) / r.height) * 2;
+      ptr.nx = clamp(ndx, -1, 1); ptr.ny = clamp(-ndy, -1, 1);
+      // the pointer's ray, taken into the mark's own space, meets the plane of its faces
+      const ty = Math.tan(FOV / 2), asp = W / (H || 1);
+      let dx = ndx * ty * asp, dy = ndy * ty, dz = -1, ox = 0, oy = -(pose.bob || 0), oz = camZ;
+      const cy = Math.cos(-pose.yaw * RAD), sy = Math.sin(-pose.yaw * RAD), cp = Math.cos(-pose.pitch * RAD), sp = Math.sin(-pose.pitch * RAD);
+      const rx = (x, y, z) => [x, cp * y - sp * z, sp * y + cp * z], ry = (x, y, z) => [cy * x + sy * z, y, -sy * x + cy * z];
+      [ox, oy, oz] = ry(...rx(ox, oy, oz)); [dx, dy, dz] = ry(...rx(dx, dy, dz));
+      const zf = D0 / 2, k = Math.abs(dz) > 1e-6 ? (zf - oz) / dz : -1;
+      ptr.hit = k > 0; if (ptr.hit) { ptr.mx = ox + dx * k; ptr.my = oy + dy * k; }
+    }
+    canvas.addEventListener('pointermove', (e) => {
+      if (still) return;
+      aim(e); ptr.seen = performance.now();
+      if (ptr.down && e.pointerId === ptr.id) {
+        const [, k] = scale(), mx = (e.clientX - ptr.sx) / k, my = (e.clientY - ptr.sy) / k;
+        if (!ptr.drag && Math.hypot(mx, my) > 6) { ptr.drag = true; canvas.classList.add('grabbing'); }
+        if (ptr.drag) {
+          const lx = ptr.last.length ? ptr.last[ptr.last.length - 1] : { x: ptr.sx, y: ptr.sy };
+          pose.yaw += ((e.clientX - lx.x) / k) * 0.42; pose.pitch = clamp(pose.pitch + ((e.clientY - lx.y) / k) * 0.25, -30, 45);
+        }
+        ptr.last.push({ x: e.clientX, y: e.clientY, t: performance.now(), yaw: pose.yaw, pitch: pose.pitch });
+        if (ptr.last.length > 6) ptr.last.shift();
+      }
+      request();
+    });
+    canvas.addEventListener('pointerdown', (e) => {
+      if (still || e.button > 0) return;
+      canvas.setPointerCapture(e.pointerId); aim(e);
+      Object.assign(ptr, { down: true, drag: false, id: e.pointerId, sx: e.clientX, sy: e.clientY, last: [], seen: performance.now() });
+      pose.vy = 0; pose.vp = 0; request();
+    });
+    const release = (e) => {
+      if (!ptr.down || (e && e.pointerId !== ptr.id)) return;
+      ptr.down = false; canvas.classList.remove('grabbing');
+      if (ptr.drag) {
+        // the throw's speed over the last few moves; project where it would come to rest, then choose
+        // the nearest turn that leaves the mark on its side, and spring there carrying that speed
+        const a = ptr.last[0], b = ptr.last[ptr.last.length - 1], span2 = Math.max(16, (b?.t || 0) - (a?.t || 0)) / 1000;
+        pose.vy = a && b ? (b.yaw - a.yaw) / span2 : 0; pose.vp = a && b ? (b.pitch - a.pitch) / span2 : 0;
+        const projected = pose.yaw + pose.vy * 0.499;
+        pose.rest = REST_YAW + 360 * Math.round((projected - REST_YAW) / 360); pose.flung = true;
+      } else if (ptr.hit) {
+        // a tap: a ripple through the boxes from where it landed, and through the background grid
+        ripples.push(...Ripple.make(ptr.mx, ptr.my, t, { speed: 9, life: 1.9, band: 0.9 }));
+        if (ripples.length > 14) ripples.splice(0, ripples.length - 14);
+        ambient.pulse(e.clientX, e.clientY);
+      }
+      ptr.drag = false; ptr.seen = performance.now(); request();
+    };
+    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+    canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.seen = performance.now() - 1500; });
+    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); canvas.remove(); ghost.remove(); area.classList.remove('is-3d'); fallback?.(); });
+    const ro = new ResizeObserver(() => { layout(); if (n) { update(0); draw(); } }); ro.observe(area);
+    const onTheme = () => setTimeout(() => { readColours(); ghostGrid(); draw(); request(); }, 30);
+    document.addEventListener('cleo:theme', onTheme);
+    document.addEventListener('visibilitychange', request);
+    function stop() {
+      stopped = true; cancelAnimationFrame(raf); raf = 0; ro.disconnect();
+      document.removeEventListener('cleo:theme', onTheme); document.removeEventListener('visibilitychange', request);
+    }
+    return stop;
+  }
+  /* the sign-in art: the 3D mark where the panel sits beside the form, the 2D mark (gridMark) on narrow
+     screens, where it shows half-hidden behind the form and takes no touches */
+  function signArt(area) {
+    const wide = mq('(min-width: 901px)');
+    let stop = null, mode = '';
+    const pick = () => {
+      if (!area.isConnected && mode) { wide.removeEventListener('change', pick); stop?.(); return; }
+      const next = wide.matches ? '3d' : '2d';
+      if (next === mode) return;
+      stop?.(); stop = null;
+      area.querySelectorAll('canvas').forEach((c) => c.remove()); area.classList.remove('is-3d');
+      mode = next;
+      if (next === '3d') stop = emblem3d(area, () => { mode = '2d'; stop = gridMark(area); });
+      if (!stop) { mode = '2d'; stop = gridMark(area); }
+    };
+    pick(); wide.addEventListener('change', pick);
   }
 
   /* ---------- Terms and Conditions, Privacy Policy ----------
@@ -5159,7 +5576,7 @@ const Cleo = (() => {
 
     requestAnimationFrame(() => {
       LiquidGlass.attach(card, { bezel: 24, tint: 'var(--glass)' });
-      gridMark($('.login-art', node));
+      signArt($('.login-art', node));
       if (!mq('(pointer: coarse)').matches) focusFirst(cur);
     });
     if (!CleoEnv.demo) $('[data-backup-line]', node).hidden = true;
@@ -5188,20 +5605,20 @@ const Cleo = (() => {
   }
 
   /* ---------- branch selection (web portals) ---------- */
-  /* a small bar chart, the same mark as Charts.columns: one thin bar per value, rounded at the top.
+  /* a small bar chart, the same mark as Charts.columns: one thin bar per value, its top a semicircle.
      null values are hours still to come: they show as a short stub, so the day keeps its width.
      The latest bar is drawn full strength (peak), the earlier ones a step softer. */
   function sparkSVG(values, { w = 280, h = 44, peak = true } = {}) {
     const n = values.length, max = Math.max(...values.filter((v) => v != null), 1);
     if (!values.some((v) => v != null)) return '';
-    const band = w / n, bw = Math.max(2, Math.min(band * 0.6, 14)), r = Math.min(3, bw / 2);
+    const band = w / n, bw = Math.max(2, Math.min(band * 0.6, 14)), r = bw / 2;
     const last = values.reduce((a, v, i) => (v != null ? i : a), -1), anim = !reduced();
     const f = (v) => +v.toFixed(2);
     const bars = values.map((v, i) => {
       const x = band * i + (band - bw) / 2;
       if (v == null) return `<rect class="sp-rest" x="${f(x)}" y="${h - 2}" width="${f(bw)}" height="2" rx="1"/>`;
-      const bh = Math.max(3, (v / max) * (h - 1)), y = h - bh;
-      return `<path class="sp-b${peak && i === last ? ' pk' : ''}${anim ? ' in' : ''}" style="--d:${i * 26}ms" d="M${f(x)},${f(h)}V${f(y + r)}A${r},${r} 0 0 1 ${f(x + r)},${f(y)}H${f(x + bw - r)}A${r},${r} 0 0 1 ${f(x + bw)},${f(y + r)}V${f(h)}Z"/>`;
+      const bh = Math.max(3, (v / max) * (h - 1)), y = h - bh, rr = f(Math.min(r, bh));
+      return `<path class="sp-b${peak && i === last ? ' pk' : ''}${anim ? ' in' : ''}" style="--d:${i * 26}ms" d="M${f(x)},${f(h)}V${f(y + rr)}A${rr},${rr} 0 0 1 ${f(x + rr)},${f(y)}H${f(x + bw - rr)}A${rr},${rr} 0 0 1 ${f(x + bw)},${f(y + rr)}V${f(h)}Z"/>`;
     }).join('');
     return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMax meet" aria-hidden="true">${bars}</svg>`;
   }
@@ -6030,20 +6447,21 @@ const Cleo = (() => {
 /* ===================== charts.js · Charts: columns, donut, bars, heatmap, bridge, calendar ===================== */
 /* =====================================================================
    Cleo charts: small, dependency-free charts in SVG and HTML.
-   One visual language for every chart:
-     - solid marks with rounded data ends (4px) and square ends on the baseline;
-     - a 2px gap where marks touch (stacked parts, donut arcs);
+   One visual language for every chart, round wherever a mark can be:
+     - solid marks with fully rounded data ends (a semicircle) and square ends on the baseline,
+       so a length still reads from zero; stacked parts are capsules with a 3px gap between them;
+     - rings with round caps; day and hour cells are dots, and a heat dot also grows with its value;
      - a quiet grid: three hairlines and their values, nothing more;
      - one tooltip on hover and on keyboard focus (arrow keys); the dashboards add a table view.
      columns()    trends and stacked parts: one column per period, parts stacked bottom up
-     donut()      part-to-whole: a ring of arcs with the figure in the middle
+     donut()      part-to-whole: a ring of round-capped arcs with the figure in the middle
      bars()       ranked rows: a rounded bar on a faint track per item
-     heatmap()    day by hour: a tile per cell whose strength is the value
-     waterfall()  the P&L bridge: floating columns joined by thin connectors
-     calendar()   daily activity: a tile per day, one column per week (Owner › Activity)
-   Marks grow in once per draw (columns from the baseline, bars from the left, the donut
-   clockwise) with a short stagger. Redraws after a resize are instant, and reduced motion
-   skips the growth.
+     heatmap()    day by hour: a dot per cell whose colour and size are the value
+     waterfall()  the P&L bridge: floating capsules joined by thin connectors
+     calendar()   daily activity: a dot per day, one column per week (Owner › Activity)
+   Marks grow in once per draw (columns rise from the baseline on a spring, bars from the left, the
+   donut clockwise, dots pop in) with a short stagger. Redraws after a resize are instant, and reduced
+   motion skips the growth.
    ===================================================================== */
 const Charts = (() => {
   const { esc, reduced, clamp } = Cleo;
@@ -6078,13 +6496,14 @@ const Charts = (() => {
     const m = n <= 1 ? 1 : n <= 1.2 ? 1.2 : n <= 1.5 ? 1.5 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 3 ? 3 : n <= 4 ? 4 : n <= 5 ? 5 : n <= 6 ? 6 : n <= 8 ? 8 : 10;
     return m * p;
   }
-  // redraw (without the entrance animation) when the width changes, or, with grow, when the room gets taller
+  // redraw (without the entrance animation) when the width changes, or, with grow, when the room gets taller;
+  // a redraw while the first one is still growing in (a neighbour stretching the panel) keeps the growth
   function observe(el, fn, { grow = false } = {}) {
     if (el._ro) el._ro.disconnect();
     let w = el.clientWidth, h = el.clientHeight;
     el._ro = new ResizeObserver(() => {
       const dw = Math.abs(el.clientWidth - w) > 2, dh = grow && el.clientHeight - h > 2;
-      if (dw || dh) { w = el.clientWidth; h = el.clientHeight; fn(false); }
+      if (dw || dh) { w = el.clientWidth; h = el.clientHeight; fn(performance.now() - (el._grewAt || -1e9) < 700 ? 'again' : false); }
     });
     el._ro.observe(el);
   }
@@ -6111,7 +6530,8 @@ const Charts = (() => {
       const { compact = false, yTick = (v) => v, label = 'Column chart' } = cfg;
       const height = Math.max(80, number(cfg.height, 260));
       const cols = list(cfg.columns).map((c) => ({ ...c, segs: list(c.segs).map((s) => ({ ...s, from: number(s.from), to: number(s.to), color: color(s.color) })) }));
-      const n = cols.length; const anim = animate && !reduced();
+      const n = cols.length; const anim = !!animate && !reduced();
+      if (animate === true) el._grewAt = performance.now();
       if (!n) { empty(el); return; }
       const W = Math.max(compact ? 140 : 280, el.clientWidth), H = cfg.fill ? Math.max(height, Math.floor(el.clientHeight)) : height;
       const hasTop = cols.some((c) => c.top);
@@ -6126,7 +6546,7 @@ const Charts = (() => {
       const band = plotW / n;
       const bw = clamp(band * (compact ? 0.6 : 0.56), 3, compact ? 16 : 36);
       const colX = (i) => pad.l + band * i + (band - bw) / 2, centre = (i) => pad.l + band * (i + 0.5);
-      const R = Math.min(4, bw / 2), GAP = 2;
+      const R = bw / 2, GAP = 3;
 
       const svg = node('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, class: `viz cols${compact ? ' compact' : ''}`, tabindex: 0, role: 'img', 'aria-label': label });
       // the grid: hairlines at zero, half and the top, with their values on the left
@@ -6149,16 +6569,18 @@ const Charts = (() => {
       // one group per column: a hover band behind, then the marks
       const groups = cols.map((c, i) => {
         const g = node('g', { class: 'col', 'data-i': i });
-        g.appendChild(node('rect', { x: pad.l + band * i + Math.min(4, band * 0.08), y: pad.t - 6, width: Math.max(1, band - Math.min(8, band * 0.16)), height: ih + 6, rx: compact ? 4 : 8, class: 'band' }));
+        const bandW = Math.max(1, band - Math.min(8, band * 0.16));
+        g.appendChild(node('rect', { x: pad.l + band * i + Math.min(4, band * 0.08), y: pad.t - 6, width: bandW, height: ih + 6, rx: Math.min(bandW / 2, 22), class: 'band' }));
         const mk = node('g', { class: `mk${anim ? ' grow' : ''}`, style: `--d:${Math.round(i * (compact ? 22 : 34))}ms` });
         const segs = c.segs.map((s) => ({ lo: Math.min(s.from, s.to), hi: Math.max(s.from, s.to), color: s.color })).filter((s) => s.hi - s.lo > 0).sort((a, b) => a.lo - b.lo);
         const top = segs.length ? Math.max(...segs.map((s) => s.hi)) : 0;
         segs.forEach((s, k) => {
           let yt = y(s.hi); const yb = y(s.lo);
           const isTop = s.hi === top, onBase = s.lo <= 0, above = segs.slice(k + 1).some((o) => Math.abs(o.lo - s.hi) < 1e-6);
-          if (above && yb - yt > GAP + 1) yt += GAP; // a sliver of surface between stacked parts
+          if (above && yb - yt > GAP + 1) yt += GAP; // surface between stacked parts
           const h = Math.max(isTop ? 1.5 : 0, yb - yt); if (h <= 0) return;
-          mk.appendChild(node('path', { d: barPath(colX(i), yt, bw, h, isTop ? R : 0, onBase ? 0 : R), fill: s.color }));
+          // every part is a capsule; only an end standing on the baseline stays square
+          mk.appendChild(node('path', { d: barPath(colX(i), yt, bw, h, R, onBase ? 0 : R), fill: s.color }));
         });
         g.appendChild(mk);
         if (c.top) { const t = node('text', { x: centre(i), y: Math.max(12, y(top) - 8), 'text-anchor': 'middle', class: `col-top${anim ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 360)}ms` }); t.textContent = c.top; g.appendChild(t); }
@@ -6202,19 +6624,21 @@ const Charts = (() => {
     segments = list(segments).map((s) => ({ ...s, value: Math.max(0, number(s.value)), color: color(s.color) }));
     size = Math.max(80, number(size, 184));
     const total = segments.reduce((a, s) => a + s.value, 0);
-    const c = size / 2, sw = Math.round(size * 0.1), r = c - sw / 2 - 2, C = 2 * Math.PI * r, GAP = 3;
+    const c = size / 2, sw = Math.round(size * 0.12), r = c - sw / 2 - 4, C = 2 * Math.PI * r, GAP = 5;
     const pct = (s) => `${(total ? (s.value / total) * 100 : 0).toFixed(1)}%`;
     const id = `dn${++uid}`, anim = !reduced();
     let at = 0;
     const arcs = segments.map((s, i) => {
       const len = total ? (s.value / total) * C : 0; const start = at; at += len;
       if (len <= 0) return '';
-      const dash = Math.max(0.6, len - GAP);
-      return `<circle class="arc" data-s="${i}" cx="${c}" cy="${c}" r="${r.toFixed(2)}" stroke="${esc(s.color)}" stroke-width="${sw}" stroke-dasharray="${dash.toFixed(2)} ${(C - dash).toFixed(2)}" stroke-dashoffset="${(-start - GAP / 2).toFixed(2)}"/>`;
+      // round caps reach half the ring's width past each end, so the dash is shortened by that much;
+      // a share too small for a dash becomes a dot
+      const dash = Math.max(0.01, len - GAP - sw), lead = (len - dash) / 2;
+      return `<circle class="arc" data-s="${i}" cx="${c}" cy="${c}" r="${r.toFixed(2)}" stroke="${esc(s.color)}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${dash.toFixed(2)} ${(C - dash).toFixed(2)}" stroke-dashoffset="${(-start - lead).toFixed(2)}"/>`;
     }).join('');
     el.innerHTML = `<div class="donut" style="--size:${size}px">
-        <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" tabindex="0" role="img" aria-label="${esc(`${centerLabel}: ${segments.map((s) => `${s.name} ${pct(s)}`).join(', ')}`)}">
-          <defs><mask id="${id}"><circle cx="${c}" cy="${c}" r="${r.toFixed(2)}" fill="none" stroke="#fff" stroke-width="${sw + 4}" stroke-dasharray="${C.toFixed(2)} ${C.toFixed(2)}" class="sweep${anim ? ' in' : ''}" style="--len:${C.toFixed(2)}px" transform="rotate(-90 ${c} ${c})"/></mask></defs>
+        <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" style="--sw:${sw}px" tabindex="0" role="img" aria-label="${esc(`${centerLabel}: ${segments.map((s) => `${s.name} ${pct(s)}`).join(', ')}`)}">
+          <defs><mask id="${id}"><circle cx="${c}" cy="${c}" r="${r.toFixed(2)}" fill="none" stroke="#fff" stroke-width="${sw + 16}" stroke-dasharray="${C.toFixed(2)} ${C.toFixed(2)}" class="sweep${anim ? ' in' : ''}" style="--len:${C.toFixed(2)}px" transform="rotate(-90 ${c} ${c})"/></mask></defs>
           <circle cx="${c}" cy="${c}" r="${r.toFixed(2)}" class="ring" stroke-width="${sw}"/>
           <g mask="url(#${id})" transform="rotate(-90 ${c} ${c})">${arcs}</g>
         </svg>
@@ -6267,9 +6691,9 @@ const Charts = (() => {
     el.innerHTML = `
       <div class="heat" style="--cols:${cols.length}">
         <span></span>${cols.map((c, i) => `<span class="hx">${i % 2 === 0 ? esc(colLabel(c)) : ''}</span>`).join('')}
-        ${rows.map((r, ri) => `<span class="hy">${esc(r)}</span>${cols.map((c, ci) => { const v = values[ri][ci]; const p = (v - min) / (max - min || 1); return `<span class="hc${anim ? ' in' : ''}" data-r="${ri}" data-c="${ci}" style="--p:${Math.round(12 + p * 88)}%;--d:${ci * 18 + ri * 26}ms"></span>`; }).join('')}`).join('')}
+        ${rows.map((r, ri) => `<span class="hy">${esc(r)}</span>${cols.map((c, ci) => { const v = values[ri][ci]; const p = (v - min) / (max - min || 1); return `<span class="hc${anim ? ' in' : ''}" data-r="${ri}" data-c="${ci}" style="--p:${Math.round(12 + p * 88)}%;--s:${(0.5 + 0.5 * p).toFixed(3)};--d:${ci * 18 + ri * 26}ms"></span>`; }).join('')}`).join('')}
       </div>
-      <div class="heat-legend"><span>${esc(fmtValue(min))}</span>${[12, 34, 56, 78, 100].map((p) => `<i style="--p:${p}%"></i>`).join('')}<span>${esc(fmtValue(max))}</span></div>`;
+      <div class="heat-legend"><span>${esc(fmtValue(min))}</span>${[12, 34, 56, 78, 100].map((p) => `<i style="--p:${p}%;--s:${(0.5 + (0.5 * (p - 12)) / 88).toFixed(3)}"></i>`).join('')}<span>${esc(fmtValue(max))}</span></div>`;
     const grid = el.querySelector('.heat');
     grid.addEventListener('pointermove', (e) => {
       const c = e.target.closest('.hc'); if (!c) return hideTip();
