@@ -21,6 +21,16 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-10-28 (night) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**New emblem (commit `956b58b`).** The design team's newest emblem replaces the V everywhere. It is the same three nodes turned a quarter turn clockwise, so it stands like a "<". The wordmark is unchanged.
+
+- `assets/brand/cleo-emblem.svg` is now portrait, with a viewBox of 980.27 × 1330.77. Every PNG in `assets/brand/` was rendered again from it under the same name, so `manifest.webmanifest` and the icon links didn't change. `sw.js` caches the new files under a new cache name.
+- The logo with the wordmark follows the new artwork: the wordmark is 0.45 of the emblem's height and sits closer to it.
+- The loading screen, both sign-in marks, the plan tabs, the customer display, the landing page and the legal pages all show the new shape. The landing page's app screenshots were captured again.
+
+Nothing on the backend side changed. If you add the logo to the sign-up email (the optional item under the rebrand entry below), `cleo-icon-192.png` already shows the new emblem.
+
 ### 2026-10-28 (evening) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
 
 **Flat 3D mark and the earlier charts (commit `66ee9e6`).**
