@@ -1491,7 +1491,8 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .feed .row-item.new { animation: feed-in 200ms ease both; }
 @keyframes feed-in { from { opacity: .4; } to { opacity: 1; } }
 
-/* Charts (charts.js): round marks (semicircle data ends, round-capped rings, dots), a quiet grid, one tooltip */
+/* Charts (charts.js): solid marks with rounded data ends, a quiet grid, one tooltip. The revenue columns and the
+   donut are the round ones: a semicircle top on joined parts, and round-capped arcs. */
 .viz { display: block; max-width: 100%; overflow: visible; font-family: var(--font); }
 .viz:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 8px; }
 .viz .grid { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
@@ -1499,8 +1500,8 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .viz .tick { fill: var(--ink-3); font-size: 11.5px; font-variant-numeric: tabular-nums; }
 .viz .col-top { fill: var(--ink-2); font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .viz .link { stroke: var(--ink-4); stroke-width: 1; stroke-dasharray: 3 3; shape-rendering: crispEdges; }
-/* columns rise from the baseline one after another on a spring; their labels and connectors fade in after */
-.viz .mk { transition: opacity 220ms ease, filter 220ms ease; }
+/* columns with the rise option (revenue and profit) rise from the baseline one after another on a spring */
+.viz .mk { transition: opacity 220ms ease; }
 .viz .mk.grow { animation: col-rise 820ms var(--spring) backwards; animation-delay: var(--d, 0ms); }
 /* revealed from the baseline up rather than stretched, so the round ends stay round while they rise */
 @keyframes col-rise { from { clip-path: inset(100% -4px 0 -4px); } to { clip-path: inset(0 -4px 0 -4px); } }
@@ -1509,7 +1510,6 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .viz .band { fill: var(--wash); opacity: 0; transition: opacity 200ms ease; }
 .viz .col.on .band { opacity: 1; }
 .viz.hot .col:not(.on) .mk { opacity: .38; }
-.viz .col.on .mk { filter: drop-shadow(0 6px 12px rgb(0 0 0 / .22)); }
 /* donut: a ring of arcs, the figure in the middle */
 .donut { position: relative; width: var(--size); height: var(--size); flex: none; }
 .donut svg { display: block; overflow: visible; }
@@ -1541,7 +1541,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .hb-label span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hb-label small { display: block; font-size: 11.5px; color: var(--ink-3); }
 .hb-track { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; min-width: 0; }
-.hb-meter { position: relative; display: block; height: 10px; border-radius: var(--r-pill); background: var(--wash); }
+.hb-meter { position: relative; display: block; height: 8px; border-radius: var(--r-pill); background: var(--wash); }
 .hb-fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--r, 0) * 100%); border-radius: inherit; background: var(--c); }
 .hb-fill.some { min-width: 8px; }
 .hb-fill.in { animation: bar-in 820ms var(--ease-out) backwards; animation-delay: calc(60ms + var(--i, 0) * 55ms); }
@@ -1549,36 +1549,35 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .hb-val { font-size: 12.5px; color: var(--ink-2); white-space: nowrap; min-width: 56px; text-align: right; }
 .hbar.hl .hb-label span { font-weight: 500; color: var(--ink); }
 
-/* heatmap: a dot per cell, shaded from the faint wash to the sequential colour and growing with the value */
+/* heatmap: tiles shaded from the faint wash to the sequential colour */
 .heat { display: grid; grid-template-columns: 40px repeat(var(--cols), minmax(0, 1fr)); gap: 3px; align-items: center; }
 .heat .hx { font-size: 11px; color: var(--ink-3); text-align: center; padding-bottom: 4px; white-space: nowrap; }
 .heat .hy { font-size: 11.5px; color: var(--ink-3); }
-.heat .hc { display: grid; place-items: center; height: 26px; min-width: 0; }
-.heat .hc::before { content: ""; width: calc(min(100%, 24px) * var(--s, 1)); aspect-ratio: 1; border-radius: 50%; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); transition: box-shadow 160ms ease, transform 200ms var(--ease-out); }
-.heat .hc.in::before { animation: dot-in 560ms var(--spring) backwards; animation-delay: var(--d, 0ms); }
-@keyframes dot-in { from { opacity: 0; transform: scale(.3); } }
-@media (hover: hover) and (pointer: fine) { .heat .hc:hover::before { box-shadow: 0 0 0 1.5px var(--ink-2); transform: scale(1.12); } }
+.heat .hc { display: block; height: 24px; border-radius: 5px; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); transition: box-shadow 160ms ease; }
+.heat .hc.in { animation: tile-in 560ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
+@keyframes tile-in { from { opacity: 0; transform: scale(.88); } }
+@media (hover: hover) and (pointer: fine) { .heat .hc:hover { box-shadow: 0 0 0 1.5px var(--ink-2); } }
 .heat-legend { display: flex; align-items: center; gap: 3px; margin-top: 14px; font-size: 11.5px; color: var(--ink-3); justify-content: flex-end; }
 .heat-legend span:first-child { margin-right: 6px; } .heat-legend span:last-child { margin-left: 6px; }
-.heat-legend i { width: calc(14px * var(--s, 1)); aspect-ratio: 1; border-radius: 50%; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); }
+.heat-legend i { width: 14px; height: 10px; border-radius: 3px; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); }
 
-/* calendar: a dot per day, a column per week */
+/* calendar: a tile per day, a column per week */
 .cal { --cg: 3px; display: grid; gap: 6px; width: 100%; max-width: calc(var(--w) * 24px); }
 .cal-m, .cal-g { display: grid; grid-template-columns: repeat(var(--w), minmax(0, 1fr)); column-gap: var(--cg); }
 .cal-m { height: 14px; font-size: 11px; line-height: 14px; color: var(--ink-3); }
 .cal-m span { white-space: nowrap; }
 .cal-g { grid-template-rows: repeat(7, auto); grid-auto-flow: column; row-gap: var(--cg); }
-.cd { display: block; aspect-ratio: 1; border-radius: 50%; background: var(--wash-2); transition: opacity 360ms ease, box-shadow 160ms ease; }
+.cd { display: block; aspect-ratio: 1; border-radius: 3px; background: var(--wash-2); transition: opacity 360ms ease, box-shadow 160ms ease; }
 .cd.l1 { background: color-mix(in oklab, var(--seq) 30%, var(--wash-2)); }
 .cd.l2 { background: color-mix(in oklab, var(--seq) 54%, var(--wash-2)); }
 .cd.l3 { background: color-mix(in oklab, var(--seq) 78%, var(--wash-2)); }
 .cd.l4 { background: var(--seq); }
 .cd.nil { background: none; }
 .cd.out { opacity: .28; }
-.cd.in { animation: dot-in 520ms var(--spring) backwards; animation-delay: var(--d, 0ms); }
+.cd.in { animation: tile-in 520ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
 @media (hover: hover) and (pointer: fine) { .cal-g .cd:not(.nil):hover { box-shadow: 0 0 0 1.5px var(--ink-2); } }
 .cal-key { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
-.cal-key .cd { width: 10px; height: 10px; aspect-ratio: auto; border-radius: 50%; }
+.cal-key .cd { width: 10px; height: 10px; aspect-ratio: auto; border-radius: 2.5px; }
 .cal-key .cd:first-of-type { margin-left: 5px; } .cal-key .cd:last-of-type { margin-right: 5px; }
 
 .empty { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 28px 12px; color: var(--ink-3); }
@@ -4352,7 +4351,7 @@ const Cleo = (() => {
     const canvas = document.createElement('canvas'); canvas.className = 'art-grid';
     area.prepend(canvas);
     const ctx = canvas.getContext('2d'); if (!ctx) return () => {};
-    const hint = $('.art-hint', area); if (hint?.lastChild) hint.lastChild.textContent = 'Drag across the mark';
+    const hint = $('.art-hint', area); if (hint?.lastChild) { hint.lastChild.textContent = 'Drag across the mark'; hint.hidden = reduced(); }
     const slot = $('.art-mark', area);
     const still = reduced();
     const emblem = new Image(); let ready = false;
@@ -4518,19 +4517,19 @@ const Cleo = (() => {
   }
 
   /* ---------- the Cleo mark in 3D (sign-in art beside the form) ----------
-     The emblem built from the grid's own rounded boxes, each one a block with depth and a bevelled face,
-     turned onto its side in perspective and lit like glossy glass, over the dimmed background grid.
-     WebGL2, one instanced draw per frame.
-       - Arrival: the boxes fly in from deep behind and from every side, the centre first, and lock into
-         the emblem, warm as they land, while the whole mark turns from facing you onto its side.
-       - At rest it sways and floats, a slow wave of depth rolls through the boxes, light glints across
-         their faces now and then, and every few seconds a quiet ripple runs through it.
-       - Pointer: the mark leans toward it, and the boxes under it rise toward you and warm.
-       - Drag turns it, 1:1. Let go and it keeps the throw, spinning if flung, then settles back onto its
-         side: the throw is projected and the nearest resting turn is chosen, so it never lands backwards.
-       - A tap sends an organic ripple (Ripple) through the boxes and through the background grid.
-     With reduced motion it is drawn once, at rest. Where WebGL2 is missing or would run in software, or its
-     context is lost, the 2D mark takes over (fallback). It stops when its screen leaves.
+     The emblem laid flat and seen from above at a fixed angle, with no perspective (an orthographic view),
+     built from the grid's own rounded boxes: each box is a pillar standing on the ground with a bevelled
+     top, lit like glossy glass over the dimmed background grid. The mark itself never moves; its pillars do.
+       - Arrival: the pillars rise out of the ground, the centre first, overshoot a little and settle.
+       - At rest every pillar has its own height and keeps changing it: two slow waves of different
+         lengths cross the mark, so its skyline is never the same twice. Taller pillars run warmer, a glint
+         passes over the tops now and then, and every few seconds a quiet ripple lifts through it.
+       - Pointer: the pillars under it rise into a soft hill that follows it and warms.
+       - Press: the pillars under the finger sink, like pressing into pin art, and a ring around them rises;
+         drag to move the dent. Let go and they spring back up, sending a ripple out.
+       - A tap sends an organic ripple (Ripple) through the pillars and through the background grid.
+     With reduced motion it is drawn once, its heights still varied. Where WebGL2 is missing or would run in
+     software, or its context is lost, the 2D mark takes over (fallback). It stops when its screen leaves.
      ASSET: assets/brand/cleo-emblem.svg, sampled into boxes. */
   function emblem3d(area, fallback) {
     const canvas = document.createElement('canvas'); canvas.className = 'art-3d';
@@ -4539,38 +4538,39 @@ const Cleo = (() => {
     try { gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true, powerPreference: 'low-power', failIfMajorPerformanceCaveat: true }); } catch { gl = null; }
     if (!gl) return null;
     const TAU = Math.PI * 2, RAD = Math.PI / 180;
-    const COLS = 28, D0 = 1.6, BREATH = 0.5, BEV = 0.08, FOV = 30 * RAD;
-    const REST_YAW = -34, REST_PITCH = 13;
-    // ---- shaders: blocks lit by a key, a fill and a rim light, with glints, in linear light ----
+    // the fixed view: steeply down onto the ground and square to the mark, so it reads upright while the
+    // near side of every pillar shows its height
+    const COLS = 28, BEV = 0.08, ELEV = 74 * RAD, AZIM = 0, H_MIN = 0.22, H_TALL = 3.4;
+    // ---- shaders: pillars lit by a key and a fill light, glints and a soft shade toward the ground, in linear light ----
     const VS = `#version 300 es
       layout(location = 0) in vec3 aPos; layout(location = 1) in vec3 aNor;
-      layout(location = 2) in vec4 aCell; layout(location = 3) in vec4 aMove; layout(location = 4) in vec2 aState;
-      uniform mat4 uProj, uView, uModel; uniform float uBevel, uBack;
-      out vec3 vNor; out vec3 vWorld; out vec3 vModel; out float vHeat; out float vFront;
+      layout(location = 2) in vec4 aCell; layout(location = 3) in vec4 aMove;
+      uniform mat4 uProj, uView, uModel; uniform float uBevel;
+      out vec3 vNor; out vec3 vModel; out float vHeat; out float vTop; out float vH;
       void main() {
-        float depth = aMove.w, s = aState.y;
-        float z = (aPos.z > 0.5 ? depth - uBevel : 0.0) + (aPos.z > 1.5 ? uBevel : 0.0);
-        vec3 p = vec3(aPos.xy * s, uBack + z * s) + vec3(aCell.xy + aMove.xy, aMove.z);
-        vec4 w = uModel * vec4(p, 1.0);
-        vWorld = w.xyz; vModel = p; vNor = mat3(uModel) * aNor; vHeat = aState.x; vFront = aNor.z;
-        gl_Position = uProj * uView * w;
+        float h = aMove.x, s = aMove.z;
+        float z = (aPos.z > 0.5 ? h - uBevel : 0.0) + (aPos.z > 1.5 ? uBevel : 0.0);
+        vec3 p = vec3(aPos.xy * s + aCell.xy, z);
+        vModel = p; vNor = mat3(uModel) * aNor; vHeat = aMove.y; vTop = aNor.z; vH = h;
+        gl_Position = uProj * uView * uModel * vec4(p, 1.0);
       }`;
     const FS = `#version 300 es
       precision highp float;
-      in vec3 vNor; in vec3 vWorld; in vec3 vModel; in float vHeat; in float vFront;
-      uniform vec3 uCam, uBase, uHot, uKey, uFill; uniform float uAmb, uEmis, uGlint, uSpan;
+      in vec3 vNor; in vec3 vModel; in float vHeat; in float vTop; in float vH;
+      uniform vec3 uBase, uHot, uKey, uFill, uEye; uniform float uAmb, uEmis, uGlint, uSpan;
       out vec4 o;
       void main() {
-        vec3 N = normalize(vNor), V = normalize(uCam - vWorld);
+        vec3 N = normalize(vNor);
         float d = max(dot(N, uKey), 0.0), f = max(dot(N, uFill), 0.0);
-        float sp = pow(max(dot(N, normalize(uKey + V)), 0.0), 70.0);
-        float fr = pow(1.0 - max(dot(N, V), 0.0), 3.0);
-        vec3 base = mix(uBase, uHot, clamp(vHeat, 0.0, 1.0));
-        vec3 c = base * (uAmb + 0.85 * d + 0.25 * f) + base * (uEmis + vHeat * 0.7);
-        c += vec3(1.0, 0.94, 0.9) * sp * (0.7 + vHeat * 0.4);
-        c += mix(base, vec3(1.0), 0.45) * fr * 0.45;
-        float u = (vModel.x * 0.8 + vModel.y * 0.5) / uSpan;
-        c += vec3(1.0, 0.9, 0.85) * exp(-pow(u - uGlint, 2.0) / 0.0016) * smoothstep(0.6, 1.0, vFront) * 0.5;
+        float sp = pow(max(dot(N, normalize(uKey + uEye)), 0.0), 60.0);
+        float fr = pow(1.0 - max(dot(N, uEye), 0.0), 3.0);
+        vec3 base = mix(uBase, uHot, clamp(vHeat + smoothstep(0.9, 2.8, vH) * 0.32, 0.0, 1.0));
+        float ao = mix(mix(0.42, 1.0, smoothstep(0.0, 1.5, vModel.z)), 1.0, step(0.5, vTop));
+        vec3 c = base * (uAmb + 0.85 * d + 0.25 * f) * ao + base * (uEmis + vHeat * 0.7);
+        c += vec3(1.0, 0.94, 0.9) * sp * (0.6 + vHeat * 0.4);
+        c += mix(base, vec3(1.0), 0.35) * fr * 0.16;
+        float u = (vModel.x * 0.8 - vModel.y * 0.5) / uSpan;
+        c += vec3(1.0, 0.9, 0.85) * exp(-pow(u - uGlint, 2.0) / 0.0016) * smoothstep(0.6, 1.0, vTop) * 0.45;
         c = c / (1.0 + c * 0.35);
         o = vec4(pow(c, vec3(1.0 / 2.2)), 1.0);
       }`;
@@ -4579,9 +4579,9 @@ const Cleo = (() => {
     if (!vs || !fs) return null;
     const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
-    const U = {}; ['uProj', 'uView', 'uModel', 'uBevel', 'uBack', 'uCam', 'uBase', 'uHot', 'uKey', 'uFill', 'uAmb', 'uEmis', 'uGlint', 'uSpan'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
-    // ---- one box: a rounded square (the grid's box) extruded, with a 45° bevel round its face ----
-    // z codes: 0 the back, 1 where the bevel starts, 2 the face; the shader turns them into depth
+    const U = {}; ['uProj', 'uView', 'uModel', 'uBevel', 'uEye', 'uBase', 'uHot', 'uKey', 'uFill', 'uAmb', 'uEmis', 'uGlint', 'uSpan'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
+    // ---- one pillar: a rounded square (the grid's box) extruded upward, with a 45° bevel round its top ----
+    // z codes: 0 the ground, 1 where the bevel starts, 2 the top; the shader turns them into height
     const mesh = (() => {
       const hb = 13 / 36, rc = 3.5 / 18, c = hb - rc, ring = [], v = [], idx = [], k45 = Math.SQRT1_2;
       [[c, c, 0], [-c, c, 90], [-c, -c, 180], [c, -c, 270]].forEach(([cx, cy, a0]) => {
@@ -4597,9 +4597,9 @@ const Cleo = (() => {
         const g = add(x1 - nx1 * BEV, y1 - ny1 * BEV, 2, nx1 * k45, ny1 * k45, k45), h = add(x0 - nx0 * BEV, y0 - ny0 * BEV, 2, nx0 * k45, ny0 * k45, k45);
         idx.push(e, f, g, e, g, h);
       }
-      const fc = add(0, 0, 2, 0, 0, 1), bc = add(0, 0, 0, 0, 0, -1);
-      const front = ring.map(([x, y, nx, ny]) => add(x - nx * BEV, y - ny * BEV, 2, 0, 0, 1)), back = ring.map(([x, y]) => add(x, y, 0, 0, 0, -1));
-      for (let j = 0; j < M; j++) { idx.push(fc, front[j], front[(j + 1) % M], bc, back[(j + 1) % M], back[j]); }
+      const tc = add(0, 0, 2, 0, 0, 1);
+      const top = ring.map(([x, y, nx, ny]) => add(x - nx * BEV, y - ny * BEV, 2, 0, 0, 1));
+      for (let j = 0; j < M; j++) idx.push(tc, top[j], top[(j + 1) % M]);
       return { v: new Float32Array(v), i: new Uint16Array(idx) };
     })();
     // ---- small matrix helpers (column-major) ----
@@ -4607,9 +4607,15 @@ const Cleo = (() => {
     const trans = (x, y, z) => new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1]);
     const rotX = (a) => { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]); };
     const rotY = (a) => { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]); };
-    const persp = (fy, asp, n, f) => { const t = 1 / Math.tan(fy / 2); return new Float32Array([t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) / (n - f), -1, 0, 0, (2 * f * n) / (n - f), 0]); };
+    const ortho = (l, r, b, t, n, f) => new Float32Array([2 / (r - l), 0, 0, 0, 0, 2 / (t - b), 0, 0, 0, 0, -2 / (f - n), 0, -(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1]);
+    const apply = (m, x, y, z) => [m[0] * x + m[4] * y + m[8] * z + m[12], m[1] * x + m[5] * y + m[9] * z + m[13]];
     const norm = (x, y, z) => { const l = Math.hypot(x, y, z) || 1; return [x / l, y / l, z / l]; };
     const lin = (c) => c.map((v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+    // the mark lies on the ground: its own height (z) points up, its top edge away from you
+    const model = rotX(-90 * RAD), view = mul(trans(0, 0, -60), mul(rotX(ELEV), rotY(AZIM)));
+    // lights and the eye, in the same (world) space as the normals
+    const key = norm(-0.35, 0.92, 0.18), fill = norm(0.55, 0.3, 0.75);
+    const eye = (() => { const s = Math.sin(ELEV), c = Math.cos(ELEV); return norm(-c * Math.sin(AZIM), s, c * Math.cos(AZIM)); })();
     // ---- buffers ----
     const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
     const vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo); gl.bufferData(gl.ARRAY_BUFFER, mesh.v, gl.STATIC_DRAW);
@@ -4618,24 +4624,22 @@ const Cleo = (() => {
     const ibo = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.i, gl.STATIC_DRAW);
     const cellBuf = gl.createBuffer(), moveBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(2, 1);
-    gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf);
-    gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 4, gl.FLOAT, false, 24, 0); gl.vertexAttribDivisor(3, 1);
-    gl.enableVertexAttribArray(4); gl.vertexAttribPointer(4, 2, gl.FLOAT, false, 24, 16); gl.vertexAttribDivisor(4, 1);
+    gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(3, 1);
     gl.bindVertexArray(null);
     area.prepend(canvas);
     const ghost = document.createElement('canvas'); ghost.className = 'art-ghost'; area.prepend(ghost);
     area.classList.add('is-3d');
-    const hint = $('.art-hint', area); if (hint?.lastChild) hint.lastChild.textContent = 'Drag to turn the mark';
     const slot = $('.art-mark', area);
     const still = reduced();
+    // the hint names what the mark answers to; a still mark answers to nothing, so it has none
+    const hint = $('.art-hint', area); if (hint?.lastChild) { hint.lastChild.textContent = 'Hover, press or tap the mark'; hint.hidden = still; }
     // ---- state ----
-    let n = 0, rows = 0, X, Y, SEED, DELAY, OFF, VEL, HEAT, move = new Float32Array(0), span = 1;
-    let W = 0, H = 0, dpr = 1, dist = 60, proj, view, camZ = 60, dark = true, base = lin([212, 0, 0]), hot = lin([255, 106, 82]);
-    let t = still ? 99 : 0, raf = 0, last = 0, drawnAt = 0, stopped = false, glintAt = 2.6, nextRipple = 5;
-    const pose = { yaw: still ? REST_YAW : 0, pitch: still ? REST_PITCH : 0, vy: 0, vp: 0, rest: REST_YAW, flung: false };
-    const ptr = { a: 0, nx: 0, ny: 0, mx: 0, my: 0, hit: false, down: false, drag: false, id: null, sx: 0, sy: 0, last: [], seen: -1e4 };
+    let n = 0, rows = 0, X, Y, SEED, DELAY, HGT, VEL, HEAT, move = new Float32Array(0), span = 1;
+    let W = 0, H = 0, dpr = 1, proj = null, frame2 = { cx: 0, cy: 0, hw: 1, hh: 1 }, dark = true, base = lin([212, 0, 0]);
+    const hot = lin([255, 106, 82]);
+    let t = still ? 7.3 : 0, raf = 0, last = 0, drawnAt = 0, stopped = false, busy = true, glintAt = 3.2, nextRipple = 6;
+    const ptr = { a: 0, mx: -99, my: -99, down: false, id: null, sx: 0, sy: 0, travel: 0, press: 0, seen: -1e4 };
     const ripples = [];
-    const key = norm(-0.5, 0.7, 0.55), fill = norm(0.65, -0.25, 0.5);
     function readColours() {
       dark = document.documentElement.dataset.theme !== 'light';
       const probe = document.createElement('i'); probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#d40000';
@@ -4652,17 +4656,14 @@ const Cleo = (() => {
       for (let j = 0; j < rows; j++) for (let i = 0; i < COLS; i++) {
         let sum = 0;
         for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += a[((j * S + yy) * c.width + i * S + xx) * 4 + 3];
-        const cov = sum / (S * S * 255);
-        if (cov >= 0.22) cells.push([i - (COLS - 1) / 2, (rows - 1) / 2 - j]);
+        if (sum / (S * S * 255) >= 0.22) cells.push([i - (COLS - 1) / 2, (rows - 1) / 2 - j]);
       }
       n = cells.length; X = new Float32Array(n); Y = new Float32Array(n); SEED = new Float32Array(n); DELAY = new Float32Array(n);
-      OFF = new Float32Array(n * 3); VEL = new Float32Array(n * 3); HEAT = new Float32Array(n); move = new Float32Array(n * 6);
+      HGT = new Float32Array(n).fill(H_MIN); VEL = new Float32Array(n); HEAT = new Float32Array(n); move = new Float32Array(n * 4);
       const far = Math.hypot(COLS / 2, rows / 2), stat = new Float32Array(n * 4);
       cells.forEach(([cx, cy], k) => {
         X[k] = cx; Y[k] = cy; SEED[k] = Math.random();
-        // the centre lands first; each box starts deep behind and off to one side
-        DELAY[k] = 0.12 + (Math.hypot(cx, cy) / far) * 0.75 + Math.random() * 0.18;
-        if (!still) { const a2 = Math.random() * TAU, r2 = 4 + Math.random() * 9; OFF[k * 3] = Math.cos(a2) * r2; OFF[k * 3 + 1] = Math.sin(a2) * r2; OFF[k * 3 + 2] = -(12 + Math.random() * 22); }
+        DELAY[k] = 0.1 + (Math.hypot(cx, cy) / far) * 0.7 + Math.random() * 0.15; // the centre rises first
         stat.set([cx, cy, SEED[k], 1], k * 4);
       });
       span = COLS * 0.8 + rows * 0.5;
@@ -4671,28 +4672,33 @@ const Cleo = (() => {
       layout(); update(0); draw(); request();
     };
     emblem.src = 'assets/brand/cleo-emblem.svg';
-    // ---- size, camera and the faint grid behind the mark in light mode ----
+    // ---- size, the orthographic frame around the mark, and the faint grid behind it in light mode ----
     function layout() {
       const w = area.offsetWidth, h = area.offsetHeight;
-      if (!w || !h) return;
+      if (!w || !h || !rows) return;
       readColours();
       W = w; H = h; dpr = Math.min(2, devicePixelRatio || 1);
       if (w * h * dpr * dpr > 3.6e6) dpr = Math.sqrt(3.6e6 / (w * h));
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
-      const asp = w / h, ty = Math.tan(FOV / 2), hw = COLS / 2 + 1, hh = (rows || 21) / 2 + 1;
-      dist = Math.max(hw / (ty * asp * 0.72), hh / (ty * 0.66)) + D0;
-      camZ = dist; proj = persp(FOV, asp, 0.5, dist * 4); view = trans(0, 0, -dist);
+      // the mark's footprint and its tallest pillars, seen through the fixed view, framed with room to spare
+      const m = mul(view, model);
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (const cx of [-COLS / 2, COLS / 2]) for (const cy of [-rows / 2, rows / 2]) for (const cz of [0, H_TALL]) {
+        const [px, py] = apply(m, cx, cy, cz); x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+      }
+      const asp = w / h;
+      let hw = Math.max((x1 - x0) / 2 / 0.78, ((y1 - y0) / 2 / 0.72) * asp); const hh = hw / asp;
+      frame2 = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hw, hh };
+      proj = ortho(frame2.cx - hw, frame2.cx + hw, frame2.cy - hh, frame2.cy + hh, 1, 200);
       ghostGrid();
-      // where the mark rests on screen, so the loading screen's mark can glide into it
-      if (slot && n) {
-        const m = mul(proj, mul(view, model(REST_YAW, REST_PITCH, 0)));
-        let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
-        for (const [cx, cy, cz] of [[-COLS / 2, -rows / 2, 0], [COLS / 2, -rows / 2, 0], [-COLS / 2, rows / 2, 0], [COLS / 2, rows / 2, 0]]) {
-          const px = m[0] * cx + m[4] * cy + m[8] * cz + m[12], py = m[1] * cx + m[5] * cy + m[9] * cz + m[13], pw = m[3] * cx + m[7] * cy + m[11] * cz + m[15];
-          const sx = (px / pw * 0.5 + 0.5) * w, sy = (0.5 - py / pw * 0.5) * h;
-          x0 = Math.min(x0, sx); y0 = Math.min(y0, sy); x1 = Math.max(x1, sx); y1 = Math.max(y1, sy);
+      // where the mark sits on screen, so the loading screen's mark can glide into it
+      if (slot) {
+        const pm = mul(proj, m); let sx0 = 1e9, sy0 = 1e9, sx1 = -1e9, sy1 = -1e9;
+        for (const cx of [-COLS / 2, COLS / 2]) for (const cy of [-rows / 2, rows / 2]) {
+          const [px, py] = apply(pm, cx, cy, 1), sx = (px * 0.5 + 0.5) * w, sy = (0.5 - py * 0.5) * h;
+          sx0 = Math.min(sx0, sx); sx1 = Math.max(sx1, sx); sy0 = Math.min(sy0, sy); sy1 = Math.max(sy1, sy);
         }
-        Object.assign(slot.style, { left: `${x0}px`, top: `${y0}px`, width: `${x1 - x0}px`, height: `${y1 - y0}px` });
+        Object.assign(slot.style, { left: `${sx0}px`, top: `${sy0}px`, width: `${sx1 - sx0}px`, height: `${sy1 - sy0}px` });
       }
     }
     function ghostGrid() {
@@ -4708,55 +4714,51 @@ const Cleo = (() => {
         x.fillStyle = `rgb(20 20 24 / ${al.toFixed(3)})`; x.beginPath(); x.roundRect(xx + 2.5, yy + 2.5, BOX, BOX, 3.5); x.fill();
       }
     }
-    const model = (yaw, pitch, bob) => mul(trans(0, bob, 0), mul(rotX(pitch * RAD), rotY(yaw * RAD)));
-    // ---- motion ----
-    const springStep = (x, v, target, dt, response, damping) => { const k = (TAU / response) ** 2, c = 2 * damping * Math.sqrt(k); v += (k * (target - x) - c * v) * dt; return [x + v * dt, v]; };
+    // ---- motion: every pillar springs toward a height made of the waves, the pointer and the ripples ----
+    // the resting skyline: two slow waves of different lengths crossing the mark, and a little of each pillar's own
+    const skyline = (x, y, s, tt) => 0.5 + 0.28 * Math.sin(tt * 0.55 + x * 0.32 + Math.sin(tt * 0.21 + y * 0.18) * 1.4) + 0.22 * Math.sin(tt * 0.37 - y * 0.41 + x * 0.12 + s * 2.1);
     function update(dt) {
-      const intro = still ? 1 : Math.min(1, t / 2.2), calm = still ? 0 : clamp((t - 1.8) / 1.2, 0, 1);
-      // the pose: facing you at first, then onto its side; it sways, floats and leans toward the pointer
-      if (!ptr.drag) {
-        const turn = t > 0.35 || still;
-        const yawT = turn ? pose.rest + 7 * Math.sin((TAU * t) / 12) * calm + ptr.a * ptr.nx * 14 : 0;
-        const pitchT = turn ? REST_PITCH + 3 * Math.sin((TAU * t) / 8.6) * calm + ptr.a * ptr.ny * 9 : 0;
-        if (still) { pose.yaw = yawT; pose.pitch = pitchT; }
-        else {
-          [pose.yaw, pose.vy] = springStep(pose.yaw, pose.vy, yawT, dt, pose.flung ? 0.9 : 1.1, pose.flung ? 0.8 : 0.78);
-          [pose.pitch, pose.vp] = springStep(pose.pitch, pose.vp, pitchT, dt, 0.9, 0.8);
-          if (pose.flung && Math.abs(pose.yaw - yawT) < 2 && Math.abs(pose.vy) < 20) pose.flung = false;
-        }
-      }
-      pose.bob = 0.25 * Math.sin((TAU * t) / 6.5) * calm;
-      // a glint now and then, and a quiet ripple every few seconds
+      const calm = still ? 1 : clamp((t - 1.4) / 1.2, 0, 1);
       if (!still && t > glintAt + 1.6) glintAt = t + 4 + Math.random() * 3;
-      if (!still && t > nextRipple && n) { const k = Math.floor(Math.random() * n); ripples.push(...Ripple.make(X[k], Y[k], t, { speed: 7, life: 1.8, band: 0.8, splash: false }).map((r) => ({ ...r, k: 0.45 }))); nextRipple = t + 5 + Math.random() * 4; }
+      if (!still && t > nextRipple && n) { const k = Math.floor(Math.random() * n); ripples.push(...Ripple.make(X[k], Y[k], t, { speed: 7, life: 1.8, band: 0.8, splash: false }).map((r) => ({ ...r, k: 0.4 }))); nextRipple = t + 5 + Math.random() * 4; }
       for (let k = ripples.length - 1; k >= 0; k--) if (t - ripples[k].t0 > ripples[k].life) ripples.splice(k, 1);
       const live = ripples.filter((r) => Ripple.prepare(r, t));
+      ptr.press += ((ptr.down ? 1 : 0) - ptr.press) * (still ? 1 : 1 - Math.exp(-dt / 0.12));
+      let moving = false;
       for (let k = 0; k < n; k++) {
-        const x = X[k], y = Y[k], o = k * 3, since = t - DELAY[k];
-        // depth: a slow wave rolling through the boxes
-        const wave = 0.5 + 0.5 * Math.sin(t * 0.85 - (x * 0.28 + y * 0.2) + SEED[k] * 0.8);
-        let zt = 0, ht = since > 0 && !still ? Math.max(0, 1 - since / 0.7) * 0.9 : 0;
-        if (ptr.a > 0.01 && ptr.hit) { const p = ptr.a * Math.exp(-((x - ptr.mx) ** 2 + (y - ptr.my) ** 2) / (2 * 2.4 * 2.4)); zt += p * (ptr.down ? 1.9 : 1.4); ht += 0.55 * p; }
-        for (const r of live) { const s = Ripple.at(r, x - r.x, y - r.y, SEED[k] * TAU); if (s > 0.01) { zt += 2 * s; ht += 0.9 * s; } }
-        if (still) { OFF[o] = OFF[o + 1] = 0; OFF[o + 2] = 0; }
-        else if (since > 0) {
-          for (let d = 0; d < 3; d++) [OFF[o + d], VEL[o + d]] = springStep(OFF[o + d], VEL[o + d], d === 2 ? zt : 0, dt, 0.55, 0.62);
+        const x = X[k], y = Y[k], since = t - DELAY[k];
+        let target = 0.4 + 1.35 * skyline(x, y, SEED[k], t) * (0.35 + 0.65 * calm), heat = since > 0 && !still ? Math.max(0, 1 - since / 0.8) * 0.8 : 0;
+        if (ptr.a > 0.01) {
+          const d = Math.hypot(x - ptr.mx, y - ptr.my);
+          const hill = Math.exp(-(d * d) / (2 * 2.3 * 2.3)) * ptr.a;
+          // hovering raises a soft hill; pressing sinks the middle of it and lifts a ring around the finger
+          const dent = Math.exp(-(d * d) / (2 * 1.5 * 1.5)), rim = Math.exp(-((d - 2.9) ** 2) / (2 * 0.9 * 0.9));
+          target += hill * 2.2 * (1 - ptr.press) + ptr.press * ptr.a * (rim * 1.3 - dent * target);
+          heat += hill * 0.55 * (1 - ptr.press) + ptr.press * ptr.a * rim * 0.5;
         }
-        HEAT[k] += (Math.min(1, ht) - HEAT[k]) * (still ? 1 : 1 - Math.exp(-dt / 0.16));
-        const s = still ? 1 : since <= 0 ? 0 : 1 - (1 - Math.min(1, since / 0.32)) ** 3;
-        move.set([OFF[o], OFF[o + 1], OFF[o + 2], D0 + BREATH * wave * wave * calm, HEAT[k], s], k * 6);
+        for (const r of live) { const s = Ripple.at(r, x - r.x, y - r.y, SEED[k] * TAU); if (s > 0.01) { target += 2.4 * s; heat += 0.9 * s; } }
+        target = Math.max(H_MIN, target);
+        if (still) HGT[k] = target;
+        else if (since > 0) {
+          const kk = (TAU / 0.4) ** 2, c = 2 * 0.52 * Math.sqrt(kk);
+          VEL[k] += (kk * (target - HGT[k]) - c * VEL[k]) * dt; HGT[k] = Math.max(H_MIN, HGT[k] + VEL[k] * dt);
+          // the drifting skyline alone is slow; anything faster (pointer, ripples, arrival) wants every frame
+          if (Math.abs(target - HGT[k]) > 0.12 || Math.abs(VEL[k]) > 0.6) moving = true;
+        }
+        HEAT[k] += (Math.min(1, heat) - HEAT[k]) * (still ? 1 : 1 - Math.exp(-dt / 0.16));
+        const scale = still ? 1 : since <= 0 ? 0.001 : 1 - (1 - Math.min(1, since / 0.18)) ** 3;
+        move.set([HGT[k], HEAT[k], scale, 0], k * 4);
       }
-      return intro < 1 || ptr.down || pose.flung || live.length > 0;
+      return t < 2.6 || ptr.a > 0.01 || ptr.press > 0.01 || live.length > 0 || moving;
     }
     function draw() {
-      if (!n || !W) return;
+      if (!n || !W || !proj) return;
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
       gl.useProgram(prog);
-      gl.uniformMatrix4fv(U.uProj, false, proj); gl.uniformMatrix4fv(U.uView, false, view);
-      gl.uniformMatrix4fv(U.uModel, false, model(pose.yaw, pose.pitch, pose.bob || 0));
-      gl.uniform1f(U.uBevel, BEV); gl.uniform1f(U.uBack, -D0 / 2); gl.uniform3f(U.uCam, 0, 0, camZ);
+      gl.uniformMatrix4fv(U.uProj, false, proj); gl.uniformMatrix4fv(U.uView, false, view); gl.uniformMatrix4fv(U.uModel, false, model);
+      gl.uniform1f(U.uBevel, BEV); gl.uniform3fv(U.uEye, eye);
       gl.uniform3fv(U.uBase, base); gl.uniform3fv(U.uHot, hot); gl.uniform3fv(U.uKey, key); gl.uniform3fv(U.uFill, fill);
       gl.uniform1f(U.uAmb, dark ? 0.2 : 0.32); gl.uniform1f(U.uEmis, dark ? 0.12 : 0.04);
       gl.uniform1f(U.uGlint, still ? -9 : ((t - glintAt) / 1.6) * 1.6 - 0.3); gl.uniform1f(U.uSpan, span);
@@ -4768,69 +4770,52 @@ const Cleo = (() => {
       if (stopped) return;
       if (!canvas.isConnected) { stop(); return; }
       if (document.hidden) return;
-      const dt = Math.min(1 / 30, last ? (now - last) / 1000 : 1 / 60);
-      // at rest the slow sway needs no more than about 30 frames a second
+      // when nothing is touched the slow skyline needs no more than about 30 frames a second
       if (!busy && last && now - drawnAt < 30) { raf = requestAnimationFrame(frame); return; }
-      last = now; drawnAt = now; t += dt;
-      ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.3));
-      busy = update(dt) || ptr.a > 0.01;
+      // the springs step at most a 60th of a second at a time, so a slow frame keeps time without overshooting
+      const real = Math.min(0.25, last ? (now - last) / 1000 : 1 / 60), steps = Math.ceil(real * 60), dt = real / steps;
+      last = now; drawnAt = now;
+      for (let i = 0; i < steps; i++) {
+        t += dt;
+        ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.3));
+        busy = update(dt);
+      }
       draw();
       raf = requestAnimationFrame(frame);
     }
-    let busy = true;
     function request() { if (!still && !raf && !stopped && canvas.isConnected) raf = requestAnimationFrame(frame); }
-    // ---- pointer: lean, push, drag to turn, tap to ripple ----
-    const scale = () => { const r = canvas.getBoundingClientRect(); return [r, r.width / (W || 1) || 1]; };
+    // ---- pointer: where it meets the mark, a little above the ground (about the height of the pillars) ----
     function aim(e) {
-      const [r] = scale(), ndx = ((e.clientX - r.left) / r.width) * 2 - 1, ndy = 1 - ((e.clientY - r.top) / r.height) * 2;
-      ptr.nx = clamp(ndx, -1, 1); ptr.ny = clamp(-ndy, -1, 1);
-      // the pointer's ray, taken into the mark's own space, meets the plane of its faces
-      const ty = Math.tan(FOV / 2), asp = W / (H || 1);
-      let dx = ndx * ty * asp, dy = ndy * ty, dz = -1, ox = 0, oy = -(pose.bob || 0), oz = camZ;
-      const cy = Math.cos(-pose.yaw * RAD), sy = Math.sin(-pose.yaw * RAD), cp = Math.cos(-pose.pitch * RAD), sp = Math.sin(-pose.pitch * RAD);
-      const rx = (x, y, z) => [x, cp * y - sp * z, sp * y + cp * z], ry = (x, y, z) => [cy * x + sy * z, y, -sy * x + cy * z];
-      [ox, oy, oz] = ry(...rx(ox, oy, oz)); [dx, dy, dz] = ry(...rx(dx, dy, dz));
-      const zf = D0 / 2, k = Math.abs(dz) > 1e-6 ? (zf - oz) / dz : -1;
-      ptr.hit = k > 0; if (ptr.hit) { ptr.mx = ox + dx * k; ptr.my = oy + dy * k; }
+      const r = canvas.getBoundingClientRect();
+      const nx = ((e.clientX - r.left) / r.width) * 2 - 1, ny = 1 - ((e.clientY - r.top) / r.height) * 2;
+      const vx = frame2.cx + nx * frame2.hw, vy = frame2.cy + ny * frame2.hh;
+      // undo the view for the point under the pointer, then slide along the view until it meets that height
+      const se = Math.sin(ELEV), ce = Math.cos(ELEV), sa = Math.sin(AZIM), ca = Math.cos(AZIM), PLANE = 1;
+      const vz = (PLANE - ce * vy) / se, a = vx, c = -se * vy + ce * vz;
+      const wx = ca * a - sa * c, wz = sa * a + ca * c;
+      ptr.mx = wx; ptr.my = -wz;
     }
     canvas.addEventListener('pointermove', (e) => {
       if (still) return;
       aim(e); ptr.seen = performance.now();
-      if (ptr.down && e.pointerId === ptr.id) {
-        const [, k] = scale(), mx = (e.clientX - ptr.sx) / k, my = (e.clientY - ptr.sy) / k;
-        if (!ptr.drag && Math.hypot(mx, my) > 6) { ptr.drag = true; canvas.classList.add('grabbing'); }
-        if (ptr.drag) {
-          const lx = ptr.last.length ? ptr.last[ptr.last.length - 1] : { x: ptr.sx, y: ptr.sy };
-          pose.yaw += ((e.clientX - lx.x) / k) * 0.42; pose.pitch = clamp(pose.pitch + ((e.clientY - lx.y) / k) * 0.25, -30, 45);
-        }
-        ptr.last.push({ x: e.clientX, y: e.clientY, t: performance.now(), yaw: pose.yaw, pitch: pose.pitch });
-        if (ptr.last.length > 6) ptr.last.shift();
-      }
+      if (ptr.down && e.pointerId === ptr.id) ptr.travel = Math.max(ptr.travel, Math.hypot(e.clientX - ptr.sx, e.clientY - ptr.sy));
       request();
     });
     canvas.addEventListener('pointerdown', (e) => {
       if (still || e.button > 0) return;
-      canvas.setPointerCapture(e.pointerId); aim(e);
-      Object.assign(ptr, { down: true, drag: false, id: e.pointerId, sx: e.clientX, sy: e.clientY, last: [], seen: performance.now() });
-      pose.vy = 0; pose.vp = 0; request();
+      canvas.setPointerCapture(e.pointerId); canvas.classList.add('grabbing'); aim(e);
+      Object.assign(ptr, { down: true, id: e.pointerId, sx: e.clientX, sy: e.clientY, travel: 0, seen: performance.now() });
+      request();
     });
     const release = (e) => {
       if (!ptr.down || (e && e.pointerId !== ptr.id)) return;
       ptr.down = false; canvas.classList.remove('grabbing');
-      if (ptr.drag) {
-        // the throw's speed over the last few moves; project where it would come to rest, then choose
-        // the nearest turn that leaves the mark on its side, and spring there carrying that speed
-        const a = ptr.last[0], b = ptr.last[ptr.last.length - 1], span2 = Math.max(16, (b?.t || 0) - (a?.t || 0)) / 1000;
-        pose.vy = a && b ? (b.yaw - a.yaw) / span2 : 0; pose.vp = a && b ? (b.pitch - a.pitch) / span2 : 0;
-        const projected = pose.yaw + pose.vy * 0.499;
-        pose.rest = REST_YAW + 360 * Math.round((projected - REST_YAW) / 360); pose.flung = true;
-      } else if (ptr.hit) {
-        // a tap: a ripple through the boxes from where it landed, and through the background grid
-        ripples.push(...Ripple.make(ptr.mx, ptr.my, t, { speed: 9, life: 1.9, band: 0.9 }));
-        if (ripples.length > 14) ripples.splice(0, ripples.length - 14);
-        ambient.pulse(e.clientX, e.clientY);
-      }
-      ptr.drag = false; ptr.seen = performance.now(); request();
+      // a tap sends a full ripple through the pillars and the background grid; letting go after a press, a smaller one
+      const tap = ptr.travel < 8;
+      ripples.push(...Ripple.make(ptr.mx, ptr.my, t, { speed: tap ? 9 : 7, life: tap ? 1.9 : 1.4, band: tap ? 0.9 : 0.7, splash: tap }).map((r) => ({ ...r, k: r.k * (tap ? 1 : 0.6) })));
+      if (ripples.length > 14) ripples.splice(0, ripples.length - 14);
+      if (tap && e) ambient.pulse(e.clientX, e.clientY);
+      ptr.seen = performance.now(); request();
     };
     canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
     canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.seen = performance.now() - 1500; });
@@ -5605,20 +5590,20 @@ const Cleo = (() => {
   }
 
   /* ---------- branch selection (web portals) ---------- */
-  /* a small bar chart, the same mark as Charts.columns: one thin bar per value, its top a semicircle.
+  /* a small bar chart, the same mark as Charts.columns: one thin bar per value, rounded at the top.
      null values are hours still to come: they show as a short stub, so the day keeps its width.
      The latest bar is drawn full strength (peak), the earlier ones a step softer. */
   function sparkSVG(values, { w = 280, h = 44, peak = true } = {}) {
     const n = values.length, max = Math.max(...values.filter((v) => v != null), 1);
     if (!values.some((v) => v != null)) return '';
-    const band = w / n, bw = Math.max(2, Math.min(band * 0.6, 14)), r = bw / 2;
+    const band = w / n, bw = Math.max(2, Math.min(band * 0.6, 14)), r = Math.min(3, bw / 2);
     const last = values.reduce((a, v, i) => (v != null ? i : a), -1), anim = !reduced();
     const f = (v) => +v.toFixed(2);
     const bars = values.map((v, i) => {
       const x = band * i + (band - bw) / 2;
       if (v == null) return `<rect class="sp-rest" x="${f(x)}" y="${h - 2}" width="${f(bw)}" height="2" rx="1"/>`;
-      const bh = Math.max(3, (v / max) * (h - 1)), y = h - bh, rr = f(Math.min(r, bh));
-      return `<path class="sp-b${peak && i === last ? ' pk' : ''}${anim ? ' in' : ''}" style="--d:${i * 26}ms" d="M${f(x)},${f(h)}V${f(y + rr)}A${rr},${rr} 0 0 1 ${f(x + rr)},${f(y)}H${f(x + bw - rr)}A${rr},${rr} 0 0 1 ${f(x + bw)},${f(y + rr)}V${f(h)}Z"/>`;
+      const bh = Math.max(3, (v / max) * (h - 1)), y = h - bh;
+      return `<path class="sp-b${peak && i === last ? ' pk' : ''}${anim ? ' in' : ''}" style="--d:${i * 26}ms" d="M${f(x)},${f(h)}V${f(y + r)}A${r},${r} 0 0 1 ${f(x + r)},${f(y)}H${f(x + bw - r)}A${r},${r} 0 0 1 ${f(x + bw)},${f(y + r)}V${f(h)}Z"/>`;
     }).join('');
     return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMax meet" aria-hidden="true">${bars}</svg>`;
   }
@@ -6447,21 +6432,23 @@ const Cleo = (() => {
 /* ===================== charts.js · Charts: columns, donut, bars, heatmap, bridge, calendar ===================== */
 /* =====================================================================
    Cleo charts: small, dependency-free charts in SVG and HTML.
-   One visual language for every chart, round wherever a mark can be:
-     - solid marks with fully rounded data ends (a semicircle) and square ends on the baseline,
-       so a length still reads from zero; stacked parts are capsules with a 3px gap between them;
-     - rings with round caps; day and hour cells are dots, and a heat dot also grows with its value;
+   One visual language for every chart:
+     - solid marks with rounded data ends (4px) and square ends on the baseline;
+     - a 2px gap where marks touch (stacked parts, donut arcs);
      - a quiet grid: three hairlines and their values, nothing more;
      - one tooltip on hover and on keyboard focus (arrow keys); the dashboards add a table view.
+   Two charts are rounder: the revenue and profit columns (columns() with round: their parts stay joined
+   and only the top of each column is round, a semicircle) and the donut (round-capped arcs; a share too
+   small for an arc is a dot).
      columns()    trends and stacked parts: one column per period, parts stacked bottom up
      donut()      part-to-whole: a ring of round-capped arcs with the figure in the middle
      bars()       ranked rows: a rounded bar on a faint track per item
-     heatmap()    day by hour: a dot per cell whose colour and size are the value
-     waterfall()  the P&L bridge: floating capsules joined by thin connectors
-     calendar()   daily activity: a dot per day, one column per week (Owner › Activity)
-   Marks grow in once per draw (columns rise from the baseline on a spring, bars from the left, the
-   donut clockwise, dots pop in) with a short stagger. Redraws after a resize are instant, and reduced
-   motion skips the growth.
+     heatmap()    day by hour: a tile per cell whose strength is the value
+     waterfall()  the P&L bridge: floating columns joined by thin connectors
+     calendar()   daily activity: a tile per day, one column per week (Owner › Activity)
+   Marks grow in once per draw (columns with rise from the baseline, bars from the left, the donut
+   clockwise) with a short stagger. Redraws after a resize are instant, and reduced motion skips the
+   growth.
    ===================================================================== */
 const Charts = (() => {
   const { esc, reduced, clamp } = Cleo;
@@ -6520,10 +6507,12 @@ const Charts = (() => {
      cfg.columns: [{ label, tipLabel, segs: [{ from, to, color }], tip: [[name, value text, color]], top? }]
        segs are value ranges in that colour: stacked parts use consecutive ranges from zero, a bridge
        (P&L) uses floating ones. `top` is an optional label above the column.
-     cfg: { height, compact, fill?, allLabels?, links?, yMax?, yTick, label }
+     cfg: { height, compact, fill?, allLabels?, links?, round?, rise?, yMax?, yTick, label }
        fill       grow to the height the element is given (a panel stretched by a taller neighbour)
        allLabels  name every column; names that would collide alternate between two lines
        links      a value per column: a thin connector to the next column at that level (bridges)
+       round      the parts of a column stay joined and only its top is round, a semicircle
+       rise       the columns rise from the baseline one after another when drawn
      Returns { update(nextCfg) }. */
   function columns(el, cfg = {}) {
     const draw = (animate = true) => {
@@ -6546,7 +6535,8 @@ const Charts = (() => {
       const band = plotW / n;
       const bw = clamp(band * (compact ? 0.6 : 0.56), 3, compact ? 16 : 36);
       const colX = (i) => pad.l + band * i + (band - bw) / 2, centre = (i) => pad.l + band * (i + 0.5);
-      const R = bw / 2, GAP = 3;
+      const round = !!cfg.round, grow = anim && !!cfg.rise, cid = ++uid;
+      const R = round ? bw / 2 : Math.min(4, bw / 2), GAP = 2;
 
       const svg = node('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, class: `viz cols${compact ? ' compact' : ''}`, tabindex: 0, role: 'img', 'aria-label': label });
       // the grid: hairlines at zero, half and the top, with their values on the left
@@ -6570,20 +6560,26 @@ const Charts = (() => {
       const groups = cols.map((c, i) => {
         const g = node('g', { class: 'col', 'data-i': i });
         const bandW = Math.max(1, band - Math.min(8, band * 0.16));
-        g.appendChild(node('rect', { x: pad.l + band * i + Math.min(4, band * 0.08), y: pad.t - 6, width: bandW, height: ih + 6, rx: Math.min(bandW / 2, 22), class: 'band' }));
-        const mk = node('g', { class: `mk${anim ? ' grow' : ''}`, style: `--d:${Math.round(i * (compact ? 22 : 34))}ms` });
+        g.appendChild(node('rect', { x: pad.l + band * i + Math.min(4, band * 0.08), y: pad.t - 6, width: bandW, height: ih + 6, rx: round ? Math.min(bandW / 2, 22) : compact ? 4 : 8, class: 'band' }));
+        const mk = node('g', { class: `mk${grow ? ' grow' : ''}`, style: `--d:${Math.round(i * (compact ? 22 : 34))}ms` });
         const segs = c.segs.map((s) => ({ lo: Math.min(s.from, s.to), hi: Math.max(s.from, s.to), color: s.color })).filter((s) => s.hi - s.lo > 0).sort((a, b) => a.lo - b.lo);
         const top = segs.length ? Math.max(...segs.map((s) => s.hi)) : 0;
-        segs.forEach((s, k) => {
+        if (round && segs.length) {
+          // one outline per column, a semicircle on top and square on the baseline; the parts fill it, joined
+          const lo = Math.min(...segs.map((s) => s.lo)), yt = y(top), yb = y(lo), id = `cc${cid}-${i}`;
+          const clip = node('clipPath', { id }); clip.appendChild(node('path', { d: barPath(colX(i), yt, bw, Math.max(1.5, yb - yt), R, lo <= 0 ? 0 : R) }));
+          const parts = node('g', { 'clip-path': `url(#${id})` });
+          segs.forEach((s) => { const a = y(s.hi), b = y(s.lo); parts.appendChild(node('rect', { x: colX(i), y: a, width: bw, height: Math.max(0, b - a) + 0.5, fill: s.color })); });
+          mk.append(clip, parts);
+        } else segs.forEach((s, k) => {
           let yt = y(s.hi); const yb = y(s.lo);
           const isTop = s.hi === top, onBase = s.lo <= 0, above = segs.slice(k + 1).some((o) => Math.abs(o.lo - s.hi) < 1e-6);
-          if (above && yb - yt > GAP + 1) yt += GAP; // surface between stacked parts
+          if (above && yb - yt > GAP + 1) yt += GAP; // a sliver of surface between stacked parts
           const h = Math.max(isTop ? 1.5 : 0, yb - yt); if (h <= 0) return;
-          // every part is a capsule; only an end standing on the baseline stays square
-          mk.appendChild(node('path', { d: barPath(colX(i), yt, bw, h, R, onBase ? 0 : R), fill: s.color }));
+          mk.appendChild(node('path', { d: barPath(colX(i), yt, bw, h, isTop ? R : 0, onBase ? 0 : R), fill: s.color }));
         });
         g.appendChild(mk);
-        if (c.top) { const t = node('text', { x: centre(i), y: Math.max(12, y(top) - 8), 'text-anchor': 'middle', class: `col-top${anim ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 360)}ms` }); t.textContent = c.top; g.appendChild(t); }
+        if (c.top) { const t = node('text', { x: centre(i), y: Math.max(12, y(top) - 8), 'text-anchor': 'middle', class: `col-top${grow ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 360)}ms` }); t.textContent = c.top; g.appendChild(t); }
         return g;
       });
       groups.forEach((g) => svg.appendChild(g));
@@ -6591,7 +6587,7 @@ const Charts = (() => {
       if (cfg.links) cols.forEach((c, i) => {
         const v = cfg.links[i]; if (v == null || i === n - 1) return;
         const ly = Math.round(y(v)) + 0.5;
-        svg.appendChild(node('line', { x1: colX(i) + bw, x2: colX(i + 1), y1: ly, y2: ly, class: `link${anim ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 420)}ms` }));
+        svg.appendChild(node('line', { x1: colX(i) + bw, x2: colX(i + 1), y1: ly, y2: ly, class: `link${grow ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 420)}ms` }));
       });
       // hover and keyboard: one column at a time, the rest step back
       const hits = cols.map((c, i) => { const h = node('rect', { x: pad.l + band * i, y: 0, width: Math.max(1, band), height: H, fill: 'transparent', 'data-i': i }); svg.appendChild(h); return h; });
@@ -6691,9 +6687,9 @@ const Charts = (() => {
     el.innerHTML = `
       <div class="heat" style="--cols:${cols.length}">
         <span></span>${cols.map((c, i) => `<span class="hx">${i % 2 === 0 ? esc(colLabel(c)) : ''}</span>`).join('')}
-        ${rows.map((r, ri) => `<span class="hy">${esc(r)}</span>${cols.map((c, ci) => { const v = values[ri][ci]; const p = (v - min) / (max - min || 1); return `<span class="hc${anim ? ' in' : ''}" data-r="${ri}" data-c="${ci}" style="--p:${Math.round(12 + p * 88)}%;--s:${(0.5 + 0.5 * p).toFixed(3)};--d:${ci * 18 + ri * 26}ms"></span>`; }).join('')}`).join('')}
+        ${rows.map((r, ri) => `<span class="hy">${esc(r)}</span>${cols.map((c, ci) => { const v = values[ri][ci]; const p = (v - min) / (max - min || 1); return `<span class="hc${anim ? ' in' : ''}" data-r="${ri}" data-c="${ci}" style="--p:${Math.round(12 + p * 88)}%;--d:${ci * 18 + ri * 26}ms"></span>`; }).join('')}`).join('')}
       </div>
-      <div class="heat-legend"><span>${esc(fmtValue(min))}</span>${[12, 34, 56, 78, 100].map((p) => `<i style="--p:${p}%;--s:${(0.5 + (0.5 * (p - 12)) / 88).toFixed(3)}"></i>`).join('')}<span>${esc(fmtValue(max))}</span></div>`;
+      <div class="heat-legend"><span>${esc(fmtValue(min))}</span>${[12, 34, 56, 78, 100].map((p) => `<i style="--p:${p}%"></i>`).join('')}<span>${esc(fmtValue(max))}</span></div>`;
     const grid = el.querySelector('.heat');
     grid.addEventListener('pointermove', (e) => {
       const c = e.target.closest('.hc'); if (!c) return hideTip();
@@ -9242,7 +9238,7 @@ Cleo.bir = (() => {
           columns: t.map((x) => ({ label: x.l, tipLabel: x.tl,
             segs: [{ from: 0, to: x.cogs, color: TREND_PARTS[0][1] }, { from: x.cogs, to: x.cogs + x.exp, color: TREND_PARTS[1][1] }, { from: x.cogs + x.exp, to: x.net, color: TREND_PARTS[2][1] }],
             tip: [['Net sales', fmt.peso(x.net, 0)], ['Cost of goods sold', fmt.peso(x.cogs, 0), TREND_PARTS[0][1]], ['Expenses', fmt.peso(x.exp, 0), TREND_PARTS[1][1]], ['Net profit', fmt.peso(x.profit, 0), TREND_PARTS[2][1]]] })),
-          yTick: (v) => fmt.axis(v), height: 270, fill: true }; };
+          yTick: (v) => fmt.axis(v), height: 270, fill: true, round: true, rise: true }; };
         const chart = Charts.columns($('[data-chart="trend"]', node), trendCfg());
         seg($('[data-gran]', node), (g) => { state.gran = g; tableOff('trend'); chart.update(trendCfg()); });
         tableToggle(node, 'trend', () => { const t = tr(); return Charts.table({ head: ['Period', 'Net sales', 'COGS', 'Expenses', 'Net profit'], numeric: [1, 2, 3, 4], rows: t.map((x) => [esc(x.tl), fmt.peso(x.net, 0), fmt.peso(x.cogs, 0), fmt.peso(x.exp, 0), fmt.peso(x.profit, 0)]) }); });
