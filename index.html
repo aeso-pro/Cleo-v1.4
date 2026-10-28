@@ -605,12 +605,12 @@ button.chip:active { transform: scale(.96); }
 ::view-transition-group(branch-chip) { animation-duration: 240ms; animation-timing-function: var(--ease-in-out); }
 
 /* Brand lockup: the emblem, then the wordmark (assets/brand/cleo-wordmark.svg, drawn as a mask so it takes
-   the ink colour). Proportions follow the brand lockup: the wordmark stands at .6 of the emblem's height,
-   about a quarter of that height away. Size a lockup with the img height and the word's font-size. */
-.lockup { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); text-decoration: none; }
-.lockup img { height: 22px; width: auto; flex: none; }
-.lockup .word { display: block; flex: none; font-size: 21px; height: .64em; aspect-ratio: 1890 / 746; background: currentColor; -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
-.lockup .app { margin-left: 6px; }
+   the ink colour). Proportions follow the brand lockup: the wordmark stands at .45 of the emblem's height,
+   centred on it, an eighth of that height away. Size a lockup with --mark, the emblem's height. */
+.lockup { --mark: 30px; display: inline-flex; align-items: center; gap: calc(var(--mark) * .123); color: var(--ink); text-decoration: none; }
+.lockup img { height: var(--mark); width: auto; flex: none; }
+.lockup .word { display: block; flex: none; height: calc(var(--mark) * .449); aspect-ratio: 1890 / 746; background: currentColor; -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
+.lockup .app { margin-left: 8px; }
 .aeso { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-3); }
 /* ASSET: assets/brand/aeso-mark.png, used as a mask so it takes the colour below */
 .aeso .mark { width: 18px; height: 15px; background: #d9541a; -webkit-mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; }
@@ -619,13 +619,13 @@ button.chip:active { transform: scale(.96); }
 /* ---------- Boot screen ---------- */
 .boot { display: grid; place-items: center; position: relative; overflow: hidden; }
 .boot-center { display: grid; justify-items: center; gap: 26px; }
-.boot-mark { position: relative; width: 168px; aspect-ratio: 1330.77 / 980.27; view-transition-name: cleo-mark; }
+.boot-mark { position: relative; width: 124px; aspect-ratio: 980.27 / 1330.77; view-transition-name: cleo-mark; }
 /* ASSET: assets/brand/cleo-emblem.svg, in three parts, one per node, that come together in the opening
    animation. Each part reaches a little past the lines where they meet, so no seam shows once joined. */
 .boot-mark .part { position: absolute; inset: 0; background: url("assets/brand/cleo-emblem.svg") center / contain no-repeat; }
-.boot-mark .part.tl { clip-path: polygon(51% 41.7%, 51% 0, 0 0, 0 86%); }
-.boot-mark .part.tr { clip-path: polygon(49% 41.7%, 49% 0, 100% 0, 100% 86%); }
-.boot-mark .part.b { clip-path: polygon(50% 39%, 0 84%, 0 100%, 100% 100%, 100% 84%); }
+.boot-mark .part.tr { clip-path: polygon(58.3% 51%, 100% 51%, 100% 0, 14% 0); }
+.boot-mark .part.br { clip-path: polygon(58.3% 49%, 100% 49%, 100% 100%, 14% 100%); }
+.boot-mark .part.l { clip-path: polygon(61% 50%, 16% 0, 0 0, 0 100%, 16% 100%); }
 .boot-glow { position: absolute; left: 50%; top: 50%; width: 560px; height: 560px; margin: -280px 0 0 -280px; border-radius: 50%; background: radial-gradient(closest-side, var(--accent-glow), transparent 70%); opacity: 0; pointer-events: none; }
 .boot-word { display: flex; align-items: baseline; gap: 14px; clip-path: inset(0 100% 0 0); }
 /* the wordmark sits on the app name's baseline (a box without text aligns by its bottom edge) */
@@ -659,14 +659,14 @@ button.chip:active { transform: scale(.96); }
 /* where the mark sits, so the loading screen's mark can glide into it */
 .art-mark { position: absolute; pointer-events: none; view-transition-name: cleo-mark; }
 .art-hint { position: absolute; bottom: 28px; right: 32px; font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; pointer-events: none; }
-/* the Cleo mark in 3D (emblem3d in core.js draws it with WebGL2 and turns it with the pointer). Behind it,
-   a soft accent glow in dark mode and a faint grid in light mode (the art-ghost canvas). */
+/* the Cleo mark in 3D (emblem3d in core.js draws it with WebGL2; its pillars answer the pointer). Behind it,
+   a soft accent glow in dark mode; in light mode a faint grid and the mark's own soft shadow (the art-ghost canvas). */
 .art-3d, .art-ghost { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .art-3d { touch-action: none; cursor: grab; }
 .art-3d.grabbing { cursor: grabbing; }
 .art-ghost { pointer-events: none; }
-.login-art.is-3d::before { content: ""; position: absolute; left: 50%; top: 50%; width: min(78%, 760px); aspect-ratio: 1.3; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, var(--accent-glow), transparent 72%); opacity: .3; pointer-events: none; }
-:root[data-theme="light"] .login-art.is-3d::before { top: 74%; aspect-ratio: 3.2; width: min(60%, 560px); background: radial-gradient(closest-side, rgb(20 20 24 / .13), transparent 74%); opacity: 1; }
+.login-art.is-3d::before { content: ""; position: absolute; left: 50%; top: 50%; width: min(58%, 600px); aspect-ratio: .8; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, var(--accent-glow), transparent 72%); opacity: .3; pointer-events: none; }
+:root[data-theme="light"] .login-art.is-3d::before { display: none; }
 .login-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .shake { animation: shake 420ms var(--ease-out); }
 @keyframes shake { 15% { transform: translateX(-9px); } 35% { transform: translateX(7px); } 55% { transform: translateX(-4px); } 75% { transform: translateX(2px); } }
@@ -874,9 +874,9 @@ a.plan-tab:active { transform: scale(.98); }
 @media (hover: hover) and (pointer: fine) { a.plan-tab.t-plain:hover { background: var(--wash-2); } }
 .plan-tab .pt-name { position: relative; font-size: 15px; font-weight: 500; letter-spacing: -.01em; }
 /* ASSET: assets/brand/cleo-emblem.svg */
-.plan-tab .pt-logo { position: relative; width: 28px; height: 21px; flex: none; background: url("assets/brand/cleo-emblem.svg") center / contain no-repeat; }
+.plan-tab .pt-logo { position: relative; width: 21px; height: 28px; flex: none; background: url("assets/brand/cleo-emblem.svg") center / contain no-repeat; }
 .plan-tab.compact { width: 66px; height: 58px; min-height: 0; padding: 0; justify-content: center; }
-.plan-tab.compact .pt-logo { width: 30px; height: 22px; }
+.plan-tab.compact .pt-logo { width: 22px; height: 30px; }
 @property --pt-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 /* the edge: a hairline with light running around it (a ring cut out by a mask) */
 .plan-tab.t-animated::before, .plan-tab.t-premium::before {
@@ -2093,13 +2093,12 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .dp .input { height: 50px; font-size: 16px; }
 .dp .seg button { height: 38px; font-size: 14px; padding: 0 16px; }
 .dp .chip { height: 36px; font-size: 13.5px; padding: 0 14px; }
-.dp .boot-mark { width: 140px; }
+.dp .boot-mark { width: 103px; }
 
 /* ---------- status bar ---------- */
 .t-shell { display: grid; grid-template-rows: 46px 1fr; height: 800px; }
 .t-status { display: flex; align-items: center; gap: 10px; padding: 0 14px 0 18px; font-size: 13px; color: var(--ink-2); position: relative; z-index: 5; }
-.t-status .lockup img { height: 16px; }
-.t-status .lockup .word { font-size: 16px; }
+.t-status .lockup { --mark: 23px; }
 .t-status .where { display: flex; align-items: center; gap: 8px; margin-left: 6px; padding-left: 12px; border-left: 1px solid var(--line-2); }
 .t-status .where b { color: var(--ink); font-weight: 500; }
 .t-status .spacer { flex: 1; }
@@ -2814,7 +2813,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .cd-done { display: grid; justify-items: center; gap: 14px; text-align: center; font-size: 19px; color: var(--ink-2); }
 .cd-done .check-anim { width: 120px; height: 120px; }
 .cd-idle { display: grid; justify-items: center; gap: 16px; font-size: 22px; color: var(--ink-3); }
-.cd-mark { width: min(240px, 30vw); opacity: .9; }
+.cd-mark { width: min(177px, 22vw); opacity: .9; }
 @media (max-width: 760px) { .cdisp { grid-template-columns: minmax(0, 1fr); } .cd-pay { grid-template-columns: minmax(0, 1fr); justify-items: center; } }
 
 /* Settings on a terminal of its own (Basic): staff and plan rows */
@@ -4231,7 +4230,7 @@ const Cleo = (() => {
   /* ---------- shared brand bits ----------
      ASSET: assets/brand/cleo-emblem.svg (the Cleo emblem), assets/brand/cleo-wordmark.svg (the wordmark, a CSS
      mask in core.css) and assets/brand/aeso-mark.png (also a mask). */
-  const lockup = (app) => `<span class="lockup"><img src="assets/brand/cleo-emblem.svg" alt="" width="30" height="22"><span class="word" role="img" aria-label="Cleo"></span>${app ? `<span class="badge app">${esc(app)}</span>` : ''}</span>`;
+  const lockup = (app) => `<span class="lockup"><img src="assets/brand/cleo-emblem.svg" alt="" width="22" height="30"><span class="word" role="img" aria-label="Cleo"></span>${app ? `<span class="badge app">${esc(app)}</span>` : ''}</span>`;
   const aeso = () => `<span class="aeso">Built by <span class="mark" aria-hidden="true"></span><b>Aeso</b></span>`;
   /* ---------- one name and one icon per action ----------
      Actions that appear in more than one place (or more than one mode) take their label and icon from
@@ -4281,7 +4280,7 @@ const Cleo = (() => {
       <section class="screen boot" aria-label="Loading Cleo ${esc(app)}">
         <div class="boot-glow"></div>
         <div class="boot-center">
-          <div class="boot-mark" role="img" aria-label="Cleo"><span class="part tl"></span><span class="part tr"></span><span class="part b"></span></div>
+          <div class="boot-mark" role="img" aria-label="Cleo"><span class="part tr"></span><span class="part br"></span><span class="part l"></span></div>
           <div class="boot-word"><span class="w" aria-hidden="true"></span><span class="a">${esc(app)}</span></div>
         </div>
         <div class="sr-only" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress></div>
@@ -4306,9 +4305,9 @@ const Cleo = (() => {
       parts.forEach((x) => x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'both' }));
       word.style.clipPath = 'none'; foot.style.opacity = 1;
     } else {
-      // the three nodes arrive from their own corners and join at the centre
+      // the three nodes arrive from their own sides (upper right, lower right, left) and join at the centre
       const opts = { duration: 950, easing: SPRING_BOUNCE, fill: 'both' };
-      const from = ['translate(-46px, -34px) rotate(-8deg)', 'translate(46px, -34px) rotate(8deg)', 'translate(0, 54px)'];
+      const from = ['translate(34px, -46px) rotate(-8deg)', 'translate(34px, 46px) rotate(8deg)', 'translate(-54px, 0)'];
       parts.forEach((x, i) => x.animate([{ transform: from[i], opacity: 0, filter: 'blur(10px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { ...opts, delay: i * 80 }));
       glow.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: .45, transform: 'scale(1.05)', offset: .55 }, { opacity: .26, transform: 'scale(1)' }], { duration: 1500, delay: 380, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
       word.animate([{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-10px)' }, { clipPath: 'inset(0 0% 0 0)', transform: 'none' }], { duration: 620, delay: 620, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
@@ -4384,8 +4383,8 @@ const Cleo = (() => {
       ox = (CELL - (((r.left - ar.left) / k) % CELL) + CELL) % CELL; oy = (CELL - (((r.top - ar.top) / k) % CELL) + CELL) % CELL;
       ghost = null; cells = [];
       if (!ready) { draw(); return; }
-      const ratio = emblem.naturalHeight / emblem.naturalWidth || 0.7366;
-      const cols = Math.round(clamp(Math.min(w * 0.62, (h * 0.62) / ratio, 640) / CELL, 12, 36)), rows = Math.round(cols * ratio);
+      const ratio = emblem.naturalHeight / emblem.naturalWidth || 1.3576;
+      const cols = Math.round(clamp(Math.min(w * 0.62, (h * 0.62) / ratio, 640 / Math.max(1, ratio)) / CELL, 12, 36)), rows = Math.round(cols * ratio);
       const S = 4, c = document.createElement('canvas'); c.width = cols * S; c.height = rows * S;
       const x = c.getContext('2d'); x.drawImage(emblem, 0, 0, c.width, c.height);
       const a = x.getImageData(0, 0, c.width, c.height).data;
@@ -4540,7 +4539,7 @@ const Cleo = (() => {
     const TAU = Math.PI * 2, RAD = Math.PI / 180;
     // the fixed view: steeply down onto the ground and square to the mark, so it reads upright while the
     // near side of every pillar shows its height
-    const COLS = 28, BEV = 0.08, ELEV = 74 * RAD, AZIM = 0, H_MIN = 0.22, H_TALL = 3.4;
+    const SIDE = 28, BEV = 0.08, ELEV = 74 * RAD, AZIM = 0, H_MIN = 0.22, H_TALL = 3.4;
     // ---- shaders: pillars lit by a key and a fill light, glints and a soft shade toward the ground, in linear light ----
     const VS = `#version 300 es
       layout(location = 0) in vec3 aPos; layout(location = 1) in vec3 aNor;
@@ -4628,16 +4627,17 @@ const Cleo = (() => {
     gl.bindVertexArray(null);
     area.prepend(canvas);
     const ghost = document.createElement('canvas'); ghost.className = 'art-ghost'; area.prepend(ghost);
+    const shade = document.createElement('canvas'); shade.className = 'art-ghost'; shade.style.opacity = 0; ghost.after(shade);
     area.classList.add('is-3d');
     const slot = $('.art-mark', area);
     const still = reduced();
     // the hint names what the mark answers to; a still mark answers to nothing, so it has none
     const hint = $('.art-hint', area); if (hint?.lastChild) { hint.lastChild.textContent = 'Hover, press or tap the mark'; hint.hidden = still; }
     // ---- state ----
-    let n = 0, rows = 0, X, Y, SEED, DELAY, HGT, VEL, HEAT, move = new Float32Array(0), span = 1;
-    let W = 0, H = 0, dpr = 1, proj = null, frame2 = { cx: 0, cy: 0, hw: 1, hh: 1 }, dark = true, base = lin([212, 0, 0]);
+    let n = 0, cols = 0, rows = 0, X, Y, SEED, DELAY, HGT, VEL, HEAT, move = new Float32Array(0), span = 1;
+    let W = 0, H = 0, dpr = 1, proj = null, frame2 = { cx: 0, cy: 0, hw: 1, hh: 1 }, foot = null, dark = true, base = lin([212, 0, 0]);
     const hot = lin([255, 106, 82]);
-    let t = still ? 7.3 : 0, raf = 0, last = 0, drawnAt = 0, stopped = false, busy = true, glintAt = 3.2, nextRipple = 6;
+    let t = still ? 7.3 : 0, raf = 0, last = 0, drawnAt = 0, stopped = false, busy = true, glintAt = 3.2, nextRipple = 6, shown = -1;
     const ptr = { a: 0, mx: -99, my: -99, down: false, id: null, sx: 0, sy: 0, travel: 0, press: 0, seen: -1e4 };
     const ripples = [];
     function readColours() {
@@ -4646,33 +4646,35 @@ const Cleo = (() => {
       document.body.appendChild(probe); const m = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g); probe.remove();
       if (m && m.length >= 3) base = lin(m.slice(0, 3).map(Number));
     }
-    // the emblem's boxes: sampled at four points per side of every box, kept where it covers enough
+    // the emblem's boxes (SIDE of them along its longer side): sampled at four points per side of every box,
+    // kept where it covers enough
     const emblem = new Image();
     emblem.onload = () => {
-      const ratio = emblem.naturalHeight / emblem.naturalWidth || 0.7366, S = 4; rows = Math.round(COLS * ratio);
-      const c = document.createElement('canvas'); c.width = COLS * S; c.height = rows * S;
+      const ratio = emblem.naturalHeight / emblem.naturalWidth || 1.3576, S = 4;
+      cols = ratio > 1 ? Math.round(SIDE / ratio) : SIDE; rows = ratio > 1 ? SIDE : Math.round(SIDE * ratio);
+      const c = document.createElement('canvas'); c.width = cols * S; c.height = rows * S;
       const x = c.getContext('2d'); x.drawImage(emblem, 0, 0, c.width, c.height);
       const a = x.getImageData(0, 0, c.width, c.height).data, cells = [];
-      for (let j = 0; j < rows; j++) for (let i = 0; i < COLS; i++) {
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
         let sum = 0;
         for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += a[((j * S + yy) * c.width + i * S + xx) * 4 + 3];
-        if (sum / (S * S * 255) >= 0.22) cells.push([i - (COLS - 1) / 2, (rows - 1) / 2 - j]);
+        if (sum / (S * S * 255) >= 0.22) cells.push([i - (cols - 1) / 2, (rows - 1) / 2 - j]);
       }
       n = cells.length; X = new Float32Array(n); Y = new Float32Array(n); SEED = new Float32Array(n); DELAY = new Float32Array(n);
       HGT = new Float32Array(n).fill(H_MIN); VEL = new Float32Array(n); HEAT = new Float32Array(n); move = new Float32Array(n * 4);
-      const far = Math.hypot(COLS / 2, rows / 2), stat = new Float32Array(n * 4);
+      const far = Math.hypot(cols / 2, rows / 2), stat = new Float32Array(n * 4);
       cells.forEach(([cx, cy], k) => {
         X[k] = cx; Y[k] = cy; SEED[k] = Math.random();
         DELAY[k] = 0.1 + (Math.hypot(cx, cy) / far) * 0.7 + Math.random() * 0.15; // the centre rises first
         stat.set([cx, cy, SEED[k], 1], k * 4);
       });
-      span = COLS * 0.8 + rows * 0.5;
+      span = cols * 0.8 + rows * 0.5;
       gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf); gl.bufferData(gl.ARRAY_BUFFER, stat, gl.STATIC_DRAW);
       gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.bufferData(gl.ARRAY_BUFFER, move.byteLength, gl.DYNAMIC_DRAW);
       layout(); update(0); draw(); request();
     };
     emblem.src = 'assets/brand/cleo-emblem.svg';
-    // ---- size, the orthographic frame around the mark, and the faint grid behind it in light mode ----
+    // ---- size, the orthographic frame around the mark, and the faint grid and shadow behind it in light mode ----
     function layout() {
       const w = area.offsetWidth, h = area.offsetHeight;
       if (!w || !h || !rows) return;
@@ -4683,25 +4685,29 @@ const Cleo = (() => {
       // the mark's footprint and its tallest pillars, seen through the fixed view, framed with room to spare
       const m = mul(view, model);
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
-      for (const cx of [-COLS / 2, COLS / 2]) for (const cy of [-rows / 2, rows / 2]) for (const cz of [0, H_TALL]) {
+      for (const cx of [-cols / 2, cols / 2]) for (const cy of [-rows / 2, rows / 2]) for (const cz of [0, H_TALL]) {
         const [px, py] = apply(m, cx, cy, cz); x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
       }
       const asp = w / h;
-      let hw = Math.max((x1 - x0) / 2 / 0.78, ((y1 - y0) / 2 / 0.72) * asp); const hh = hw / asp;
+      let hw = Math.max((x1 - x0) / 2 / 0.78, ((y1 - y0) / 2 / 0.76) * asp); const hh = hw / asp;
       frame2 = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hw, hh };
       proj = ortho(frame2.cx - hw, frame2.cx + hw, frame2.cy - hh, frame2.cy + hh, 1, 200);
-      ghostGrid();
-      // where the mark sits on screen, so the loading screen's mark can glide into it
-      if (slot) {
-        const pm = mul(proj, m); let sx0 = 1e9, sy0 = 1e9, sx1 = -1e9, sy1 = -1e9;
-        for (const cx of [-COLS / 2, COLS / 2]) for (const cy of [-rows / 2, rows / 2]) {
-          const [px, py] = apply(pm, cx, cy, 1), sx = (px * 0.5 + 0.5) * w, sy = (0.5 - py * 0.5) * h;
+      // the mark on screen: its footprint on the ground (light mode's shadow), and its outline at a pillar's
+      // height (where the loading screen's mark glides into)
+      const pm = mul(proj, m), onScreen = (z) => {
+        let sx0 = 1e9, sy0 = 1e9, sx1 = -1e9, sy1 = -1e9;
+        for (const cx of [-cols / 2, cols / 2]) for (const cy of [-rows / 2, rows / 2]) {
+          const [px, py] = apply(pm, cx, cy, z), sx = (px * 0.5 + 0.5) * w, sy = (0.5 - py * 0.5) * h;
           sx0 = Math.min(sx0, sx); sx1 = Math.max(sx1, sx); sy0 = Math.min(sy0, sy); sy1 = Math.max(sy1, sy);
         }
-        Object.assign(slot.style, { left: `${sx0}px`, top: `${sy0}px`, width: `${sx1 - sx0}px`, height: `${sy1 - sy0}px` });
-      }
+        return { x: sx0, y: sy0, w: sx1 - sx0, h: sy1 - sy0 };
+      };
+      foot = onScreen(0);
+      ghostGrid();
+      if (slot) { const r = onScreen(1); Object.assign(slot.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` }); }
     }
     function ghostGrid() {
+      shadeLayer();
       ghost.width = Math.round(W * dpr); ghost.height = Math.round(H * dpr);
       const x = ghost.getContext('2d'); x.clearRect(0, 0, ghost.width, ghost.height);
       if (dark) return; // dark mode: the background grid itself, dimmed on sign-in screens
@@ -4713,6 +4719,17 @@ const Cleo = (() => {
         if (al < 0.004) continue;
         x.fillStyle = `rgb(20 20 24 / ${al.toFixed(3)})`; x.beginPath(); x.roundRect(xx + 2.5, yy + 2.5, BOX, BOX, 3.5); x.fill();
       }
+    }
+    // light mode: the mark's own soft shadow, a little toward you, so it stands on the page instead of floating
+    // over it. It is the shadow of a copy drawn off the canvas (shadow offsets and blur are in device pixels),
+    // and it grows in with the pillars (draw).
+    function shadeLayer() {
+      shade.width = Math.round(W * dpr); shade.height = Math.round(H * dpr);
+      if (dark || !foot) return;
+      const x = shade.getContext('2d');
+      x.shadowColor = 'rgb(20 20 24 / .14)'; x.shadowBlur = foot.h * 0.045 * dpr;
+      x.shadowOffsetX = 1e4 * dpr; x.shadowOffsetY = foot.h * 0.02 * dpr;
+      x.drawImage(emblem, (foot.x - 1e4) * dpr, foot.y * dpr, foot.w * dpr, foot.h * dpr);
     }
     // ---- motion: every pillar springs toward a height made of the waves, the pointer and the ripples ----
     // the resting skyline: two slow waves of different lengths crossing the mark, and a little of each pillar's own
@@ -4753,6 +4770,8 @@ const Cleo = (() => {
     }
     function draw() {
       if (!n || !W || !proj) return;
+      const grown = still ? 1 : clamp((t - 0.3) / 1.2, 0, 1) ** 1.5;
+      if (grown !== shown) { shown = grown; shade.style.opacity = grown.toFixed(3); }
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
@@ -4819,7 +4838,7 @@ const Cleo = (() => {
     };
     canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
     canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.seen = performance.now() - 1500; });
-    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); canvas.remove(); ghost.remove(); area.classList.remove('is-3d'); fallback?.(); });
+    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); canvas.remove(); ghost.remove(); shade.remove(); area.classList.remove('is-3d'); fallback?.(); });
     const ro = new ResizeObserver(() => { layout(); if (n) { update(0); draw(); } }); ro.observe(area);
     const onTheme = () => setTimeout(() => { readColours(); ghostGrid(); draw(); request(); }, 30);
     document.addEventListener('cleo:theme', onTheme);
