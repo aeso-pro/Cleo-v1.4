@@ -1,0 +1,4 @@
+# Local environment settings; keep the public template tracked.
+.env
+.env.*
+!.env.example
