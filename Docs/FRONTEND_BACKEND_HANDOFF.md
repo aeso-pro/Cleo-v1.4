@@ -21,9 +21,41 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-13 (later) · Frontend (Claude Code), `main`
+
+**A Free plan, plans that feel different, a new loading screen, and a Terminal without tables.** These changes went straight to `main`, as the owner asked.
+
+What touches the backend:
+
+- [ ] **Free plan: activation and limits.** `content/plans.md` has a new first plan with the ID `free` and a price of 0:
+  - one terminal in one branch, Terminal only;
+  - up to 100 products and one cashier;
+  - data kept on the device, with no cloud sync, backup or remote support, so it costs nothing to run.
+
+  Start free calls `Cleo.api.subscribe({ plan: 'free', terminals: 1, cycle: 'monthly', branches: 1, expectedTotal: 0 })` with no payment step, and `Cleo.licensing.quote` returns a zero quotation for it. The real adapter still answers `subscribe` with the unavailable-integration error, so Free can't start in real use yet. It needs:
+  - a server path that activates Free without payment;
+  - its limits enforced on the server;
+  - no sync or backup jobs for Free businesses.
+- **Feature tiers.** In `licensing.js` the tiers now run 0 Free, 1 Basic, 2 Pro and 3 Max; Enterprise has everything. Free includes checkout, the catalog, discounts and tax, refunds, receipts, shifts, daily and monthly sales reports, data export and updates. Server entitlements should match when they're enforced.
+- **No tables in the Terminal.** The floor plan, table checks and the table chip are gone. The `features.tables` setting is no longer offered or read; old saved configs may still hold it and it is ignored. Dine-in orders are paid at the counter like takeout, and their kitchen tickets read "Dine-in".
+- **The connection line is gone** from the foot of the sign-in and setup screens. When the server can't be reached, the sign-in card still says so.
+- **Aeso's address is now Batangas City** in the legal pages, the embedded legal text and the receipt's software-supplier block. The Terms' disputes clause still names the courts of Makati City. Changing that is a decision for the owner and would need a new Terms version. The legal versions (privacy 1.0, terms 1.0) are unchanged, and the auth checks pass.
+- **App downloads.** The landing page's new Windows and Android buttons link to `downloads/Cleo-Setup.exe` and `downloads/Cleo.apk`. The installers aren't in the repository yet.
+
+Frontend only:
+
+- The apps sit on plain light or dark backgrounds.
+- The theme switch moved into each app's Settings.
+- The sign-in mark has no shine, and hovering dims it.
+- The loading screen lights the emblem in the grid, fades the logo in and slides the wordmark out.
+- The plan logos now grow from a seed (Free) to a bonsai (Enterprise), and each plan has its own look.
+- The landing page is dark only, with no pause or theme button.
+
+Nothing changed in `backend/*`, `api.js`, `env.js` or `supabase/`.
+
 ### 2026-11-13 · Frontend (Claude Code), `main`
 
-**Everything is on `main` now.** At the owner's request, `codex/backend-auth-operations` (draft PR #2) and `claude/quirky-einstein-00lir7` were merged into `main`, and both branches were deleted. Start new work from `main`.
+**Everything is on `main` now.** At the owner's request, `codex/backend-auth-operations` (draft PR #2) and `claude/quirky-einstein-00lir7` were merged into `main`. Both branches are still on GitHub: deleting them from here was refused, so the owner will delete them there. Start new work from `main`.
 
 - Merging deployed nothing. Migrations 002–004 are in `supabase/migrations/` but are still not applied to the hosted project. The caution in PR #2 still holds: try the new Auth trigger on a staging copy of the hosted schema first.
 - All 46 backend checks in `supabase/tests` pass on the merged `main`, including the one that reads the legal contract from `index.html`.
