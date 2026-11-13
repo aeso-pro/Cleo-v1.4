@@ -4,7 +4,9 @@
 <!-- Editable pricing source. PHP amounts. Price/Annual cover the first terminal in
 one branch; Additional/Annual additional cover each extra terminal in that branch.
 Annual extras are twelve monthly fees, paid upfront. Branches limits connected
-branch management. Basic terminals operate independently. Inclusions are proposed,
+branch management. A Price of 0 is the free plan: one terminal, no billing, and
+nothing that costs Cleo to run (no cloud sync, backup or remote support). Basic
+terminals operate independently. Inclusions are proposed,
 not implementation claims. See source/licensing.js for the full feature matrix.
 Summary is the one sentence a plan card shows while its feature list is folded.
 Run node source/build.js and node source/export-data.js after editing.
@@ -13,6 +15,26 @@ Run node source/build.js and node source/export-data.js after editing.
 - Notice: Proposed software pricing
 - Demo notice: Payment is simulated in this preview
 - Subtitle: One branch subscription includes a terminal. Add terminal licenses as you grow
+
+## Free
+
+- ID: free
+- Price: 0 per month
+- Terminals: 1
+- Branches: 1
+- Tagline: One counter, free for as long as you like
+- Summary: Sell, print receipts and close shifts on one terminal, with everything kept on that device.
+- Tab: quiet
+- Modes: Terminal
+
+### Includes
+
+- Sales, checkout and receipts on one terminal
+- Up to 100 products, with categories, discounts and tax settings
+- Refunds, voids and shifts for one cashier
+- Daily sales summary on the terminal
+- Data export to a file
+- Everything stays on the device: no cloud sync, backup or remote support
 
 ## Basic
 
@@ -24,18 +46,17 @@ Run node source/build.js and node source/export-data.js after editing.
 - Terminals: Unlimited
 - Branches: 1
 - Tagline: Core POS for small retailers and single-counter stores
-- Summary: Checkout, receipts and offline selling, with stock alerts, sales reports and standard support.
+- Summary: Adds cloud sync and backup, more terminals and cashiers, stock alerts, product reports and standard support.
 - Tab: plain
 - Modes: Terminal
 
 ### Includes
 
-- Sales, checkout, receipts and offline selling
-- Products, categories, discounts and tax settings
-- Refunds, voids, cashiers and shifts
+- Offline selling with cloud sync and automated backup
+- More terminals in the branch, and any number of products and cashiers
 - Stock tracking and low-stock notifications
 - Sales and product reports
-- Data export, backup, updates and standard support
+- Standard remote support
 - Standalone terminals with basic permissions
 
 ## Pro
@@ -92,7 +113,7 @@ Run node source/build.js and node source/export-data.js after editing.
 - Terminals: Unlimited
 - Branches: Unlimited
 - Tagline: Custom POS built around your business
-- Tab: premium
+- Tab: elite
 - Modes: Terminal, Owner Dashboard, Back Office
 
 ### Includes
