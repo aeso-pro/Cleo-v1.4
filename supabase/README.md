@@ -1,5 +1,7 @@
 # Cleo account and onboarding database
 
+New backend work is documented in [`../backend/README.md`](../backend/README.md): verified-profile registration and operational migrations 002–004, with 46 passing local checks. These follow-up migrations are not yet deployed to the hosted project. The original foundation documented below remains migration 001.
+
 `migrations/202610170001_auth_onboarding.sql` connects the real Supabase Auth account to a Cleo business. It is a deliberately limited foundation for authentication and onboarding. It does not implement payments, subscriptions, staff invitations, terminal credentials, sales, product editing, stock, or fiscal records. Those operations must continue to report that their server integration is unavailable.
 
 ## Apply
@@ -8,7 +10,7 @@
 2. Apply the entire migration once as the database owner, through the Supabase CLI migrations or the dashboard SQL Editor. The file includes a transaction and a PostgREST schema-cache reload notification.
 3. Inspect the tables, RLS policies, and function grants. Test authentication with a fresh account and a returning account through the configured application callback URL.
 
-The first guard stops the transaction if any reserved table or function already exists. It does not replace an existing implementation. Reapplying this file manually is therefore intentionally rejected; use a new reviewed migration for future changes. Existing `public.profiles`, existing `handle_new_user` functions, Auth users, and Auth triggers are untouched. No trigger is added to `auth.users`.
+The first guard stops the transaction if any reserved table or function already exists. It does not replace an existing implementation. Reapplying this file manually is therefore intentionally rejected; use a new reviewed migration for future changes. Existing `public.profiles`, existing `handle_new_user` functions, Auth users, and Auth triggers are untouched. Migration 001 adds no trigger to `auth.users`. Follow-up migration 002 adds a separate confirmed-profile registration trigger, leaving existing triggers intact.
 
 ## Tables
 
@@ -95,11 +97,11 @@ Before live deployment, the migration was executed in PGlite 0.5.10, a local Pos
 The runnable harness, pinned development dependency, and recorded result are in `supabase/tests/`. It uses an in-memory database and makes no connection to the hosted project. To rerun from the project root:
 
 ```sh
-npm --prefix supabase/tests install --ignore-scripts
+npm --prefix supabase/tests ci --ignore-scripts
 npm --prefix supabase/tests test
 ```
 
-The run writes its check list and timestamp to `supabase/tests/results.json`. `node_modules` is not included in the deliverable.
+The original 19 checks still run, followed by 27 new operations/transfer checks. The harness writes a report only when `CLEO_RESULTS_FILE` is explicitly set; the checked-in `results.json` is historical. `node_modules` is ignored.
 
 `supabase/tests/live-rollback-verification.sql` is a separate, optional database-owner check for the target Supabase PostgreSQL instance after migration. It creates two synthetic confirmed `example.invalid` Auth users inside one transaction, performs nine named assertions against the actual functions and RLS, returns their results, and ends with `ROLLBACK`. It sends no email and leaves no persistent verification users or business rows. Run the whole file together; if a client stops on an assertion error, issue `ROLLBACK`. Its fixture shape and rollback cleanup were also exercised locally. It does not change any existing user or existing `public.profiles` row.
 
