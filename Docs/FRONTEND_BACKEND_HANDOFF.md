@@ -1,0 +1,121 @@
+# Frontend ↔ backend handoff
+
+A running log between the two developers on Cleo v1.4: **Claude Code (frontend)** and **ChatGPT Codex (backend)**. Add a dated entry at the top of the log when you change something the other side depends on, and answer open questions in place. Never put passwords, service-role keys or other secrets in this file.
+
+## Who owns what
+
+| Area | Owner | Where it lives |
+| --- | --- | --- |
+| Landing page, app screens, CSS, motion, accessibility | Frontend | `landing.html`; the CSS sections and screen code in `index.html` (`core.css` … `launcher.css`, `core.js`, `owner.js`, `backoffice.js`, `terminal.js`, `launcher.js`) |
+| Static files the pages load | Frontend | `assets/`, `legal/`, `content/plans.md`, `sw.js` |
+| Supabase schema, RLS, RPCs, Edge Functions, email templates, tests | Backend | `supabase/` |
+| The real data-source adapter | Backend | the `backend/supabase.js` section of `index.html` (banner `===== backend/supabase.js`) |
+| The operation contract both data sources implement | Shared: agree before changing | the `backend/contract.js` and `backend/errors.js` sections of `index.html` |
+| Supabase dashboard settings (Auth URLs, providers, SMTP) | Backend | Supabase project `ntbkbvlsgymupjdpuvob` |
+
+`index.html` is one built file that both of us edit. To keep merges clean, stay inside your own sections (each starts with a `/* ===== file · … */` banner), and say here before editing a shared one.
+
+## Important: the repository has no `source/`
+
+The README describes building from `Frontend/source/` with `node source/build.js`, but this repository only holds the **built** files (`index.html`, `landing.html`, `sw.js`). All frontend fixes so far were made directly in the built files. If a copy of `source/` exists elsewhere, either commit it here or port the changes listed below before rebuilding. Otherwise a rebuild silently undoes them.
+
+## Log
+
+### 2026-10-28 (night) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**New emblem (commit `956b58b`).** The design team's newest emblem replaces the V everywhere. It is the same three nodes turned a quarter turn clockwise, so it stands like a "<". The wordmark is unchanged.
+
+- `assets/brand/cleo-emblem.svg` is now portrait, with a viewBox of 980.27 × 1330.77. Every PNG in `assets/brand/` was rendered again from it under the same name, so `manifest.webmanifest` and the icon links didn't change. `sw.js` caches the new files under a new cache name.
+- The logo with the wordmark follows the new artwork: the wordmark is 0.45 of the emblem's height and sits closer to it.
+- The loading screen, both sign-in marks, the plan tabs, the customer display, the landing page and the legal pages all show the new shape. The landing page's app screenshots were captured again.
+
+Nothing on the backend side changed. If you add the logo to the sign-up email (the optional item under the rebrand entry below), `cleo-icon-192.png` already shows the new emblem.
+
+### 2026-10-28 (evening) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**Flat 3D mark and the earlier charts (commit `66ee9e6`).**
+
+- The sign-in emblem now lies flat and holds still, seen from above at a fixed angle with no perspective.
+- Each box of the emblem is a pillar whose height keeps changing. Hovering raises the pillars, pressing sinks them, and tapping sends a ripple through them.
+- The charts are back to their earlier designs, except two. The payment-mix ring keeps its round ends, and the revenue and profit columns are joined stacks with a round top.
+
+These are frontend-only changes. Nothing on the backend side changed.
+
+### 2026-10-28 (later) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**3D sign-in mark, loading screen, ripples and charts (commit `a576076`).**
+
+- The sign-in screen's emblem is now 3D. It is drawn with WebGL2 and turned onto its side, and people can drag or tap it. Narrow screens, reduced motion and computers without WebGL2 or graphics acceleration fall back to the 2D mark.
+- The loading screen shows only the logo, with ripples in the background. The progress bar is gone. Progress is still announced to screen readers.
+- Ripples everywhere are now irregular instead of perfect circles.
+- Charts use round shapes: capsule columns, round-capped donut arcs, and dots for the heatmap and the calendar.
+- The landing page's app screenshots were captured again.
+
+Nothing on the backend side changed, and nothing in `supabase/`. One thing to know: `boot()` keeps its `work` option. Real start-up tasks still run one per step, and a failed task still ends the loading screen with `{ node, error }`. The steps just aren't shown on screen any more.
+
+### 2026-10-28 · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**Rebrand (commit `2ed4396`).** The design team's new emblem and wordmark replace every Cleo logo: the app, the landing page, the legal pages, the favicons and the install icons.
+
+- New files in `assets/brand/`: `cleo-emblem.svg`, `cleo-wordmark.svg`, `cleo-icon-32.png`, `cleo-icon-192.png`, `cleo-icon-512.png`, `cleo-maskable-512.png` and `cleo-touch-icon.png`. `cleo-emblem.png` is redrawn from the new emblem. `assets/README.md` has the details.
+- `manifest.webmanifest` lists the new icons. `sw.js` caches the new files under a new cache name, so installed copies pick them up on their next online visit.
+- Every glass surface now refracts its backdrop at the edge and has an embossed rim. The sheen gradients are gone. Chromium shows the refraction; other browsers keep the plain blur.
+- The red backdrop light in the app is about half as strong. The landing page keeps its own.
+- Controls follow Apple's conventions: the iOS switch, segmented controls, filled fields, bold titles, back chevrons, and bottom sheets on phones.
+- The sign-in screen's right panel is now the emblem drawn in the lit box grid. People can drag across it or tap it.
+- The landing page's embedded app screenshots were captured again from the rebranded app. The embedded fonts are now subsets, so `landing.html` went from 4.2 MB to 0.87 MB.
+
+All 23 demo routes still fit at 320, 360, 390 and 1440 px, with no console errors. The key screens were checked in both themes. The service worker installs and the app opens offline.
+
+Nothing on the backend side changed: no edits to the `backend/*`, `api.js` or `env.js` sections of `index.html`, and none to `supabase/`. The line endings in `backend/supabase.js` are kept as they were.
+
+- [ ] **Optional: logo in the sign-up email.** `supabase/templates/confirm-signup.html` is text only. To add the emblem, use the PNG `https://<production-host>/assets/brand/cleo-icon-192.png`, shown at 48 px. Many mail clients block SVG images.
+
+### 2026-10-17 · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
+
+**Restored the files the pages load (commit `334937b`).** Everything under `assets/`, plus `legal/` and `content/plans.md`, was missing from the repo, so on the host:
+
+- real sign-in could not work, because `assets/vendor/supabase-js-2.118.0.js` returned 404 and the app said "This build doesn't include the Supabase client library yet";
+- the app had no icons and no Cleo Sans, and its logos were broken;
+- the Privacy and Terms links returned 404;
+- the service worker never installed, so the Terminal had no offline mode.
+
+The SDK is the official `@supabase/supabase-js@2.118.0` UMD build. Its sha384 matches the `integrity` attribute in `index.html`. The provenance of every file is in `assets/README.md`. With the restored files, the sign-in screen reports "Connected to Cleo". A sign-in attempt with the network blocked shows "Couldn't reach Cleo…", as designed. No request reached the live project during testing.
+
+**Landing page (commit `8355b3b`).**
+
+- The headline now reads "One Phase / Ahead.", and the page title follows.
+- The light wave that ran under the footer now runs through the footer panel itself, and the extra strip at the bottom is gone.
+- The opening paints in about 0.4 s instead of 3.7–4.1 s, measured on a throttled 4G-like connection with a 4× slower CPU.
+- The opening no longer gets cut off on slow loads.
+- The screen captures load while the page is idle, and the grid redraws less often when nothing moves.
+
+DESIGN.md is updated to match.
+
+**App layout on phones (commit `7258b6e`).** Every Owner Dashboard and Back Office page was 8 px wider than the screen, so the page panned sideways under a finger. Owner › Branches overflowed by 157 px, and Plan and billing and BIR also overflowed. All 23 demo routes now fit at 320, 360, 390 and 1440 px, with no console errors. These are CSS-only changes in `web-shell.css`, `owner.css` and `backoffice.css`. No backend sections were touched.
+
+### Requests for the backend (Codex)
+
+- [ ] **Auth URL configuration.** In Supabase › Authentication › URL Configuration:
+  - set the Site URL to the production landing origin on Hostinger (plain `https://…/`);
+  - allow the app callback, `https://<production-host>/index.html**`, as a redirect URL;
+  - remove `localhost` entries from production.
+
+  `Docs/AUTH_INTEGRATION.md` has the details.
+- [ ] **Google and Facebook sign-in.** Both providers need public policy URLs, which now exist: `https://<production-host>/legal/privacy.html` and `https://<production-host>/legal/terms.html`. Enter them in the Google Cloud OAuth consent screen and the Facebook app settings, then confirm both buttons complete a round trip.
+- [ ] **Pending operations.** These still return the unavailable-integration error from the real adapter:
+  - catalog and settings writes;
+  - terminal registration and staff PIN credentials;
+  - sales upload and the electronic journal;
+  - stock;
+  - reports;
+  - billing, subscriptions and payments.
+
+  The screens already handle that error, so each can be switched on independently. Keep the `CleoError` codes and result shapes in `backend/contract.js` and `backend/errors.js`. Tell us here when one goes live, and the frontend will check its screens against real data.
+- [ ] **Plan activation.** A new real business reaches the plan page but cannot activate a plan, because no subscription or payment API exists yet. This is the first blocker for a real owner after sign-up.
+- [ ] **Demo in production.** The committed `.env` has `CLEO_DEMO=on`, and the built `index.html` includes the sample café (`?demo`). Decide whether production should be built with `CLEO_DEMO=off`. That needs `source/`, see above.
+
+### Open questions for the backend
+
+1. Which HTTPS host and path does Hostinger serve this repository from (root or a subfolder)? The redirect allowlist and the service worker scope both depend on it.
+2. Does `source/` exist anywhere? If so, who will commit it?

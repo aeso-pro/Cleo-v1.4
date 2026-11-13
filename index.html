@@ -41,8 +41,9 @@
 <meta name="description" content="Cleo POS: Terminal, Owner Dashboard and Back Office for Philippine businesses.">
 <meta name="theme-color" content="#0d0d0e">
 <!-- ASSET: favicon, home-screen icon and install manifest -->
-<link rel="icon" type="image/png" href="assets/brand/cleo-emblem.png">
-<link rel="apple-touch-icon" href="assets/brand/cleo-emblem.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/brand/cleo-icon-32.png">
+<link rel="icon" type="image/svg+xml" href="assets/brand/cleo-emblem.svg">
+<link rel="apple-touch-icon" href="assets/brand/cleo-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <!-- ASSET: Phosphor icons 2.1.1 (regular, fill, bold), served locally -->
 <link rel="stylesheet" href="assets/icons/phosphor/regular/style.css">
@@ -91,11 +92,17 @@
   --accent-glow: rgb(212 0 0 / .55);
   --on-accent: #fff8f6;
 
-  --good: #34c77b;  --good-soft: rgb(52 199 123 / .16);
-  --warn: #f5a524;  --warn-soft: rgb(245 165 36 / .16);
+  /* status in Apple's dark-mode system colours (green, orange, red, blue) */
+  --good: #30d158;  --good-soft: rgb(48 209 88 / .16);
+  --warn: #ff9f0a;  --warn-soft: rgb(255 159 10 / .16);
   --serious: #ef8a5d; --serious-soft: rgb(239 138 93 / .16);
-  --bad: #ff6159;   --bad-soft: rgb(255 97 89 / .16);
-  --info: #6aa8ff;  --info-soft: rgb(106 168 255 / .16);
+  --bad: #ff453a;   --bad-soft: rgb(255 69 58 / .16);
+  --info: #0a84ff;  --info-soft: rgb(10 132 255 / .18);
+  /* system fills, as Apple uses them: tracks and toggles (fill-2), fields and segmented tracks (fill-3) */
+  --fill-2: rgb(120 120 128 / .32);
+  --fill-3: rgb(118 118 128 / .24);
+  --switch-on: #30d158;
+  --seg-thumb: #636366;
 
   --glass: rgb(28 28 31 / .46);
   --glass-thick: rgb(22 22 25 / .72);
@@ -104,16 +111,20 @@
   --glass-rim: rgb(255 255 255 / .10);
   --glass-hi: rgb(255 255 255 / .17);
   --glass-lo: rgb(255 255 255 / .03);
-  --spec: rgb(255 255 255 / .10);
-  --lens-tint: rgb(255 255 255 / .04); /* sign-in lens (core.js loginScreen) */
+  /* the embossed rim of every glass panel (see "Glass materials"): a hairline edge, light along the
+     upper-left bevel, and a softer catch of light refracted through to the lower-right */
+  --rim-edge: rgb(255 255 255 / .13);
+  --rim-light: rgb(255 255 255 / .42);
+  --rim-catch: rgb(255 255 255 / .15);
   --shadow-lg: 0 30px 70px -18px rgb(0 0 0 / .62), 0 3px 10px rgb(0 0 0 / .28);
   --shadow-md: 0 14px 34px -12px rgb(0 0 0 / .55), 0 1px 4px rgb(0 0 0 / .24);
   --shadow-sm: 0 4px 12px -4px rgb(0 0 0 / .45);
   --scrim: rgb(6 6 7 / .55);
 
-  --amb-1: rgb(212 0 0 / .55);
-  --amb-2: rgb(122 6 16 / .65);
-  --amb-3: rgb(255 112 52 / .20);
+  /* the red stays a quiet presence behind the app (the landing keeps its own, stronger light) */
+  --amb-1: rgb(212 0 0 / .26);
+  --amb-2: rgb(122 6 16 / .34);
+  --amb-3: rgb(255 112 52 / .10);
   --amb-4: rgb(54 62 84 / .45);
   --grain-opacity: .035;
 
@@ -155,6 +166,10 @@
   --serious: #9c4519; --serious-soft: rgb(239 138 93 / .18);
   --bad: #b3241d;   --bad-soft: rgb(198 42 34 / .10);
   --info: #1f63c4;  --info-soft: rgb(31 99 196 / .10);
+  --fill-2: rgb(120 120 128 / .16);
+  --fill-3: rgb(118 118 128 / .12);
+  --switch-on: #34c759;
+  --seg-thumb: #ffffff;
 
   --glass: rgb(255 255 255 / .6);
   --glass-thick: rgb(255 255 255 / .78);
@@ -163,17 +178,18 @@
   --glass-rim: rgb(20 20 20 / .07);
   --glass-hi: rgb(255 255 255 / 1);
   --glass-lo: rgb(20 20 20 / .04);
-  --spec: rgb(255 255 255 / .5);
-  --lens-tint: rgb(255 255 255 / .18);
+  --rim-edge: rgb(20 20 20 / .09);
+  --rim-light: rgb(255 255 255 / 1);
+  --rim-catch: rgb(255 255 255 / .8);
   --shadow-lg: 0 26px 52px -28px rgb(28 24 32 / .26), 0 2px 6px rgb(28 24 32 / .05);
   --shadow-md: 0 12px 28px -18px rgb(28 24 32 / .22), 0 1px 3px rgb(28 24 32 / .05);
   --shadow-sm: 0 3px 10px -6px rgb(28 24 32 / .2);
   --scrim: rgb(16 16 20 / .30);
 
   /* still, faint lights behind the glass (see "Ambient world"); applyBrand follows the brand colour */
-  --amb-1: rgb(212 0 0 / .09);
-  --amb-2: rgb(255 150 120 / .16);
-  --amb-3: rgb(255 205 170 / .22);
+  --amb-1: rgb(212 0 0 / .045);
+  --amb-2: rgb(255 150 120 / .09);
+  --amb-3: rgb(255 205 170 / .13);
   --amb-4: rgb(120 138 190 / .16);
   --grain-opacity: 0;
 
@@ -251,17 +267,18 @@ i.ph, i.ph-fill, i.ph-bold { line-height: 1; display: inline-block; flex: none; 
 @keyframes drift-c { to { transform: translate3d(-12vmax, 9vmax, 0) scale(1.1); } }
 /* dark mode, loading and sign-in screens: a grid of boxes lit by moving light (the ambient module in
    core.js draws it). It fades in over the drifting lights and fades out when the app opens.
-   Light mode never shows it. */
+   Light mode shows it only behind the loading screen, where its ripples carry the wait. */
 .ambient canvas.amb-grid { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1000ms var(--ease-out); }
 :root.amb-on .ambient canvas.amb-grid { opacity: 1; transition-duration: 500ms; }
+/* behind the loading screen's logo the grid stays low, so the ripples read as a backdrop */
+:root.amb-on.amb-boot .ambient canvas.amb-grid { opacity: .55; }
 :root.amb-on .ambient b { opacity: 0; }
 /* Still ambient light gives the glass its depth without motion during long shifts. */
 :root:not(.amb-on) .ambient b { opacity: .48; animation-play-state: paused; }
-:root[data-theme="light"] .ambient canvas.amb-grid { display: none; }
+:root[data-theme="light"]:not(.amb-boot) .ambient canvas.amb-grid { display: none; }
 /* light mode: the lights stand still and stay faint, with no glows or grain behind the panels */
 :root[data-theme="light"] .ambient b { opacity: .9; animation-play-state: paused; }
 :root[data-theme="light"] .boot-glow,
-:root[data-theme="light"] .art-emblem::before,
 :root[data-theme="light"] body::after { display: none; }
 body::after {
   content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none;
@@ -272,45 +289,35 @@ body::after {
 /* ---------- Glass materials ----------
    glass        floating functional layer (nav, toolbars, cards that hold controls)
    glass-thick  surfaces that carry dense data; more opaque so text stays crisp
-   glass-thin   chips and buttons sitting on top of other material (no blur)    */
-.glass, .glass-thick {
+   glass-thin   chips and buttons sitting on top of other material (no blur)
+   The fill is one flat tint over the blurred backdrop: no sheen gradient. What makes it read as glass
+   is the edge. LiquidGlass (core.js) bends the backdrop inside a narrow rim, the way the curved edge of
+   a real slab refracts what is behind it (Chromium; it sets --refract), and ::before draws the embossed
+   stroke: a hairline edge, light along the upper-left bevel and a softer catch on the lower-right. */
+.glass, .glass-thick, .lg {
   position: relative; isolation: isolate;
   background: var(--glass);
   -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
-  backdrop-filter: blur(var(--blur)) saturate(var(--sat));
+  backdrop-filter: blur(var(--blur)) saturate(var(--sat)) var(--refract,);
   border-radius: var(--r-lg);
-  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 0 var(--glass-lo), inset 0 0 0 1px var(--glass-rim), var(--shadow-lg);
+  box-shadow: var(--shadow-lg);
 }
-.glass-thick { background: var(--glass-thick); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim), var(--shadow-md); }
-.glass::before, .glass-thick::before {
+.glass-thick { background: var(--glass-thick); box-shadow: var(--shadow-md); }
+.glass::before, .glass-thick::before, .lg::before {
   content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  background:
-    radial-gradient(130% 70% at 12% -12%, var(--spec), transparent 52%),
-    linear-gradient(180deg, var(--spec), transparent 22%);
-  opacity: .9;
+  box-shadow:
+    inset 0 0 0 1px var(--rim-edge),
+    inset 1.5px 1.5px 0 -0.5px var(--rim-light),
+    inset -1.5px -1.5px 0 -0.5px var(--rim-catch);
 }
-.glass-thick::before { opacity: .55; }
 .glass-thin {
   background: var(--glass-thin);
-  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim);
+  box-shadow: inset 0 0 0 1px var(--rim-edge), inset 1px 1px 0 -0.5px var(--rim-light);
 }
-
-/* Liquid layer injected by LiquidGlass.attach(). The element keeps its tint;
-   the fx layer carries the blurred, refracted backdrop. */
-.lg { position: relative; isolation: isolate; background: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-.lg > .lg-fx, .lg > .lg-tint, .lg > .lg-rim {
-  position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-}
-.lg > .lg-fx { z-index: -3; -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat)); backdrop-filter: blur(var(--blur)) saturate(var(--sat)); }
-.lg > .lg-tint { z-index: -2; background: var(--lg-tint, var(--glass)); }
-.lg > .lg-rim {
-  z-index: -1;
-  box-shadow:
-    inset 1.5px 1.5px 0 -0.5px rgb(255 255 255 / .38),
-    inset -1px -1px 0 -0.5px rgb(255 255 255 / .16),
-    inset 0 0 0 1px var(--glass-rim);
-}
-:root[data-theme="light"] .lg > .lg-rim { box-shadow: inset 1.5px 1.5px 0 -0.5px rgb(255 255 255 / .95), inset 0 0 0 1px var(--glass-rim); }
+/* LiquidGlass.attach(el, { tint }) gives a surface its own tint over the same material */
+.lg { background: var(--lg-tint, var(--glass)) !important; }
+/* each surface carries its own rim map; a nested panel must never borrow its parent's */
+@property --refract { syntax: '*'; inherits: false; }
 
 /* Pointer sheen for small interactive glass */
 .sheen { position: relative; overflow: hidden; }
@@ -325,7 +332,8 @@ body::after {
 /* ---------- Type ---------- */
 .t-hero { font-size: 52px; line-height: 1; font-weight: 300; letter-spacing: -.035em; }
 .t-display { font-size: 36px; line-height: 1.08; font-weight: 500; letter-spacing: -.025em; }
-.t-title { font-size: 26px; line-height: 1.15; font-weight: 500; letter-spacing: -.02em; }
+/* titles are bold, as Apple's large titles are; section heads stay medium */
+.t-title { font-size: 26px; line-height: 1.15; font-weight: 700; letter-spacing: -.022em; }
 .t-h3 { font-size: 18px; line-height: 1.25; font-weight: 500; letter-spacing: -.01em; }
 .t-h4 { font-size: 15px; line-height: 1.3; font-weight: 500; letter-spacing: -.005em; }
 .t-body { font-size: 14px; line-height: 1.5; }
@@ -337,7 +345,7 @@ body::after {
   --h: 40px;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   height: var(--h); padding: 0 18px; border-radius: var(--r-pill);
-  font-size: 14px; font-weight: 500; letter-spacing: 0; white-space: nowrap;
+  font-size: 14px; font-weight: 500; letter-spacing: 0; white-space: nowrap; text-decoration: none;
   color: var(--ink); background: var(--wash-2);
   box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim);
   transition: transform var(--t-press) var(--ease-out), background-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease, color 160ms ease;
@@ -348,9 +356,10 @@ body::after {
 .btn:active:not(:disabled) { transform: scale(.97); }
 @media (hover: hover) and (pointer: fine) { .btn:hover:not(:disabled) { background: var(--line-2); } }
 .btn:disabled { opacity: .42; cursor: not-allowed; }
+/* a filled button, as Apple draws one: flat colour, a fine top light, a small grounded shadow (no glow) */
 .btn-primary {
   color: var(--on-accent); background: var(--accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .28), inset 0 -1px 0 rgb(0 0 0 / .18), 0 8px 22px -8px var(--accent-glow);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 2px rgb(0 0 0 / .14), 0 4px 12px -6px var(--accent-glow);
 }
 @media (hover: hover) and (pointer: fine) { .btn-primary:hover:not(:disabled) { background: var(--accent-hover); } }
 .btn-primary:active:not(:disabled) { background: var(--accent-press); }
@@ -388,16 +397,17 @@ body::after {
 .field { display: grid; gap: 7px; }
 .field > label, .label { font-size: 13px; font-weight: 500; color: var(--ink-2); }
 .input-wrap { position: relative; display: flex; align-items: center; }
+/* fields are filled, as on iOS and in System Settings: a quiet system fill, no outline until focus */
 .input, .select, .textarea {
   width: 100%; height: 46px; padding: 0 14px; border-radius: var(--r-sm); border: 0;
-  background: var(--wash); color: var(--ink); font-size: 15px;
-  box-shadow: inset 0 0 0 1px var(--line-2), inset 0 1px 2px rgb(0 0 0 / .12);
+  background: var(--fill-3); color: var(--ink); font-size: 15px;
+  box-shadow: inset 0 0 0 1px transparent;
   transition: box-shadow 160ms ease, background-color 160ms ease;
 }
 .textarea { height: auto; min-height: 84px; padding: 12px 14px; resize: vertical; line-height: 1.45; }
 .input::placeholder, .textarea::placeholder { color: var(--ink-3); }
-.input:hover, .select:hover, .textarea:hover { box-shadow: inset 0 0 0 1px var(--ink-4); }
-.input:focus, .select:focus, .textarea:focus { outline: none; background: var(--wash-2); box-shadow: inset 0 0 0 1.5px var(--focus), 0 0 0 4px var(--focus-soft); }
+@media (hover: hover) and (pointer: fine) { .input:hover, .select:hover, .textarea:hover { background: var(--fill-2); } }
+.input:focus, .select:focus, .textarea:focus { outline: none; background: var(--fill-3); box-shadow: inset 0 0 0 1.5px var(--focus), 0 0 0 4px var(--focus-soft); }
 .input-wrap .input { padding-right: 44px; }
 .input-wrap .lead-icon { position: absolute; left: 13px; color: var(--ink-3); font-size: 18px; pointer-events: none; }
 .input-wrap .lead-icon ~ .input { padding-left: 40px; }
@@ -407,7 +417,10 @@ body::after {
 .field-opt { margin-left: 4px; font-weight: 400; color: var(--ink-3); }
 .field .err { display: none; align-items: center; gap: 6px; font-size: 12.5px; color: var(--bad); }
 .field.invalid .err { display: flex; }
-.select { appearance: none; -webkit-appearance: none; padding-right: 36px; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+/* a popup button: the up-and-down chevron Apple uses for menus that pick one value */
+.select { appearance: none; -webkit-appearance: none; padding-right: 38px; background-image: var(--chevrons); background-position: calc(100% - 14px) 50%; background-size: 10px 14px; background-repeat: no-repeat; }
+:root, :root[data-theme="dark"] { --chevrons: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 14'%3E%3Cpath d='M1.5 5 5 1.5 8.5 5M1.5 9 5 12.5 8.5 9' fill='none' stroke='%23f3f1ee' stroke-opacity='.7' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-theme="light"] { --chevrons: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 14'%3E%3Cpath d='M1.5 5 5 1.5 8.5 5M1.5 9 5 12.5 8.5 9' fill='none' stroke='%23141414' stroke-opacity='.62' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 .select option { background: var(--glass-solid); color: var(--ink); }
 
 .check { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13.5px; color: var(--ink-2); user-select: none; }
@@ -416,10 +429,15 @@ body::after {
 .check input:checked { background: var(--accent); box-shadow: none; }
 .check input:checked::after { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
 
-.switch { appearance: none; -webkit-appearance: none; margin: 0; width: 40px; height: 24px; border-radius: 99px; background: var(--wash-2); box-shadow: inset 0 0 0 1px var(--line-2); position: relative; cursor: pointer; transition: background-color 200ms ease; flex: none; }
-.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); box-shadow: 0 2px 6px rgb(0 0 0 / .3); transition: transform 240ms var(--ease-out); }
-.switch:checked { background: var(--good); box-shadow: none; }
-.switch:checked::after { transform: translateX(16px); background: #fff; }
+/* the iOS switch: a white knob on a grey track that turns green; the knob stretches while pressed and
+   springs across */
+.switch { appearance: none; -webkit-appearance: none; margin: 0; width: 46px; height: 28px; border-radius: 99px; background: var(--fill-2); position: relative; cursor: pointer; transition: background-color 240ms ease; flex: none; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 99px; background: #fff; box-shadow: 0 3px 8px rgb(0 0 0 / .15), 0 1px 1px rgb(0 0 0 / .16); transition: transform 360ms var(--spring), width 200ms var(--ease-out); }
+.switch:checked { background: var(--switch-on); }
+.switch:checked::after { transform: translateX(18px); }
+.switch:active:not(:disabled)::after { width: 30px; }
+.switch:checked:active:not(:disabled)::after { transform: translateX(12px); }
+.switch:disabled { opacity: .45; cursor: not-allowed; }
 
 /* one-time code */
 .otp { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
@@ -429,12 +447,12 @@ body::after {
 .otp.invalid input { box-shadow: inset 0 0 0 1.5px var(--bad); }
 
 /* ---------- Segmented control (sliding thumb) ---------- */
-.seg { position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 3px; border-radius: var(--r-pill); background: var(--wash); box-shadow: inset 0 0 0 1px var(--line); }
+/* Apple's segmented control: a system-fill track, a raised thumb that springs between segments */
+.seg { position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 3px; border-radius: var(--r-pill); background: var(--fill-3); }
 .seg button { position: relative; z-index: 1; height: 32px; padding: 0 14px; border-radius: var(--r-pill); font-size: 13px; font-weight: 500; color: var(--ink-3); transition: color 200ms ease; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .seg button[aria-pressed="true"], .seg button[aria-selected="true"] { color: var(--ink); }
 @media (hover: hover) and (pointer: fine) { .seg button:hover { color: var(--ink-2); } }
-.seg .thumb { position: absolute; z-index: 0; top: 3px; left: 0; height: calc(100% - 6px); border-radius: var(--r-pill); background: var(--wash-2); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim), var(--shadow-sm); transition: transform var(--t-fast) var(--ease-out); }
-:root[data-theme="light"] .seg .thumb { background: rgb(255 255 255 / .9); }
+.seg .thumb { position: absolute; z-index: 0; top: 3px; left: 0; height: calc(100% - 6px); border-radius: var(--r-pill); background: var(--seg-thumb); box-shadow: 0 3px 8px rgb(0 0 0 / .12), 0 3px 1px rgb(0 0 0 / .04), inset 0 0 0 .5px rgb(0 0 0 / .04); transition: transform 380ms var(--spring), width 380ms var(--spring); }
 .seg button:disabled { opacity: .45; cursor: not-allowed; }
 
 /* ---------- Chips, badges, status ---------- */
@@ -543,6 +561,15 @@ button.chip:active { transform: scale(.96); }
 .drawer-head { padding: 22px 24px 16px; display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--line); }
 .drawer-body { flex: 1; overflow: auto; padding: 20px 24px 24px; }
 .drawer-foot { padding: 14px 24px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--line); }
+/* phones: dialogs and side panels rise from the bottom as sheets and leave the same way, as iOS presents
+   them. Only overlays on the web page change; the Terminal's stage keeps its own fixed size. */
+@media (max-width: 720px) {
+  body > #overlays > .overlay { place-items: end stretch; padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
+  body > #overlays > .overlay .dialog { width: 100%; max-height: calc(100dvh - 56px); border-radius: 28px; padding: 24px 20px; transform: translateY(calc(100% + 24px)); transition: opacity 200ms ease, transform 460ms var(--ease-drawer); }
+  body > #overlays > .overlay.as-drawer .drawer { width: 100%; height: calc(100dvh - 56px); align-self: end; transform: translateY(calc(100% + 24px)); }
+  body > #overlays > .overlay[data-open] .dialog, body > #overlays > .overlay[data-open] .drawer { transform: none; }
+  body > #overlays > .overlay[data-closing] .dialog { transition-duration: 180ms; }
+}
 
 .popover {
   position: fixed; z-index: 70; min-width: 240px; max-width: 340px; border-radius: var(--r-md); padding: 6px;
@@ -577,11 +604,13 @@ button.chip:active { transform: scale(.96); }
 ::view-transition-group(cleo-mark) { animation-duration: 260ms; animation-timing-function: var(--ease-in-out); }
 ::view-transition-group(branch-chip) { animation-duration: 240ms; animation-timing-function: var(--ease-in-out); }
 
-/* Brand lockup */
-.lockup { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
-.lockup img { height: 22px; width: auto; }
-.lockup .word { font-size: 21px; font-weight: 400; letter-spacing: -.02em; line-height: 1; }
-.lockup .app { margin-left: 4px; }
+/* Brand lockup: the emblem, then the wordmark (assets/brand/cleo-wordmark.svg, drawn as a mask so it takes
+   the ink colour). Proportions follow the brand lockup: the wordmark stands at .45 of the emblem's height,
+   centred on it, an eighth of that height away. Size a lockup with --mark, the emblem's height. */
+.lockup { --mark: 30px; display: inline-flex; align-items: center; gap: calc(var(--mark) * .123); color: var(--ink); text-decoration: none; }
+.lockup img { height: var(--mark); width: auto; flex: none; }
+.lockup .word { display: block; flex: none; height: calc(var(--mark) * .449); aspect-ratio: 1890 / 746; background: currentColor; -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
+.lockup .app { margin-left: 8px; }
 .aeso { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-3); }
 /* ASSET: assets/brand/aeso-mark.png, used as a mask so it takes the colour below */
 .aeso .mark { width: 18px; height: 15px; background: #d9541a; -webkit-mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; }
@@ -590,28 +619,19 @@ button.chip:active { transform: scale(.96); }
 /* ---------- Boot screen ---------- */
 .boot { display: grid; place-items: center; position: relative; overflow: hidden; }
 .boot-center { display: grid; justify-items: center; gap: 26px; }
-.boot-mark { position: relative; width: 168px; height: 139px; view-transition-name: cleo-mark; }
-/* ASSET: assets/brand/cleo-emblem.png, split in two halves for the opening animation */
-.boot-mark .half { position: absolute; inset: 0; background: url("assets/brand/cleo-emblem.png") center / contain no-repeat; }
-.boot-mark .half.l { clip-path: inset(0 50% 0 0); }
-.boot-mark .half.r { clip-path: inset(0 0 0 50%); }
+.boot-mark { position: relative; width: 124px; aspect-ratio: 980.27 / 1330.77; view-transition-name: cleo-mark; }
+/* ASSET: assets/brand/cleo-emblem.svg, in three parts, one per node, that come together in the opening
+   animation. Each part reaches a little past the lines where they meet, so no seam shows once joined. */
+.boot-mark .part { position: absolute; inset: 0; background: url("assets/brand/cleo-emblem.svg") center / contain no-repeat; }
+.boot-mark .part.tr { clip-path: polygon(58.3% 51%, 100% 51%, 100% 0, 14% 0); }
+.boot-mark .part.br { clip-path: polygon(58.3% 49%, 100% 49%, 100% 100%, 14% 100%); }
+.boot-mark .part.l { clip-path: polygon(61% 50%, 16% 0, 0 0, 0 100%, 16% 100%); }
 .boot-glow { position: absolute; left: 50%; top: 50%; width: 560px; height: 560px; margin: -280px 0 0 -280px; border-radius: 50%; background: radial-gradient(closest-side, var(--accent-glow), transparent 70%); opacity: 0; pointer-events: none; }
-.boot-word { display: flex; align-items: baseline; gap: 12px; clip-path: inset(0 100% 0 0); }
-.boot-word .w { font-size: 44px; font-weight: 400; letter-spacing: -.03em; line-height: 1; }
+.boot-word { display: flex; align-items: baseline; gap: 14px; clip-path: inset(0 100% 0 0); }
+/* the wordmark sits on the app name's baseline (a box without text aligns by its bottom edge) */
+.boot-word .w { display: block; height: 30px; aspect-ratio: 1890 / 746; background: var(--ink); -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
 .boot-word .a { font-size: 17px; color: var(--ink-3); font-weight: 400; letter-spacing: -.005em; }
-/* loading progress: a grid of rounded boxes (boot() in core.js lights them as steps finish) */
-.boot-grid { display: grid; grid-template-columns: repeat(16, 10px); grid-auto-rows: 10px; gap: 4px; opacity: 0; }
-.boot-grid i { display: block; border-radius: 3px; background: var(--ink); opacity: .1; animation: boot-scan 1.8s ease-in-out infinite; animation-delay: calc(var(--c) * 70ms + var(--r) * 45ms); }
-/* lit boxes keep a slow glint running across them, so the whole grid stays alive while loading */
-.boot-grid i.on { background: var(--accent); opacity: 1; animation: boot-on 420ms var(--ease-out) var(--od, 0ms) both, boot-glint 2.4s var(--ease-in-out) calc(var(--od, 0ms) + 420ms + var(--c) * 80ms) infinite; }
-.boot-grid.done i.on { animation: boot-done 640ms var(--ease-in-out) calc(var(--c) * 22ms + var(--r) * 34ms) both; }
-@keyframes boot-scan { 0%, 100% { opacity: .07; } 45% { opacity: .28; } }
-@keyframes boot-on { from { background: var(--ink); opacity: .14; transform: none; } 55% { background: var(--accent); opacity: 1; transform: scale(1.22); } to { background: var(--accent); opacity: 1; transform: none; } }
-@keyframes boot-glint { 0%, 100% { filter: none; } 50% { filter: brightness(1.3); } }
-@keyframes boot-done { 0%, 100% { filter: none; transform: none; } 45% { filter: brightness(1.45); transform: scale(.8); } }
-.boot-status { height: 20px; font-size: 13px; color: var(--ink-3); text-align: center; opacity: 0; }
-.boot-status span { display: inline-block; transition: opacity 180ms ease, filter 180ms ease, transform 220ms var(--ease-out); }
-.boot-status span.swap { opacity: 0; filter: blur(3px); transform: translateY(-4px); }
+/* there is no progress bar: organic ripples from behind the mark (the background grid) carry the wait */
 .boot-foot { position: absolute; bottom: 28px; left: 0; right: 0; display: flex; justify-content: center; opacity: 0; }
 
 /* ---------- Login (web) ---------- */
@@ -624,7 +644,7 @@ button.chip:active { transform: scale(.96); }
 .login-card .step { transition: opacity 260ms ease, transform 420ms var(--ease-out), filter 260ms ease; }
 .login-card .step[aria-hidden="true"] { position: absolute; inset: 0 0 auto 0; opacity: 0; pointer-events: none; transform: translateX(-20px); filter: blur(2px); visibility: hidden; transition: opacity 200ms ease, transform 420ms var(--ease-out), filter 200ms ease, visibility 0s 420ms; }
 .login-card .step.ahead[aria-hidden="true"] { transform: translateX(24px); }
-.login-card h1 { font-size: 28px; font-weight: 500; letter-spacing: -.025em; line-height: 1.1; }
+.login-card h1 { font-size: 28px; font-weight: 700; letter-spacing: -.028em; line-height: 1.1; }
 .login-card .lede { margin-top: 8px; color: var(--ink-2); font-size: 14px; }
 .login-card form { display: grid; gap: 16px; margin-top: 26px; }
 .login-card .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -633,17 +653,20 @@ button.chip:active { transform: scale(.96); }
 .link-btn { color: var(--accent-ink); font-size: 13px; font-weight: 500; border-radius: 6px; }
 @media (hover: hover) and (pointer: fine) { .link-btn:hover { text-decoration: underline; text-underline-offset: 3px; } }
 .login-art { position: relative; overflow: hidden; display: grid; place-items: center; }
-.art-emblem { position: relative; width: min(46vw, 620px); aspect-ratio: 720 / 594; view-transition-name: cleo-mark; }
-.art-emblem .em { position: absolute; inset: 0; background: url("assets/brand/cleo-emblem.png") center / contain no-repeat; }
-.art-emblem::before { content: ""; position: absolute; inset: -30%; background: radial-gradient(closest-side, var(--accent-glow), transparent 70%); opacity: .55; }
-.lens {
-  position: absolute; width: 300px; height: 300px; border-radius: 50%; left: 50%; top: 50%;
-  touch-action: none; cursor: grab; will-change: transform;
-  --lg-tint: rgb(255 255 255 / .04);
-  box-shadow: var(--shadow-lg);
-}
-.lens:active { cursor: grabbing; }
-.lens-hint { position: absolute; bottom: 28px; right: 32px; font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; }
+/* the Cleo mark in lit boxes (gridMark in core.js draws it on this canvas and makes it respond to the pointer) */
+.art-grid { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.art-grid.grabbing { cursor: grabbing; }
+/* where the mark sits, so the loading screen's mark can glide into it */
+.art-mark { position: absolute; pointer-events: none; view-transition-name: cleo-mark; }
+.art-hint { position: absolute; bottom: 28px; right: 32px; font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; pointer-events: none; }
+/* the Cleo mark in 3D (emblem3d in core.js draws it with WebGL2; its pillars answer the pointer). Behind it,
+   a soft accent glow in dark mode; in light mode a faint grid and the mark's own soft shadow (the art-ghost canvas). */
+.art-3d, .art-ghost { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.art-3d { touch-action: none; cursor: grab; }
+.art-3d.grabbing { cursor: grabbing; }
+.art-ghost { pointer-events: none; }
+.login-art.is-3d::before { content: ""; position: absolute; left: 50%; top: 50%; width: min(58%, 600px); aspect-ratio: .8; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, var(--accent-glow), transparent 72%); opacity: .3; pointer-events: none; }
+:root[data-theme="light"] .login-art.is-3d::before { display: none; }
 .login-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .shake { animation: shake 420ms var(--ease-out); }
 @keyframes shake { 15% { transform: translateX(-9px); } 35% { transform: translateX(7px); } 55% { transform: translateX(-4px); } 75% { transform: translateX(2px); } }
@@ -755,7 +778,9 @@ button.chip:active { transform: scale(.96); }
 .set-sub { font-size: 15px; font-weight: 500; margin-top: 6px; }
 .set-list { display: grid; border-radius: 18px; background: var(--wash); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
 .set-row { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 12px 16px; min-height: 64px; }
-.set-row + .set-row { border-top: 1px solid var(--line); }
+/* separators start where the text does, as in iOS lists */
+.set-row + .set-row { position: relative; }
+.set-row + .set-row::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 1px; background: var(--line); }
 .set-row .set-c { flex: none; display: flex; align-items: center; gap: 8px; }
 .set-row .seg button { height: 34px; }
 
@@ -820,8 +845,9 @@ button.chip:active { transform: scale(.96); }
 }
 @media (max-width: 900px) {
   .login { grid-template-columns: 1fr; }
-  .login-art { position: fixed; inset: 0; z-index: 0; opacity: .5; }
-  .login-art .lens, .lens-hint { display: none; }
+  /* behind the card on phones: a quiet backdrop that leaves touches to the page */
+  .login-art { position: fixed; inset: 0; z-index: 0; opacity: .5; pointer-events: none; }
+  .art-hint { display: none; }
   .login-left { padding: 20px 16px; }
   .login-card { padding: 28px 22px 24px; }
 }
@@ -847,10 +873,10 @@ button.chip:active { transform: scale(.96); }
 a.plan-tab:active { transform: scale(.98); }
 @media (hover: hover) and (pointer: fine) { a.plan-tab.t-plain:hover { background: var(--wash-2); } }
 .plan-tab .pt-name { position: relative; font-size: 15px; font-weight: 500; letter-spacing: -.01em; }
-/* ASSET: assets/brand/cleo-emblem.png */
-.plan-tab .pt-logo { position: relative; width: 26px; height: 22px; flex: none; background: url("assets/brand/cleo-emblem.png") center / contain no-repeat; }
+/* ASSET: assets/brand/cleo-emblem.svg */
+.plan-tab .pt-logo { position: relative; width: 21px; height: 28px; flex: none; background: url("assets/brand/cleo-emblem.svg") center / contain no-repeat; }
 .plan-tab.compact { width: 66px; height: 58px; min-height: 0; padding: 0; justify-content: center; }
-.plan-tab.compact .pt-logo { width: 28px; height: 23px; }
+.plan-tab.compact .pt-logo { width: 22px; height: 30px; }
 @property --pt-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 /* the edge: a hairline with light running around it (a ring cut out by a mask) */
 .plan-tab.t-animated::before, .plan-tab.t-premium::before {
@@ -956,11 +982,10 @@ a.plan-tab:active { transform: scale(.98); }
   .input, .select, .textarea { font-size: 16px; }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .glass, .glass-thick, .lg > .lg-tint { background: var(--glass-solid) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-  .lg > .lg-fx { display: none; }
+  .glass, .glass-thick, .lg { background: var(--glass-solid) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 }
 @media (prefers-contrast: more) {
-  :root { --glass: var(--glass-solid); --glass-thick: var(--glass-solid); --glass-rim: var(--ink-3); --ink-3: var(--ink-2); }
+  :root { --glass: var(--glass-solid); --glass-thick: var(--glass-solid); --glass-rim: var(--ink-3); --rim-edge: var(--ink-3); --ink-3: var(--ink-2); }
 }
 
 /* ---------- subscription payment methods (Cleo.billing in core.js): the plan pages, Owner Dashboard ›
@@ -1466,7 +1491,8 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .feed .row-item.new { animation: feed-in 200ms ease both; }
 @keyframes feed-in { from { opacity: .4; } to { opacity: 1; } }
 
-/* Charts (charts.js): solid marks with rounded data ends, a quiet grid, one tooltip */
+/* Charts (charts.js): solid marks with rounded data ends, a quiet grid, one tooltip. The revenue columns and the
+   donut are the round ones: a semicircle top on joined parts, and round-capped arcs. */
 .viz { display: block; max-width: 100%; overflow: visible; font-family: var(--font); }
 .viz:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 8px; }
 .viz .grid { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
@@ -1474,9 +1500,12 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .viz .tick { fill: var(--ink-3); font-size: 11.5px; font-variant-numeric: tabular-nums; }
 .viz .col-top { fill: var(--ink-2); font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .viz .link { stroke: var(--ink-4); stroke-width: 1; stroke-dasharray: 3 3; shape-rendering: crispEdges; }
-/* columns grow from the baseline one after another; their labels and connectors fade in after */
+/* columns with the rise option (revenue and profit) rise from the baseline one after another on a spring */
 .viz .mk { transition: opacity 220ms ease; }
-.viz .mk.grow, .viz .late { animation: none; }
+.viz .mk.grow { animation: col-rise 820ms var(--spring) backwards; animation-delay: var(--d, 0ms); }
+/* revealed from the baseline up rather than stretched, so the round ends stay round while they rise */
+@keyframes col-rise { from { clip-path: inset(100% -4px 0 -4px); } to { clip-path: inset(0 -4px 0 -4px); } }
+.viz .late { animation: mark-fade 420ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
 /* one column at a time under the pointer or arrow keys: a soft band behind it, the others step back */
 .viz .band { fill: var(--wash); opacity: 0; transition: opacity 200ms ease; }
 .viz .col.on .band { opacity: 1; }
@@ -1486,9 +1515,11 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .donut svg { display: block; overflow: visible; }
 .donut svg:focus-visible { outline: 2px solid var(--focus); outline-offset: 6px; border-radius: 50%; }
 .donut .ring { fill: none; stroke: var(--wash); }
-.donut .arc { fill: none; transition: opacity 220ms ease; }
+.donut .arc { fill: none; transition: opacity 220ms ease, stroke-width 260ms var(--ease-out); }
 .donut svg.hot .arc:not(.on) { opacity: .3; }
-.donut .sweep.in { animation: none; }
+/* the part under the pointer swells out of the ring, a round lozenge */
+.donut svg.hot .arc.on { stroke-width: calc(var(--sw) + 6px); }
+.donut .sweep.in { animation: donut-sweep 1100ms var(--ease-out) 120ms backwards; }
 @keyframes donut-sweep { from { stroke-dashoffset: var(--len); } }
 .donut-c { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; text-align: center; line-height: 1.2; pointer-events: none; }
 .donut-c b { font-size: 22px; font-weight: 500; letter-spacing: -.02em; }
@@ -1501,7 +1532,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .viz-tip .th { font-weight: 500; margin-bottom: 6px; color: var(--ink); }
 .viz-tip .tr { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; color: var(--ink-2); padding: 2px 0; }
 .viz-tip .tr b { color: var(--ink); font-weight: 500; }
-.viz-key { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.viz-key { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
 
 /* ranked rows: a rounded bar on a faint track, scaled inside the room left after the value */
 .hbars { display: grid; gap: 14px; }
@@ -1594,6 +1625,8 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
   .shell.nav-open .nav-scrim { opacity: 1; pointer-events: auto; }
   .topbar .menu-btn { display: inline-grid; }
   .main { padding: 10px 12px calc(110px + env(safe-area-inset-bottom, 0px)); }
+  /* the scroll-edge blur spans .main's padding; past it, the page panned sideways on phones */
+  .edge-fade::before { left: -12px; right: -12px; }
   .topbar { padding-left: 20px; top: 10px; }
   .topbar .hide-sm { display: none !important; }
 }
@@ -1608,8 +1641,10 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
   .scope-btn .sb-t span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .scope-btn .sb-t small { display: none; }
   .panel-head { flex-wrap: wrap; }
-  .page-head .filters, .page-head .seg { max-width: 100%; }
-  .page-head .seg { overflow-x: auto; scrollbar-width: none; }
+  .page-head .filters, .page-head .seg, .panel-head .seg { max-width: 100%; }
+  .page-head .seg, .panel-head .seg { overflow-x: auto; scrollbar-width: none; }
+  /* a long notice (e.g. "Payment is simulated in this preview") wraps instead of widening the page */
+  .page-head .badge { white-space: normal; height: auto; min-height: 22px; padding-block: 3px; max-width: 100%; }
   .tabbar {
     display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; z-index: 28; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     height: 66px; border-radius: 26px; padding: 6px; box-shadow: var(--shadow-lg);
@@ -1625,6 +1660,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
   .page-head .filters { width: 100%; gap: 8px; }
   .page-head .filters > .seg { width: 100%; display: flex; }
   .page-head .filters > .seg button { flex: 1 1 auto; min-width: 0; padding-inline: 8px; font-size: 12px; }
+  .license-billing-link .btn { max-width: 100%; height: auto; min-height: var(--h); padding-block: 9px; white-space: normal; text-align: center; }
 }
 /* the top-bar search gives way before the branch switcher does */
 .topbar .input-wrap { flex: 0 1 260px; min-width: 150px; }
@@ -1704,6 +1740,8 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .plan-price { font-size: 26px; font-weight: 400; letter-spacing: -.02em; white-space: nowrap; }
 .plan-price small { display: block; margin-top: 3px; font-size: 12.5px; font-weight: 400; letter-spacing: 0; color: var(--ink-3); white-space: normal; }
 .plan-hero .plan-price { text-align: right; }
+/* once the panel head wraps on phones, the price sits under the plan's name: align it with the name */
+@media (max-width: 720px) { .plan-hero .plan-price { text-align: left; } }
 /* the monthly amount: the plan's price times the terminals in use */
 .plan-total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 16px 0 4px; padding: 12px 14px; border-radius: 14px; background: var(--wash); box-shadow: inset 0 0 0 1px var(--line); font-size: 13.5px; color: var(--ink-2); }
 .plan-total b { font-size: 15px; font-weight: 500; color: var(--ink); }
@@ -1837,7 +1875,7 @@ tr.short td { background: var(--warn-soft); }
 .zsum { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border-radius: 16px; overflow: hidden; margin-top: 16px; }
 .zsum > div { background: var(--glass-thick); padding: 12px 14px; display: grid; gap: 3px; }
 .zsum b { font-size: 18px; font-weight: 500; }
-.receipt-host { display: grid; place-items: start center; background: var(--glass); }
+.receipt-host { display: grid; grid-template-columns: minmax(0, 1fr); place-items: start center; background: var(--glass); }
 .receipt {
   width: 340px; max-width: 100%; padding: 22px 20px 28px; background: #fbfaf7; color: #1b1b1b;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 11.5px; line-height: 1.55;
@@ -2055,14 +2093,12 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .dp .input { height: 50px; font-size: 16px; }
 .dp .seg button { height: 38px; font-size: 14px; padding: 0 16px; }
 .dp .chip { height: 36px; font-size: 13.5px; padding: 0 14px; }
-.dp .login .lens { width: 240px; height: 240px; }
-.dp .boot-mark { width: 140px; height: 116px; }
+.dp .boot-mark { width: 103px; }
 
 /* ---------- status bar ---------- */
 .t-shell { display: grid; grid-template-rows: 46px 1fr; height: 800px; }
 .t-status { display: flex; align-items: center; gap: 10px; padding: 0 14px 0 18px; font-size: 13px; color: var(--ink-2); position: relative; z-index: 5; }
-.t-status .lockup img { height: 16px; }
-.t-status .lockup .word { font-size: 16px; }
+.t-status .lockup { --mark: 23px; }
 .t-status .where { display: flex; align-items: center; gap: 8px; margin-left: 6px; padding-left: 12px; border-left: 1px solid var(--line-2); }
 .t-status .where b { color: var(--ink); font-weight: 500; }
 .t-status .spacer { flex: 1; }
@@ -2508,9 +2544,8 @@ body.is-terminal { overflow: hidden; background: #050506; }
    so restore their desktop layout regardless of the browser window. */
 .dp .login { grid-template-columns: minmax(420px, 500px) 1fr; }
 .dp .login-left { padding: 26px 36px; }
-.dp .login-art { position: relative; inset: auto; z-index: auto; opacity: 1; }
-.dp .login-art .lens { display: block; }
-.dp .lens-hint { display: flex; }
+.dp .login-art { position: relative; inset: auto; z-index: auto; opacity: 1; pointer-events: auto; }
+.dp .art-hint { display: flex; }
 .dp .login-card { padding: 32px 30px 28px; }
 .dp .branches { padding: 26px 36px 40px; }
 .dp .branches-top { margin-bottom: 34px; }
@@ -2778,7 +2813,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .cd-done { display: grid; justify-items: center; gap: 14px; text-align: center; font-size: 19px; color: var(--ink-2); }
 .cd-done .check-anim { width: 120px; height: 120px; }
 .cd-idle { display: grid; justify-items: center; gap: 16px; font-size: 22px; color: var(--ink-3); }
-.cd-mark { width: min(240px, 30vw); opacity: .9; }
+.cd-mark { width: min(177px, 22vw); opacity: .9; }
 @media (max-width: 760px) { .cdisp { grid-template-columns: minmax(0, 1fr); } .cd-pay { grid-template-columns: minmax(0, 1fr); justify-items: center; } }
 
 /* Settings on a terminal of its own (Basic): staff and plan rows */
@@ -3349,21 +3384,78 @@ const Cleo = (() => {
     st.setProperty('--accent-soft', css(c, dark ? 0.2 : 0.12));
     st.setProperty('--accent-glow', css(c, dark ? 0.5 : 0.32));
     st.setProperty('--on-accent', css(contrast(onDark, c) >= contrast(onLight, c) ? onDark : onLight));
-    st.setProperty('--amb-1', css(c, dark ? 0.5 : 0.1));
-    st.setProperty('--amb-2', dark ? css(mix(c, K, 0.55), 0.65) : css(mix(c, W, 0.55), 0.18));
-    st.setProperty('--amb-3', dark ? css(mix(c, W, 0.25), 0.2) : css(mix(c, W, 0.75), 0.24));
+    // the ambient light stays quiet in any brand colour, as it does in Cleo red (core.css tokens)
+    st.setProperty('--amb-1', css(c, dark ? 0.24 : 0.05));
+    st.setProperty('--amb-2', dark ? css(mix(c, K, 0.55), 0.34) : css(mix(c, W, 0.55), 0.1));
+    st.setProperty('--amb-3', dark ? css(mix(c, W, 0.25), 0.1) : css(mix(c, W, 0.75), 0.13));
   }
   applyBrand();
   document.addEventListener('cleo:theme', applyBrand);
   config.onChange(({ path }) => { if (path === '*' || path.startsWith('brand')) applyBrand(); });
 
+  /* ---------- ripples: an organic wavefront, never a perfect circle ----------
+     A ripple widens from where it started, but its edge wobbles with direction (a few slow harmonics with
+     random phases that drift as it travels), it runs further one way than another, its front breaks into
+     brighter and fainter stretches, a fainter echo follows it, and boxes just behind the front twinkle on
+     their own. Most ripples also throw two or three smaller ones nearby a moment later, like a splash. Every
+     ripple draws a fresh shape, so no two look alike. Distances are in the caller's units (screen pixels
+     for the background grid, grid cells for the 3D mark).
+       make(x, y, t0, { speed, life, band, splash })  the ripple and its splash, as a list
+       prepare(r, t)   once per frame: where its front has reached in every direction (false when over)
+       at(r, dx, dy, ph)  0 to 1: how strongly it lights a point dx, dy from its start (ph: that point's own phase) */
+  const Ripple = (() => {
+    const TAU = Math.PI * 2, BINS = 96, rnd = Math.random;
+    const one = (x, y, t0, speed, life, band, k) => ({
+      x, y, t0, speed: speed * (0.82 + rnd() * 0.36), life, band, k,
+      harm: [2, 3, 4, 6].map((n, i) => [n, (0.05 + rnd() * 0.1) / (1 + i * 0.45), rnd() * TAU, (rnd() - 0.5) * 2.4]),
+      dir: rnd() * TAU, skew: 0.06 + rnd() * 0.2, lobes: 2 + Math.floor(rnd() * 3), lp: [rnd() * TAU, rnd() * TAU],
+      echo: 0.48 + rnd() * 0.2, sh: new Float32Array(BINS), pa: new Float32Array(BINS),
+    });
+    function make(x, y, t0, { speed = 620, life = 1.9, band = 20, splash = true } = {}) {
+      const out = [one(x, y, t0, speed, life, band, 1)];
+      if (splash && rnd() < 0.75) for (let i = 0, n = 1 + Math.floor(rnd() * 3); i < n; i++) {
+        const a = rnd() * TAU, d = band * (2.5 + rnd() * 5);
+        out.push(one(x + Math.cos(a) * d, y + Math.sin(a) * d, t0 + 0.1 + rnd() * 0.35, speed * (0.4 + rnd() * 0.3), life * (0.5 + rnd() * 0.2), band * 0.7, 0.5 + rnd() * 0.25));
+      }
+      return out;
+    }
+    function prepare(r, t) {
+      const age = t - r.t0; r.age = age;
+      if (age <= 0 || age >= r.life) return false;
+      let hi = 0, lo = 9;
+      for (let b = 0; b < BINS; b++) {
+        const th = (b / BINS) * TAU - Math.PI;
+        let s = 1 + r.skew * Math.cos(th - r.dir);
+        for (const [n, a, p, w] of r.harm) s += a * Math.sin(n * th + p + w * age);
+        r.sh[b] = s; if (s > hi) hi = s; if (s < lo) lo = s;
+        // brighter and fainter stretches along the front, drifting as it travels
+        r.pa[b] = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(r.lobes * th + r.lp[0] + age * 1.4)) * (0.6 + 0.4 * Math.sin((r.lobes + 3) * th + r.lp[1] - age * 0.9));
+      }
+      r.reach = r.speed * age; r.sig = r.band * (1 + age * 0.35); r.fade = (1 - age / r.life) ** 1.5 * r.k;
+      r.max = r.reach * hi + r.sig * 3; r.min = Math.max(0, r.reach * lo * Math.min(r.echo, 0.45) - r.sig * 3);
+      return true;
+    }
+    function at(r, dx, dy, ph = 0) {
+      let dist = Math.hypot(dx, dy);
+      if (dist > r.max || dist < r.min) return 0;
+      dist += Math.sin(ph * 3.7) * r.band * 0.35; // a ragged edge: each point is reached a little early or late
+      const f = ((Math.atan2(dy, dx) + Math.PI) / TAU) * BINS, i0 = Math.floor(f) % BINS, i1 = (i0 + 1) % BINS, u = f - Math.floor(f);
+      const R = r.reach * (r.sh[i0] + (r.sh[i1] - r.sh[i0]) * u), pa = r.pa[i0] + (r.pa[i1] - r.pa[i0]) * u, s2 = 2 * r.sig * r.sig;
+      let v = Math.exp(-((dist - R) ** 2) / s2) + 0.38 * Math.exp(-((dist - R * r.echo) ** 2) / (s2 * 0.7));
+      if (dist < R && dist > R * 0.45) v += 0.32 * (0.5 + 0.5 * Math.sin(ph * 5.3 + r.age * 21)) ** 6 * ((dist - R * 0.45) / (R * 0.55));
+      return Math.min(1, v * pa * r.fade);
+    }
+    return { make, prepare, at };
+  })();
+
   /* ---------- background: a grid of boxes lit by moving light ----------
-     Dark mode only, and only behind the loading screen and the sign-in screens (the web sign-in and the
-     Terminal's staff PIN screen). Everywhere else the grid fades away and dark mode keeps its slowly
-     drifting colour (the .ambient lights in core.css). Light mode never shows the grid: it stays flat.
-       - loading (mode 'boot', set by boot()): four soft lights in the ambient colours drift across the
-         grid, and a ripple of accent light spreads from the Cleo mark each time a step finishes (pulse()).
-       - sign-in (mode 'login', a screen with data-amb="login"; show() reads it): the same, a step quieter.
+     Dark mode, behind the loading screen and the sign-in screens (the web sign-in and the Terminal's staff
+     PIN screen). Everywhere else the grid fades away and dark mode keeps its slowly drifting colour (the
+     .ambient lights in core.css). Light mode shows it only while loading, as faint ink boxes.
+       - loading (mode 'boot', set by boot()): the grid stays low behind the logo (core.css dims it), and
+         organic ripples of accent light spread from behind the mark, now and then and at every step (pulse()).
+       - sign-in (mode 'login', a screen with data-amb="login"; show() reads it): dimmer still, so the mark
+         and the form lead.
      Every box takes part: lit boxes shimmer on their own beat and the unlit grid breathes softly, so
      no part of the screen sits still. With a mouse, a faint light follows the pointer.
      Performance: the light is computed on a tiny canvas with one pixel per box, then drawn scaled up
@@ -3375,11 +3467,11 @@ const Cleo = (() => {
     const CELL = 18, GAP = 5, RAD = 3.5;
     // lights: [colour index, centre x, sway x, period x (s), centre y, sway y, period y (s), radius (share of the long side), strength]
     const LIGHTS = [[0, 0.16, 0.16, 23, 0.10, 0.12, 29, 0.44, 0.95], [1, 0.84, 0.14, 31, 0.88, 0.12, 37, 0.48, 1], [2, 0.70, 0.20, 19, 0.16, 0.16, 26, 0.30, 0.9], [3, 0.38, 0.22, 34, 0.94, 0.10, 24, 0.42, 0.85]];
-    // each level: [light gain, brightest box, unlit grid]. Kept low so the text on top always reads first.
-    const LEVEL = { boot: [0.34, 0.26, 0.026], login: [0.26, 0.19, 0.02] };
+    // each level: [light gain, brightest box, unlit grid, ripple strength]. Kept low so the text on top always reads first.
+    const LEVEL = { boot: [0.3, 0.24, 0.026, 1.25], login: [0.15, 0.11, 0.013, 0.85] };
     const views = new Map(); let colours = [], accent = [212, 0, 0, 1], raf = 0, last = 0, scanAt = 0;
     let on = false, target = 'boot', cur = LEVEL.boot.slice(), offUntil = 0, settleT = 0;
-    const ripples = []; // { x, y (client px), t0 (s) }
+    const ripples = []; // Ripple.make() entries, in client px
     const pointer = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4, a: 0, seen: 0 };
     const probe = document.createElement('i');
     const rgba = (v) => {
@@ -3393,8 +3485,8 @@ const Cleo = (() => {
       accent = rgba(s.getPropertyValue('--accent').trim() || '#d40000'); probe.remove();
     };
     const dark = () => theme.get() === 'dark';
-    // light mode has no grid: nothing is drawn, and a switch to dark mode on a sign-in screen brings it in
-    const running = (now) => dark() && (on || now < offUntil);
+    // light mode draws the grid only while loading; a switch to dark mode on a sign-in screen brings it in
+    const running = (now) => (dark() || target === 'boot') && (on || now < offUntil);
     function attach(el) {
       const canvas = document.createElement('canvas'); canvas.className = 'amb-grid';
       el.prepend(canvas);
@@ -3421,15 +3513,17 @@ const Cleo = (() => {
     function render(v, t) {
       if (!v.cols || !v.pattern) return;
       const { cols, rows, w, h, img, phase } = v; const d = img.data; const L = Math.max(w, h);
-      const [gain, cap, ghost] = cur;
+      const [gain, cap, ghost, rgain] = cur;
+      const ink = dark() ? 255 : 24; // the unlit grid: faint white in dark mode, faint ink in light mode
       const lights = LIGHTS.map(([ci, cx, sx, px, cy, sy, py, rr, k]) => {
         const c = colours[ci] || [0, 0, 0, 0];
         return [(cx + sx * Math.sin((t / px) * Math.PI * 2 + ci)) * w, (cy + sy * Math.cos((t / py) * Math.PI * 2 + ci * 1.7)) * h, (rr * L) ** 2, c[0], c[1], c[2], c[3] * k * (0.85 + 0.15 * Math.sin(t * 0.35 + ci))];
       });
       if (pointer.a > 0.01) { const c = colours[2] || [0, 0, 0, 0]; lights.push([pointer.x, pointer.y, 180 ** 2, c[0], c[1], c[2], Math.min(1, c[3] * 2.2) * pointer.a]); }
-      // ripples: a ring of accent light that widens from where it started and fades as it goes
+      // ripples start in screen pixels; measure them from this element's corner (the Terminal stage is scaled)
       const rect = v.el.getBoundingClientRect(), sx = w / (rect.width || w), sy = h / (rect.height || h);
-      const rings = ripples.map((p) => { const age = t - p.t0; return [(p.x - rect.left) * sx, (p.y - rect.top) * sy, age * 820, (1 - age / 1.8) ** 1.6]; }).filter((r) => r[3] > 0.01);
+      const live = ripples.filter((r) => Ripple.prepare(r, t));
+      live.forEach((r) => { r.lx = (r.x - rect.left) * sx; r.ly = (r.y - rect.top) * sy; });
       for (let y = 0, i = 0; y < rows; y++) {
         const py = (y + 0.5) * CELL;
         for (let x = 0; x < cols; x++, i++) {
@@ -3442,20 +3536,22 @@ const Cleo = (() => {
           const tw = 0.82 + 0.18 * Math.sin(t * 1.1 + phase[i]); // each lit box shimmers on its own beat
           // colour of the light on this box, and how strongly the box is lit
           let cr = Wt ? R / Wt : 0, cg = Wt ? G / Wt : 0, cb = Wt ? B / Wt : 0, lit = Math.min(cap, Wt * tw * gain);
-          for (let k = 0; k < rings.length; k++) {
-            const rg = rings[k]; const dist = Math.hypot(px - rg[0], py - rg[1]) - rg[2];
-            const a = Math.min(0.5, rg[3] * Math.exp(-(dist * dist) / (2 * 42 * 42)) * 0.4);
-            if (a < 0.004) continue;
-            const sum = lit + a; // blend the accent over the light already here, weighted by strength
-            cr = (cr * lit + accent[0] * a) / sum; cg = (cg * lit + accent[1] * a) / sum; cb = (cb * lit + accent[2] * a) / sum;
-            lit = Math.min(0.8, sum);
+          for (let k = 0; k < live.length; k++) {
+            const r = live[k], s = Ripple.at(r, px - r.lx, py - r.ly, phase[i]);
+            if (s < 0.01) continue;
+            // accent light, blended over the light already here by strength; its brightest stretches run warmer
+            const a = Math.min(0.62, 0.5 * s * rgain), warm = Math.max(0, s - 0.55) * 0.55, sum = lit + a;
+            cr = (cr * lit + (accent[0] + (255 - accent[0]) * warm) * a) / sum;
+            cg = (cg * lit + (accent[1] + (120 - accent[1]) * warm) * a) / sum;
+            cb = (cb * lit + (accent[2] + (90 - accent[2]) * warm) * a) / sum;
+            lit = Math.min(0.85, sum);
           }
-          // the unlit grid (faint white) breathes softly under the light
+          // the unlit grid breathes softly under the light
           const gh = ghost * (1 + 0.32 * Math.sin(t * 0.8 + phase[i] * 1.7));
           const tot = lit + gh, o = i * 4;
-          d[o] = (cr * lit + 255 * gh) / tot;
-          d[o + 1] = (cg * lit + 255 * gh) / tot;
-          d[o + 2] = (cb * lit + 255 * gh) / tot;
+          d[o] = (cr * lit + ink * gh) / tot;
+          d[o + 1] = (cg * lit + ink * gh) / tot;
+          d[o + 2] = (cb * lit + ink * gh) / tot;
           d[o + 3] = Math.min(255, tot * 255);
         }
       }
@@ -3482,7 +3578,7 @@ const Cleo = (() => {
       // the pointer light eases toward the pointer, and fades out two seconds after it stops
       pointer.x += (pointer.tx - pointer.x) * ease(0.12); pointer.y += (pointer.ty - pointer.y) * ease(0.12);
       pointer.a += ((now - pointer.seen < 2000 ? 1 : 0) - pointer.a) * ease(0.5);
-      while (ripples.length && now / 1000 - ripples[0].t0 > 1.8) ripples.shift();
+      for (let k = ripples.length - 1; k >= 0; k--) if (now / 1000 - ripples[k].t0 > ripples[k].life) ripples.splice(k, 1);
       views.forEach((v) => render(v, now / 1000));
       raf = requestAnimationFrame(frame);
     }
@@ -3501,12 +3597,19 @@ const Cleo = (() => {
         if (!on) cur = LEVEL[name].slice(); // appearing: start at this level (the fade-in covers it)
         on = true; target = name; root.classList.add('amb-on');
       } else if (on) { on = false; offUntil = performance.now() + 1200; root.classList.remove('amb-on'); }
+      root.classList.toggle('amb-boot', on && name === 'boot');
       start();
     }
     // after loading, the next screen sets the level; if none does in a moment, the grid fades away
     function settle() { clearTimeout(settleT); settleT = setTimeout(() => mode('off'), 900); }
-    // a ripple of light from a point on screen (client coordinates), e.g. the centre of the Cleo mark
-    function pulse(x, y) { if (reduced() || !on) return; ripples.push({ x, y, t0: performance.now() / 1000 }); if (ripples.length > 6) ripples.shift(); start(); }
+    // an organic ripple of light from a point on screen (client coordinates), e.g. behind the Cleo mark;
+    // opts tune it (Ripple.make): the loading screen sends slower, wider ones
+    function pulse(x, y, opts) {
+      if (reduced() || !on) return;
+      ripples.push(...Ripple.make(x, y, performance.now() / 1000, opts));
+      if (ripples.length > 18) ripples.splice(0, ripples.length - 18);
+      start();
+    }
     if (mq('(pointer: fine)').matches) addEventListener('pointermove', (e) => {
       if (!on) return;
       // the stage of the Terminal is scaled; map the pointer into the element the light is drawn on
@@ -3601,19 +3704,31 @@ const Cleo = (() => {
     el._cu = requestAnimationFrame(step);
   }
 
-  /* ---------- liquid glass: edge refraction via SVG displacement ---------- */
+  /* ---------- liquid glass: every glass surface refracts at its rim ----------
+     Each surface's backdrop is blurred, then bent inside a narrow rim by an SVG displacement map: the way
+     the curved edge of a real glass slab refracts what lies behind it, light from just past the edge is
+     drawn into the rim while the middle stays still. The fill is a flat tint and ::before draws the
+     embossed stroke (core.css "Glass materials"); there is no sheen gradient.
+     Every .glass, .glass-thick and .lg element (and [data-lg]) is picked up on its own, including ones
+     added later, so new screens need nothing. attach(el, { bezel, scale, tint }) still works for a surface
+     that wants a wider rim or its own tint. Chromium only (an SVG filter inside backdrop-filter); elsewhere,
+     and with reduced transparency, surfaces keep the plain blur.
+     Performance: maps are drawn small (the filter stretches them), built a few per frame, and shared
+     between surfaces of the same size and corner radius; a surface that leaves the page releases its map. */
   const LiquidGlass = (() => {
     const brands = navigator.userAgentData?.brands?.map((b) => b.brand).join(' ') || '';
     const chromium = /Chromium|Google Chrome|Microsoft Edge|Opera/.test(brands) || (!!window.chrome && !/Firefox/.test(navigator.userAgent));
     const enabled = chromium && !mq('(prefers-reduced-transparency: reduce)').matches;
     if (enabled) document.documentElement.classList.add('has-refraction');
+    const NS = 'http://www.w3.org/2000/svg';
+    const SEL = '.glass, .glass-thick, .lg, [data-lg]';
     let defs, uid = 0;
     const ensureDefs = () => {
-      if (defs) return defs;
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      if (defs?.isConnected) return defs;
+      const svg = document.createElementNS(NS, 'svg');
       svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.setAttribute('aria-hidden', 'true');
       svg.style.position = 'absolute';
-      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      defs = document.createElementNS(NS, 'defs');
       svg.appendChild(defs); document.body.appendChild(svg);
       return defs;
     };
@@ -3622,87 +3737,137 @@ const Cleo = (() => {
       if (r.endsWith('%')) return (Math.min(w, h) * parseFloat(r)) / 100;
       return Math.min(parseFloat(r) || 0, Math.min(w, h) / 2);
     };
+    // the rim: neutral (128, 128) inside; within `bezel` of the edge a push outward along the edge's normal,
+    // strongest at the edge and easing to nothing, so the backdrop just beyond the edge bends into the rim
     function buildMap(w, h, radius, bezel) {
-      const S = Math.min(1, 700 / Math.max(w, h));
+      const S = Math.min(1, Math.max(6 / bezel, 360 / Math.max(w, h)));
       const cw = Math.max(8, Math.round(w * S)), ch = Math.max(8, Math.round(h * S));
       const c = document.createElement('canvas'); c.width = cw; c.height = ch;
       const ctx = c.getContext('2d'); const img = ctx.createImageData(cw, ch); const d = img.data;
-      const r = radius * S, bz = Math.max(2, bezel * S), hx = cw / 2, hy = ch / 2;
-      for (let y = 0; y < ch; y++) {
-        for (let x = 0; x < cw; x++) {
-          const px = x + 0.5 - hx, py = y + 0.5 - hy;
-          const qx = Math.abs(px) - (hx - r), qy = Math.abs(py) - (hy - r);
-          const ox = Math.max(qx, 0), oy = Math.max(qy, 0);
-          const sd = Math.hypot(ox, oy) + Math.min(Math.max(qx, qy), 0) - r;
+      const r = radius * (cw / w), bz = Math.max(2, bezel * (cw / w)), hx = cw / 2, hy = ch / 2;
+      for (let y = 0, i = 0; y < ch; y++) {
+        const py = y + 0.5 - hy, qy = Math.abs(py) - (hy - r);
+        for (let x = 0; x < cw; x++, i += 4) {
           let R = 128, G = 128;
-          const inside = -sd;
+          const px = x + 0.5 - hx, qx = Math.abs(px) - (hx - r);
+          const inside = -(Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - r);
           if (inside >= 0 && inside < bz) {
-            const k = 1 - inside / bz;
-            const mag = k * k * (3 - 2 * k) * 0.95;
+            const m = (1 - inside / bz) ** 2.2 * 127;
             let nx, ny;
             if (qx > 0 && qy > 0) { const l = Math.hypot(qx, qy) || 1; nx = (qx / l) * Math.sign(px); ny = (qy / l) * Math.sign(py); }
             else if (qx > qy) { nx = Math.sign(px); ny = 0; } else { nx = 0; ny = Math.sign(py); }
-            R = 128 - nx * mag * 127; G = 128 - ny * mag * 127;
+            R = 128 + nx * m; G = 128 + ny * m;
           }
-          const i = (y * cw + x) * 4; d[i] = R; d[i + 1] = G; d[i + 2] = 128; d[i + 3] = 255;
+          d[i] = R; d[i + 1] = G; d[i + 2] = 128; d[i + 3] = 255;
         }
       }
       ctx.putImageData(img, 0, 0);
       return c.toDataURL();
     }
-    function refresh(el) {
-      const st = el._lg; if (!st?.filter) return;
-      const w = el.offsetWidth, h = el.offsetHeight;
-      if (!w || !h || (w === st.w && h === st.h)) return;
-      st.w = w; st.h = h;
-      const radius = parseRadius(el, w, h);
-      const NS = 'http://www.w3.org/2000/svg';
-      const f = st.filter;
-      f.setAttribute('width', w); f.setAttribute('height', h);
-      st.img.setAttribute('width', w); st.img.setAttribute('height', h);
-      st.img.setAttribute('href', buildMap(w, h, radius, st.bezel));
-      st.disp.setAttribute('scale', st.scale);
-      void NS;
+    const maps = new Map();     // size key -> { id, filter, users }
+    const surfaces = new Map(); // element -> { bezel, scale, key }
+    function acquire(w, h, r, bezel, scale) {
+      const key = `${w}x${h}r${Math.round(r)}b${bezel}s${scale}`;
+      let m = maps.get(key);
+      if (!m) {
+        const id = 'lgf' + ++uid;
+        const filter = document.createElementNS(NS, 'filter');
+        for (const [k, v] of Object.entries({ id, x: 0, y: 0, width: w, height: h, filterUnits: 'userSpaceOnUse', primitiveUnits: 'userSpaceOnUse', 'color-interpolation-filters': 'sRGB' })) filter.setAttribute(k, v);
+        const img = document.createElementNS(NS, 'feImage');
+        for (const [k, v] of Object.entries({ x: 0, y: 0, width: w, height: h, preserveAspectRatio: 'none', result: 'rim', href: buildMap(w, h, r, bezel) })) img.setAttribute(k, v);
+        const disp = document.createElementNS(NS, 'feDisplacementMap');
+        for (const [k, v] of Object.entries({ in: 'SourceGraphic', in2: 'rim', scale, xChannelSelector: 'R', yChannelSelector: 'G' })) disp.setAttribute(k, v);
+        filter.append(img, disp); ensureDefs().appendChild(filter);
+        m = { id, filter, users: 0 }; maps.set(key, m);
+      }
+      m.users++;
+      return key;
     }
-    const ro = 'ResizeObserver' in window ? new ResizeObserver((entries) => {
-      for (const e of entries) { clearTimeout(e.target._lgT); e.target._lgT = setTimeout(() => refresh(e.target), 90); }
+    function release(key) {
+      const m = maps.get(key); if (!m) return;
+      if (--m.users <= 0) { m.filter.remove(); maps.delete(key); }
+    }
+    // a narrow rim on small controls, up to 20px on large panels; the push reaches about one bezel past the edge
+    const autoBezel = (r, w, h) => Math.max(4, Math.round(Math.min(clamp(r * 0.8, 8, 20), Math.min(w, h) / 4)));
+    function refresh(el) {
+      const s = surfaces.get(el); if (!s) return;
+      const w = el.offsetWidth, h = el.offsetHeight;
+      if (!w || !h) return; // not laid out yet: the ResizeObserver brings it back
+      const r = parseRadius(el, w, h);
+      const bezel = s.bezel ?? autoBezel(r, w, h), scale = s.scale ?? Math.round(bezel * 1.9);
+      const key = `${w}x${h}r${Math.round(r)}b${bezel}s${scale}`;
+      if (key === s.key) return;
+      if (s.key) release(s.key);
+      s.key = acquire(w, h, r, bezel, scale);
+      el.style.setProperty('--refract', `url(#${maps.get(s.key).id})`);
+    }
+    // maps are built a few per frame so a new screen never stalls
+    const queue = new Set(); let qRaf = 0;
+    function flush() {
+      qRaf = 0; const t0 = performance.now();
+      for (const el of queue) {
+        queue.delete(el);
+        if (el.isConnected) refresh(el);
+        if (performance.now() - t0 > 6) break;
+      }
+      if (queue.size) qRaf = requestAnimationFrame(flush);
+    }
+    const schedule = (el) => { queue.add(el); if (!qRaf) qRaf = requestAnimationFrame(flush); };
+    const ro = enabled && 'ResizeObserver' in window ? new ResizeObserver((entries) => {
+      for (const e of entries) { clearTimeout(e.target._lgT); e.target._lgT = setTimeout(() => schedule(e.target), 90); }
     }) : null;
-    function attach(el, { bezel = 18, scale, tint } = {}) {
-      if (!el || el._lg) return;
+    function register(el, { bezel, scale } = {}) {
+      if (!enabled || !el) return;
+      const s = surfaces.get(el);
+      if (s) {
+        if (bezel == null && scale == null) return;
+        s.bezel = bezel ?? s.bezel; s.scale = scale ?? s.scale;
+        if (s.key) { release(s.key); s.key = null; }
+      } else {
+        const lg = el.dataset?.lg ? +el.dataset.lg : undefined;
+        surfaces.set(el, { bezel: bezel ?? lg, scale, key: null });
+        ro?.observe(el);
+      }
+      schedule(el);
+    }
+    function unregister(el) {
+      const s = surfaces.get(el); if (!s) return;
+      ro?.unobserve(el); clearTimeout(el._lgT); queue.delete(el);
+      if (s.key) release(s.key);
+      surfaces.delete(el); el.style.removeProperty('--refract');
+    }
+    function scan(root = document) {
+      if (!enabled) return;
+      if (root.matches?.(SEL)) register(root);
+      root.querySelectorAll?.(SEL).forEach((el) => register(el));
+    }
+    const prune = () => surfaces.forEach((s, el) => { if (!el.isConnected) unregister(el); });
+    if (enabled) {
+      const added = new Set(); let mRaf = 0, removed = false;
+      const mo = new MutationObserver((records) => {
+        for (const r of records) {
+          r.addedNodes.forEach((n) => { if (n.nodeType === 1) added.add(n); });
+          if (r.removedNodes.length) removed = true;
+        }
+        if (!mRaf) mRaf = requestAnimationFrame(() => {
+          mRaf = 0;
+          added.forEach((n) => { if (n.isConnected) scan(n); }); added.clear();
+          if (removed) { removed = false; prune(); }
+        });
+      });
+      const start = () => { mo.observe(document.body, { childList: true, subtree: true }); scan(document); };
+      if (document.body) start(); else document.addEventListener('DOMContentLoaded', start, { once: true });
+    }
+    // kept for surfaces that want a wider rim, a stronger push or their own tint
+    function attach(el, { bezel, scale, tint } = {}) {
+      if (!el) return;
       el.classList.add('lg');
       if (tint) el.style.setProperty('--lg-tint', tint);
-      const fx = document.createElement('span'); fx.className = 'lg-fx';
-      const tn = document.createElement('span'); tn.className = 'lg-tint';
-      const rim = document.createElement('span'); rim.className = 'lg-rim';
-      el.prepend(fx, tn, rim);
-      el._lg = { bezel, scale: scale ?? Math.round(bezel * 1.7) };
-      if (!enabled) return;
-      const NS = 'http://www.w3.org/2000/svg';
-      const id = 'lgf' + ++uid;
-      const filter = document.createElementNS(NS, 'filter');
-      filter.setAttribute('id', id);
-      filter.setAttribute('x', '0'); filter.setAttribute('y', '0');
-      filter.setAttribute('filterUnits', 'userSpaceOnUse'); filter.setAttribute('primitiveUnits', 'userSpaceOnUse');
-      filter.setAttribute('color-interpolation-filters', 'sRGB');
-      const img = document.createElementNS(NS, 'feImage');
-      img.setAttribute('x', '0'); img.setAttribute('y', '0'); img.setAttribute('preserveAspectRatio', 'none'); img.setAttribute('result', 'map');
-      const disp = document.createElementNS(NS, 'feDisplacementMap');
-      disp.setAttribute('in', 'SourceGraphic'); disp.setAttribute('in2', 'map');
-      disp.setAttribute('xChannelSelector', 'R'); disp.setAttribute('yChannelSelector', 'G');
-      filter.append(img, disp); ensureDefs().appendChild(filter);
-      Object.assign(el._lg, { filter, img, disp, id });
-      fx.style.filter = `url(#${id})`;
-      refresh(el);
-      ro?.observe(el);
+      register(el, { bezel, scale });
     }
-    // an element leaving for good (a closed dialog) drops its filter and stops being observed
-    function detach(el) {
-      const st = el?._lg; if (!st) return;
-      ro?.unobserve(el); clearTimeout(el._lgT);
-      st.filter?.remove(); delete el._lg;
-    }
-    function scan(root = document) { $$('[data-lg]', root).forEach((el) => attach(el, { bezel: +el.dataset.lg || 18 })); }
-    return { attach, detach, scan, enabled, refresh };
+    // an element leaving for good (a closed dialog) drops its map at once
+    const detach = (el) => unregister(el);
+    return { attach, detach, scan, enabled, refresh: (el) => schedule(el) };
   })();
 
   /* ---------- pointer sheen (one delegated listener) ---------- */
@@ -4063,8 +4228,9 @@ const Cleo = (() => {
   }
 
   /* ---------- shared brand bits ----------
-     ASSET: assets/brand/cleo-emblem.png (Cleo emblem) and assets/brand/aeso-mark.png (used as a CSS mask in core.css). */
-  const lockup = (app) => `<span class="lockup"><img src="assets/brand/cleo-emblem.png" alt="" width="27" height="22"><span class="word">Cleo</span>${app ? `<span class="badge app">${esc(app)}</span>` : ''}</span>`;
+     ASSET: assets/brand/cleo-emblem.svg (the Cleo emblem), assets/brand/cleo-wordmark.svg (the wordmark, a CSS
+     mask in core.css) and assets/brand/aeso-mark.png (also a mask). */
+  const lockup = (app) => `<span class="lockup"><img src="assets/brand/cleo-emblem.svg" alt="" width="22" height="30"><span class="word" role="img" aria-label="Cleo"></span>${app ? `<span class="badge app">${esc(app)}</span>` : ''}</span>`;
   const aeso = () => `<span class="aeso">Built by <span class="mark" aria-hidden="true"></span><b>Aeso</b></span>`;
   /* ---------- one name and one icon per action ----------
      Actions that appear in more than one place (or more than one mode) take their label and icon from
@@ -4077,7 +4243,7 @@ const Cleo = (() => {
     darkMode: ['Dark mode', 'moon'], lightMode: ['Light mode', 'sun'],
     switchMode: ['Switch mode', 'swap'], switchBranch: ['Switch branch', 'storefront'], signOut: ['Sign out', 'sign-out'],
     lock: ['Lock and switch user', 'lock-simple'], account: ['Account and security', 'user-circle'], settings: ['Settings', 'gear-six'],
-    notifications: ['Notifications', 'bell'], close: ['Close', 'x'], back: ['Back', 'arrow-left'],
+    notifications: ['Notifications', 'bell'], close: ['Close', 'x'], back: ['Back', 'caret-left'],
     add: ['Add', 'plus'], edit: ['Edit', 'pencil-simple'], remove: ['Remove', 'trash'], delete: ['Delete', 'trash'],
     export: ['Export', 'download-simple'], import: ['Import CSV', 'upload-simple'], print: ['Print', 'printer'],
     search: ['Search', 'magnifying-glass'], customize: ['Customize', 'sliders-horizontal'],
@@ -4102,12 +4268,11 @@ const Cleo = (() => {
   /* ---------- boot / loading screen ----------
      BACKEND: the step labels are cosmetic. Real start-up work (session check, config, catalog,
      the terminal's local database) can run while this plays; await it before the caller continues. */
-  /* progress is a grid of rounded boxes, the same mark as the charts: unlit boxes shimmer as a light
-     sweeps across, each finished step lights the next run of boxes column by column (bottom up), and the
-     grid pulses once when everything is ready */
-  const BOOT_ROWS = 3, BOOT_COLS = 16;
-  /* work: optional [[label, async fn], ...]. Each step shows while its task runs (no step is faked); a task that
-     fails ends the loading screen early and boot() resolves { node, error }. Without work, steps are the labels
+  /* The loading screen is the logo alone: the emblem and wordmark, with organic ripples of light spreading
+     through the background grid from behind the mark, now and then and at every finished step. There is
+     no visible progress bar; the progress and the current step are announced to assistive technology.
+     work: optional [[label, async fn], ...]. Each step runs its task (no step is faked); a task that fails
+     ends the loading screen early and boot() resolves { node, error }. Without work, steps are the labels
      of start-up that happens elsewhere (the demo's own data loads instantly). */
   async function boot({ app, steps, minTotal = 2600, work = null }) {
     if (work) steps = work.map((w) => w[0]);
@@ -4115,116 +4280,591 @@ const Cleo = (() => {
       <section class="screen boot" aria-label="Loading Cleo ${esc(app)}">
         <div class="boot-glow"></div>
         <div class="boot-center">
-          <div class="boot-mark" role="img" aria-label="Cleo"><span class="half l"></span><span class="half r"></span></div>
-          <div class="boot-word"><span class="w">Cleo</span><span class="a">${esc(app)}</span></div>
-          <div class="boot-grid" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${Array.from({ length: BOOT_ROWS * BOOT_COLS }, (_, i) => `<i style="--c:${i % BOOT_COLS};--r:${Math.floor(i / BOOT_COLS)}"></i>`).join('')}</div>
-          <p class="boot-status" aria-live="polite"><span>${esc(steps[0])}</span></p>
+          <div class="boot-mark" role="img" aria-label="Cleo"><span class="part tr"></span><span class="part br"></span><span class="part l"></span></div>
+          <div class="boot-word"><span class="w" aria-hidden="true"></span><span class="a">${esc(app)}</span></div>
         </div>
+        <div class="sr-only" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress></div>
+        <p class="sr-only" aria-live="polite" data-step>${esc(steps[0])}</p>
         <div class="boot-foot">${aeso()}</div>
       </section>`);
     root().replaceChildren(node);
-    const L = $('.half.l', node), R = $('.half.r', node), glow = $('.boot-glow', node), word = $('.boot-word', node);
-    const prog = $('.boot-grid', node), cells = $$('i', prog), status = $('.boot-status', node), statusSpan = $('span', status), foot = $('.boot-foot', node);
-    // lighting order: column by column, left to right, each column from the bottom row up
-    const order = cells.map((x, i) => i).sort((a, b) => (a % BOOT_COLS) - (b % BOOT_COLS) || Math.floor(b / BOOT_COLS) - Math.floor(a / BOOT_COLS));
-    let litCount = 0;
-    const lightTo = (n) => { for (let j = litCount; j < n; j++) { const box = cells[order[j]]; box.style.setProperty('--od', `${(j - litCount) * 18}ms`); box.classList.add('on'); } litCount = Math.max(litCount, n); };
+    const parts = $$('.boot-mark .part', node), glow = $('.boot-glow', node), word = $('.boot-word', node), foot = $('.boot-foot', node);
+    const prog = $('[data-progress]', node), status = $('[data-step]', node), mark = $('.boot-mark', node);
     const red = reduced();
-    // the background grid shows while loading, with a ripple from the mark at every step
+    // the background grid shows while loading, kept low behind the logo (core.css), with ripples from the mark
     ambient.mode('boot');
-    const mark = $('.boot-mark', node);
-    const ripple = () => { const r = mark.getBoundingClientRect(); ambient.pulse(r.left + r.width / 2, r.top + r.height / 2); };
+    // each ripple starts somewhere behind the mark, not always its centre, so the patterns never repeat
+    const ripple = (big = false) => {
+      const r = mark.getBoundingClientRect(), a = Math.random() * Math.PI * 2, d = Math.random() * (big ? 0.12 : 0.3);
+      ambient.pulse(r.left + r.width * (0.5 + Math.cos(a) * d), r.top + r.height * (0.5 + Math.sin(a) * d), { speed: big ? 560 : 440, life: big ? 2.3 : 2, band: big ? 22 : 17 });
+    };
+    let idle = 0;
+    const drift = () => { if (!mark.isConnected) return; ripple(); idle = setTimeout(drift, 1100 + Math.random() * 1000); };
     const t0 = performance.now();
     if (red) {
-      [L, R].forEach((x) => x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'both' }));
-      word.style.clipPath = 'none'; [prog, status, foot].forEach((x) => (x.style.opacity = 1));
+      parts.forEach((x) => x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'both' }));
+      word.style.clipPath = 'none'; foot.style.opacity = 1;
     } else {
+      // the three nodes arrive from their own sides (upper right, lower right, left) and join at the centre
       const opts = { duration: 950, easing: SPRING_BOUNCE, fill: 'both' };
-      L.animate([{ transform: 'translate(-70px, 22px) rotate(-6deg)', opacity: 0, filter: 'blur(10px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], opts);
-      R.animate([{ transform: 'translate(70px, -22px) rotate(-6deg)', opacity: 0, filter: 'blur(10px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { ...opts, delay: 90 });
-      glow.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: .85, transform: 'scale(1.05)', offset: .55 }, { opacity: .5, transform: 'scale(1)' }], { duration: 1500, delay: 380, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
+      const from = ['translate(34px, -46px) rotate(-8deg)', 'translate(34px, 46px) rotate(8deg)', 'translate(-54px, 0)'];
+      parts.forEach((x, i) => x.animate([{ transform: from[i], opacity: 0, filter: 'blur(10px)' }, { transform: 'none', opacity: 1, filter: 'blur(0)' }], { ...opts, delay: i * 80 }));
+      glow.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: .45, transform: 'scale(1.05)', offset: .55 }, { opacity: .26, transform: 'scale(1)' }], { duration: 1500, delay: 380, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
       word.animate([{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-10px)' }, { clipPath: 'inset(0 0% 0 0)', transform: 'none' }], { duration: 620, delay: 620, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' });
-      [prog, status].forEach((x, i) => x.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 900 + i * 60, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'both' }));
       foot.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 1100, fill: 'both' });
     }
-    await wait(red ? 200 : 1000);
-    ripple();
+    // the first ripple as the nodes join, then a quiet drift of them until loading ends
+    await wait(red ? 200 : 820);
+    ripple(true); idle = setTimeout(drift, 700);
+    const done = () => { clearTimeout(idle); ambient.settle(); };
     const per = Math.max(260, (minTotal - (performance.now() - t0)) / steps.length);
     for (let i = 0; i < steps.length; i++) {
-      if (i > 0) {
-        statusSpan.classList.add('swap'); await wait(160);
-        statusSpan.textContent = steps[i]; statusSpan.classList.remove('swap');
-      }
+      if (i > 0) status.textContent = steps[i];
       if (work) {
         try { await Promise.all([work[i][1](), wait(Math.min(per, 400))]); }
-        catch (error) { ambient.settle(); return { node, error }; }
+        catch (error) { done(); return { node, error }; }
       }
-      const pct = Math.round(((i + 1) / steps.length) * 100);
-      lightTo(Math.round((pct / 100) * cells.length)); prog.setAttribute('aria-valuenow', pct); ripple();
+      prog.setAttribute('aria-valuenow', Math.round(((i + 1) / steps.length) * 100)); ripple(true);
       if (!work) await wait(per);
     }
-    if (!red) { prog.classList.add('done'); ripple(); await wait(520); }
-    await wait(160);
+    status.textContent = 'Ready';
+    await wait(red ? 160 : 420);
     // the next screen decides whether the grid stays (sign-in) or fades away (show() reads data-amb)
-    ambient.settle();
+    done();
     return node;
   }
 
-  /* ---------- draggable refracting lens (login art) ---------- */
-  function lens(lensEl, area) {
-    const red = reduced();
-    let x = 0, y = 0, vx = 0, vy = 0, tx = 0, ty = 0, drag = null, idle = true, t = Math.random() * 10, last = performance.now(), alive = true;
-    const hist = [];
-    const bounds = () => ({ w: area.offsetWidth / 2 - lensEl.offsetWidth / 2 - 24, h: area.offsetHeight / 2 - lensEl.offsetHeight / 2 - 24 });
-    // pointer coordinates are in screen pixels; the lens may sit inside a scaled stage
-    let k = 1;
-    const rubber = (o, dim) => (o * dim * 0.55) / (dim + 0.55 * Math.abs(o));
-    lensEl.addEventListener('pointerdown', (e) => {
-      lensEl.setPointerCapture(e.pointerId);
-      k = lensEl.getBoundingClientRect().width / lensEl.offsetWidth || 1;
-      drag = { ox: e.clientX / k - x, oy: e.clientY / k - y }; idle = false; hist.length = 0;
-    });
-    lensEl.addEventListener('pointermove', (e) => {
-      if (!drag) return;
-      const b = bounds();
-      let nx = e.clientX / k - drag.ox, ny = e.clientY / k - drag.oy;
-      if (Math.abs(nx) > b.w) nx = Math.sign(nx) * (b.w + rubber(Math.abs(nx) - b.w, b.w));
-      if (Math.abs(ny) > b.h) ny = Math.sign(ny) * (b.h + rubber(Math.abs(ny) - b.h, b.h));
-      x = nx; y = ny; vx = vy = 0;
-      hist.push({ x, y, t: performance.now() }); if (hist.length > 6) hist.shift();
-    });
-    const release = () => {
-      if (!drag) return; drag = null;
-      if (hist.length > 1) {
-        const a = hist[0], z = hist[hist.length - 1], dt = Math.max(16, z.t - a.t);
-        vx = ((z.x - a.x) / dt) * 1000; vy = ((z.y - a.y) / dt) * 1000;
+  /* ---------- the Cleo mark in lit boxes (sign-in art on narrow screens, and wherever WebGL2 is missing) ----------
+     The emblem drawn on Cleo's box grid: 18px rounded boxes, the same grid the background lights in dark
+     mode and aligned to it, lit in Cleo red. It answers the pointer:
+       - a light follows the pointer and warms the boxes under it;
+       - press and drag parts the boxes around the pointer, like a magnet; they spring home on release,
+         with a little bounce because the drag carried momentum;
+       - a tap sends an organic ripple of light through the grid (Ripple), and each box hops as it passes.
+     At rest every box shimmers on its own beat and a soft band of light sweeps across the mark now and
+     then. Light mode draws its own faint grid around the mark (the background grid is dark mode only).
+     With reduced motion the mark is drawn once and holds still. It stops when its screen leaves.
+     ASSET: assets/brand/cleo-emblem.svg, sampled into boxes. */
+  function gridMark(area) {
+    const CELL = 18, GAP = 5, RAD = 3.5, BOX = CELL - GAP;
+    const canvas = document.createElement('canvas'); canvas.className = 'art-grid';
+    area.prepend(canvas);
+    const ctx = canvas.getContext('2d'); if (!ctx) return () => {};
+    const hint = $('.art-hint', area); if (hint?.lastChild) { hint.lastChild.textContent = 'Drag across the mark'; hint.hidden = reduced(); }
+    const slot = $('.art-mark', area);
+    const still = reduced();
+    const emblem = new Image(); let ready = false;
+    emblem.onload = () => { ready = true; layout(); }; emblem.src = 'assets/brand/cleo-emblem.svg';
+    let W = 0, H = 0, dpr = 1, ox = 0, oy = 0, k = 1, dark = true, cells = [], ghost = null, raf = 0, last = 0, drawnAt = 0;
+    let brand = [212, 0, 0], ink = [255, 255, 255];
+    const HOT = [255, 106, 82];
+    let t = Math.random() * 6, sweepAt = 2.5;
+    const ptr = { x: -1e4, y: -1e4, a: 0, down: false, id: null, sx: 0, sy: 0, travel: 0, seen: -1e4 };
+    const rings = []; // Ripple.make() entries, in this canvas's pixels
+    const rgbOf = (v, d) => { const m = String(v).match(/\d+(\.\d+)?/g); return m && m.length >= 3 ? m.slice(0, 3).map(Number) : d; };
+    function readColours() {
+      const s = getComputedStyle(document.documentElement);
+      dark = document.documentElement.dataset.theme !== 'light';
+      const probe = document.createElement('i'); probe.style.color = s.getPropertyValue('--brand').trim() || '#d40000';
+      document.body.appendChild(probe); brand = rgbOf(getComputedStyle(probe).color, [212, 0, 0]); probe.remove();
+      ink = dark ? [255, 255, 255] : [20, 20, 24];
+    }
+    // the mark's boxes: the emblem sampled at four points per side of every box, kept where it covers enough
+    function layout() {
+      const w = area.offsetWidth, h = area.offsetHeight;
+      if (!w || !h) return;
+      readColours();
+      dpr = Math.min(2, devicePixelRatio || 1); W = w; H = h;
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      // align to the background grid (it starts at the corner of the .ambient layer); the Terminal stage is scaled
+      const amb = area.closest('.dp')?.querySelector('.ambient') || document.querySelector('.ambient');
+      const r = area.getBoundingClientRect(); k = r.width / w || 1;
+      const ar = amb ? amb.getBoundingClientRect() : { left: 0, top: 0 };
+      ox = (CELL - (((r.left - ar.left) / k) % CELL) + CELL) % CELL; oy = (CELL - (((r.top - ar.top) / k) % CELL) + CELL) % CELL;
+      ghost = null; cells = [];
+      if (!ready) { draw(); return; }
+      const ratio = emblem.naturalHeight / emblem.naturalWidth || 1.3576;
+      const cols = Math.round(clamp(Math.min(w * 0.62, (h * 0.62) / ratio, 640 / Math.max(1, ratio)) / CELL, 12, 36)), rows = Math.round(cols * ratio);
+      const S = 4, c = document.createElement('canvas'); c.width = cols * S; c.height = rows * S;
+      const x = c.getContext('2d'); x.drawImage(emblem, 0, 0, c.width, c.height);
+      const a = x.getImageData(0, 0, c.width, c.height).data;
+      const c0 = Math.round((w / 2 - (cols * CELL) / 2 - ox) / CELL), r0 = Math.round((h / 2 - (rows * CELL) / 2 - oy) / CELL);
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+        let sum = 0;
+        for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += a[(((j * S + yy) * c.width) + i * S + xx) * 4 + 3];
+        const cov = sum / (S * S * 255);
+        if (cov < 0.22) continue;
+        const hx = ox + (c0 + i) * CELL + GAP / 2, hy = oy + (r0 + j) * CELL + GAP / 2;
+        cells.push({ hx, hy, cx: hx + BOX / 2, cy: hy + BOX / 2, a: Math.min(1, (cov - 0.22) / 0.45), dx: 0, dy: 0, vx: 0, vy: 0, ph: Math.random() * Math.PI * 2 });
       }
-      const proj = (v) => ((v / 1000) * 0.998) / (1 - 0.998);
-      const b = bounds();
-      tx = clamp(x + proj(vx) * 0.35, -b.w, b.w); ty = clamp(y + proj(vy) * 0.35, -b.h, b.h);
-      setTimeout(() => (idle = true), 2600);
-    };
-    lensEl.addEventListener('pointerup', release); lensEl.addEventListener('pointercancel', release);
-    lensEl.addEventListener('keydown', (e) => {
-      const k = { ArrowLeft: [-40, 0], ArrowRight: [40, 0], ArrowUp: [0, -40], ArrowDown: [0, 40] }[e.key];
-      if (!k) return; e.preventDefault(); idle = false; const b = bounds();
-      tx = clamp(tx + k[0], -b.w, b.w); ty = clamp(ty + k[1], -b.h, b.h);
-    });
-    const tick = (now) => {
-      if (!alive || !lensEl.isConnected) return;
-      const dt = Math.min(0.033, (now - last) / 1000); last = now;
-      if (!drag) {
-        if (idle && !red) { t += dt * 0.16; const b = bounds(); tx = Math.sin(t * 1.3) * b.w * 0.55; ty = Math.sin(t * 0.9 + 1.2) * b.h * 0.45; }
-        // critically damped follow (response ~0.5s); a flick's velocity carries in
-        const k = 60, c = 2 * Math.sqrt(k) * 0.82;
-        vx += (k * (tx - x) - c * vx) * dt; vy += (k * (ty - y) - c * vy) * dt;
-        x += vx * dt; y += vy * dt;
+      if (slot) Object.assign(slot.style, { left: `${ox + c0 * CELL}px`, top: `${oy + r0 * CELL}px`, width: `${cols * CELL}px`, height: `${rows * CELL}px` });
+      draw(); request();
+    }
+    // light mode: a faint grid around the mark that fades out toward the edges (drawn once per layout)
+    function ghostLayer() {
+      const g = document.createElement('canvas'); g.width = canvas.width; g.height = canvas.height;
+      const x = g.getContext('2d'); x.scale(dpr, dpr);
+      const cxm = W / 2, cym = H / 2, reach = Math.min(W, H) * 0.62;
+      for (let y = oy - CELL; y < H; y += CELL) for (let xx = ox - CELL; xx < W; xx += CELL) {
+        const d = Math.hypot(xx + CELL / 2 - cxm, (y + CELL / 2 - cym) * 1.15) / reach;
+        const al = 0.055 * Math.max(0, 1 - d * d);
+        if (al < 0.004) continue;
+        x.fillStyle = `rgb(${ink[0]} ${ink[1]} ${ink[2]} / ${al.toFixed(3)})`;
+        x.beginPath(); x.roundRect(xx + GAP / 2, y + GAP / 2, BOX, BOX, RAD); x.fill();
       }
-      lensEl.style.transform = `translate(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px))`;
-      requestAnimationFrame(tick);
+      return g;
+    }
+    function draw() {
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!W) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (!dark) { ghost ||= ghostLayer(); ctx.drawImage(ghost, 0, 0, W, H); }
+      // unlit boxes near the pointer catch its light (dark mode: on top of the background grid)
+      if (ptr.a > 0.01 && !still) {
+        const R = 130, c0 = Math.floor((ptr.x - R - ox) / CELL), c1 = Math.ceil((ptr.x + R - ox) / CELL), r0 = Math.floor((ptr.y - R - oy) / CELL), r1 = Math.ceil((ptr.y + R - oy) / CELL);
+        for (let j = r0; j <= r1; j++) for (let i = c0; i <= c1; i++) {
+          const bx = ox + i * CELL + GAP / 2, by = oy + j * CELL + GAP / 2, d = Math.hypot(bx + BOX / 2 - ptr.x, by + BOX / 2 - ptr.y);
+          const al = (dark ? 0.16 : 0.1) * ptr.a * Math.exp(-(d * d) / (2 * 56 * 56));
+          if (al < 0.004) continue;
+          ctx.fillStyle = `rgb(${ink[0]} ${ink[1]} ${ink[2]} / ${al.toFixed(3)})`;
+          ctx.beginPath(); ctx.roundRect(bx, by, BOX, BOX, RAD); ctx.fill();
+        }
+      }
+      const sweep = still ? -9 : (t - sweepAt) / 1.7; // 0 to 1 while the band crosses the mark
+      const live = still ? [] : rings.filter((r) => Ripple.prepare(r, t));
+      const span = cells.length ? cells[cells.length - 1].cx - cells[0].cx + 1 : 1, left = cells.length ? cells[0].cx : 0;
+      for (const c of cells) {
+        const x = c.cx + c.dx, y = c.cy + c.dy;
+        let heat = 0, hop = 0;
+        if (!still) {
+          if (ptr.a > 0.01) { const d = Math.hypot(x - ptr.x, y - ptr.y); heat += 0.6 * ptr.a * Math.exp(-(d * d) / (2 * 64 * 64)); }
+          if (sweep > -0.2 && sweep < 1.2) { const u = (x - left) / span * 0.8 + (y - cells[0].cy) / span * 0.4; heat += 0.42 * Math.exp(-((u - sweep * 1.3 + 0.1) ** 2) / (2 * 0.05 * 0.05)); }
+          for (const g of live) { const f = Ripple.at(g, x - g.x, y - g.y, c.ph); heat += 0.75 * f; hop = Math.max(hop, f); }
+        }
+        heat = Math.min(1, heat);
+        const shimmer = still ? 1 : 0.84 + 0.16 * Math.sin(t * 1.3 + c.ph);
+        const al = Math.min(1, c.a * shimmer + heat * 0.35);
+        const col = brand.map((v, n) => Math.round(v + (HOT[n] - v) * heat));
+        const s = BOX * (1 + 0.28 * hop), off = (s - BOX) / 2;
+        ctx.fillStyle = `rgb(${col[0]} ${col[1]} ${col[2]} / ${al.toFixed(3)})`;
+        ctx.beginPath(); ctx.roundRect(c.hx + c.dx - off, c.hy + c.dy - off, s, s, RAD * (1 + 0.28 * hop)); ctx.fill();
+      }
+    }
+    // the boxes' springs: home is where the emblem puts them; a held pointer pushes them aside
+    function step(dt) {
+      const stiff = (2 * Math.PI / 0.34) ** 2, damp = 2 * 0.74 * Math.sqrt(stiff);
+      let moving = false;
+      for (const c of cells) {
+        let fx = 0, fy = 0;
+        if (ptr.a > 0.01) {
+          const ddx = c.cx - ptr.x, ddy = c.cy - ptr.y, d = Math.hypot(ddx, ddy) || 1;
+          const push = (ptr.down ? 34 : 4) * ptr.a * Math.exp(-(d * d) / (2 * (ptr.down ? 86 : 60) ** 2));
+          fx = (ddx / d) * push; fy = (ddy / d) * push;
+        }
+        c.vx += (stiff * (fx - c.dx) - damp * c.vx) * dt; c.vy += (stiff * (fy - c.dy) - damp * c.vy) * dt;
+        c.dx += c.vx * dt; c.dy += c.vy * dt;
+        if (Math.abs(c.vx) + Math.abs(c.vy) > 0.5 || Math.abs(c.dx) + Math.abs(c.dy) > 0.3) moving = true;
+      }
+      return moving;
+    }
+    function frame(now) {
+      raf = 0;
+      if (!canvas.isConnected) { stop(); return; }
+      if (document.hidden) return;
+      const dt = Math.min(1 / 30, last ? (now - last) / 1000 : 1 / 60);
+      const active = ptr.down || rings.length || ptr.a > 0.01;
+      // at rest the shimmer needs no more than about 30 frames a second
+      if (!active && last && now - drawnAt < 30) { raf = requestAnimationFrame(frame); return; }
+      last = now; drawnAt = now; t += dt;
+      if (t - sweepAt > 2.2) sweepAt = t + 4 + Math.random() * 3;
+      ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.25));
+      for (let k = rings.length - 1; k >= 0; k--) if (t - rings[k].t0 > rings[k].life) rings.splice(k, 1);
+      step(dt); draw();
+      raf = requestAnimationFrame(frame);
+    }
+    function request() { if (!still && !raf && canvas.isConnected) raf = requestAnimationFrame(frame); }
+    // pointer coordinates are screen pixels; the art may sit inside the Terminal's scaled stage
+    const local = (e) => { const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / k, (e.clientY - r.top) / k]; };
+    canvas.addEventListener('pointermove', (e) => {
+      if (still) return;
+      [ptr.x, ptr.y] = local(e); ptr.seen = performance.now();
+      if (ptr.down && e.pointerId === ptr.id) ptr.travel = Math.max(ptr.travel, Math.hypot(ptr.x - ptr.sx, ptr.y - ptr.sy));
+      request();
+    });
+    canvas.addEventListener('pointerdown', (e) => {
+      if (still || e.button > 0) return;
+      canvas.setPointerCapture(e.pointerId); canvas.classList.add('grabbing');
+      [ptr.x, ptr.y] = local(e); ptr.sx = ptr.x; ptr.sy = ptr.y; ptr.travel = 0; ptr.down = true; ptr.id = e.pointerId; ptr.seen = performance.now();
+      request();
+    });
+    const release = (e) => {
+      if (!ptr.down || (e && e.pointerId !== ptr.id)) return;
+      ptr.down = false; canvas.classList.remove('grabbing');
+      // a tap (no real drag) sends an organic ripple of light through the boxes
+      if (ptr.travel < 10) { rings.push(...Ripple.make(ptr.x, ptr.y, t, { speed: 520, life: 1.6, band: 16 })); if (rings.length > 14) rings.splice(0, rings.length - 14); }
+      ptr.seen = performance.now(); request();
     };
-    requestAnimationFrame(tick);
-    return () => (alive = false);
+    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+    canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.seen = performance.now() - 1500; });
+    const ro = new ResizeObserver(() => layout()); ro.observe(area);
+    const onTheme = () => setTimeout(() => { readColours(); ghost = null; draw(); request(); }, 30);
+    document.addEventListener('cleo:theme', onTheme);
+    document.addEventListener('visibilitychange', request);
+    function stop() { cancelAnimationFrame(raf); raf = 0; ro.disconnect(); document.removeEventListener('cleo:theme', onTheme); document.removeEventListener('visibilitychange', request); }
+    layout();
+    return stop;
+  }
+
+  /* ---------- the Cleo mark in 3D (sign-in art beside the form) ----------
+     The emblem laid flat and seen from above at a fixed angle, with no perspective (an orthographic view),
+     built from the grid's own rounded boxes: each box is a pillar standing on the ground with a bevelled
+     top, lit like glossy glass over the dimmed background grid. The mark itself never moves; its pillars do.
+       - Arrival: the pillars rise out of the ground, the centre first, overshoot a little and settle.
+       - At rest every pillar has its own height and keeps changing it: two slow waves of different
+         lengths cross the mark, so its skyline is never the same twice. Taller pillars run warmer, a glint
+         passes over the tops now and then, and every few seconds a quiet ripple lifts through it.
+       - Pointer: the pillars under it rise into a soft hill that follows it and warms.
+       - Press: the pillars under the finger sink, like pressing into pin art, and a ring around them rises;
+         drag to move the dent. Let go and they spring back up, sending a ripple out.
+       - A tap sends an organic ripple (Ripple) through the pillars and through the background grid.
+     With reduced motion it is drawn once, its heights still varied. Where WebGL2 is missing or would run in
+     software, or its context is lost, the 2D mark takes over (fallback). It stops when its screen leaves.
+     ASSET: assets/brand/cleo-emblem.svg, sampled into boxes. */
+  function emblem3d(area, fallback) {
+    const canvas = document.createElement('canvas'); canvas.className = 'art-3d';
+    let gl = null;
+    // no software WebGL: a computer without graphics acceleration keeps the 2D mark instead of a slow 3D one
+    try { gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true, powerPreference: 'low-power', failIfMajorPerformanceCaveat: true }); } catch { gl = null; }
+    if (!gl) return null;
+    const TAU = Math.PI * 2, RAD = Math.PI / 180;
+    // the fixed view: steeply down onto the ground and square to the mark, so it reads upright while the
+    // near side of every pillar shows its height
+    const SIDE = 28, BEV = 0.08, ELEV = 74 * RAD, AZIM = 0, H_MIN = 0.22, H_TALL = 3.4;
+    // ---- shaders: pillars lit by a key and a fill light, glints and a soft shade toward the ground, in linear light ----
+    const VS = `#version 300 es
+      layout(location = 0) in vec3 aPos; layout(location = 1) in vec3 aNor;
+      layout(location = 2) in vec4 aCell; layout(location = 3) in vec4 aMove;
+      uniform mat4 uProj, uView, uModel; uniform float uBevel;
+      out vec3 vNor; out vec3 vModel; out float vHeat; out float vTop; out float vH;
+      void main() {
+        float h = aMove.x, s = aMove.z;
+        float z = (aPos.z > 0.5 ? h - uBevel : 0.0) + (aPos.z > 1.5 ? uBevel : 0.0);
+        vec3 p = vec3(aPos.xy * s + aCell.xy, z);
+        vModel = p; vNor = mat3(uModel) * aNor; vHeat = aMove.y; vTop = aNor.z; vH = h;
+        gl_Position = uProj * uView * uModel * vec4(p, 1.0);
+      }`;
+    const FS = `#version 300 es
+      precision highp float;
+      in vec3 vNor; in vec3 vModel; in float vHeat; in float vTop; in float vH;
+      uniform vec3 uBase, uHot, uKey, uFill, uEye; uniform float uAmb, uEmis, uGlint, uSpan;
+      out vec4 o;
+      void main() {
+        vec3 N = normalize(vNor);
+        float d = max(dot(N, uKey), 0.0), f = max(dot(N, uFill), 0.0);
+        float sp = pow(max(dot(N, normalize(uKey + uEye)), 0.0), 60.0);
+        float fr = pow(1.0 - max(dot(N, uEye), 0.0), 3.0);
+        vec3 base = mix(uBase, uHot, clamp(vHeat + smoothstep(0.9, 2.8, vH) * 0.32, 0.0, 1.0));
+        float ao = mix(mix(0.42, 1.0, smoothstep(0.0, 1.5, vModel.z)), 1.0, step(0.5, vTop));
+        vec3 c = base * (uAmb + 0.85 * d + 0.25 * f) * ao + base * (uEmis + vHeat * 0.7);
+        c += vec3(1.0, 0.94, 0.9) * sp * (0.6 + vHeat * 0.4);
+        c += mix(base, vec3(1.0), 0.35) * fr * 0.16;
+        float u = (vModel.x * 0.8 - vModel.y * 0.5) / uSpan;
+        c += vec3(1.0, 0.9, 0.85) * exp(-pow(u - uGlint, 2.0) / 0.0016) * smoothstep(0.6, 1.0, vTop) * 0.45;
+        c = c / (1.0 + c * 0.35);
+        o = vec4(pow(c, vec3(1.0 / 2.2)), 1.0);
+      }`;
+    const shader = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
+    const vs = shader(gl.VERTEX_SHADER, VS), fs = shader(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) return null;
+    const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+    const U = {}; ['uProj', 'uView', 'uModel', 'uBevel', 'uEye', 'uBase', 'uHot', 'uKey', 'uFill', 'uAmb', 'uEmis', 'uGlint', 'uSpan'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
+    // ---- one pillar: a rounded square (the grid's box) extruded upward, with a 45° bevel round its top ----
+    // z codes: 0 the ground, 1 where the bevel starts, 2 the top; the shader turns them into height
+    const mesh = (() => {
+      const hb = 13 / 36, rc = 3.5 / 18, c = hb - rc, ring = [], v = [], idx = [], k45 = Math.SQRT1_2;
+      [[c, c, 0], [-c, c, 90], [-c, -c, 180], [c, -c, 270]].forEach(([cx, cy, a0]) => {
+        for (let k = 0; k <= 5; k++) { const a = (a0 + k * 18) * RAD; ring.push([cx + rc * Math.cos(a), cy + rc * Math.sin(a), Math.cos(a), Math.sin(a)]); }
+      });
+      const add = (x, y, z, nx, ny, nz) => { v.push(x, y, z, nx, ny, nz); return v.length / 6 - 1; };
+      const M = ring.length;
+      for (let j = 0; j < M; j++) {
+        const [x0, y0, nx0, ny0] = ring[j], [x1, y1, nx1, ny1] = ring[(j + 1) % M];
+        const a = add(x0, y0, 0, nx0, ny0, 0), b = add(x1, y1, 0, nx1, ny1, 0), cc = add(x1, y1, 1, nx1, ny1, 0), d = add(x0, y0, 1, nx0, ny0, 0);
+        idx.push(a, b, cc, a, cc, d);
+        const e = add(x0, y0, 1, nx0 * k45, ny0 * k45, k45), f = add(x1, y1, 1, nx1 * k45, ny1 * k45, k45);
+        const g = add(x1 - nx1 * BEV, y1 - ny1 * BEV, 2, nx1 * k45, ny1 * k45, k45), h = add(x0 - nx0 * BEV, y0 - ny0 * BEV, 2, nx0 * k45, ny0 * k45, k45);
+        idx.push(e, f, g, e, g, h);
+      }
+      const tc = add(0, 0, 2, 0, 0, 1);
+      const top = ring.map(([x, y, nx, ny]) => add(x - nx * BEV, y - ny * BEV, 2, 0, 0, 1));
+      for (let j = 0; j < M; j++) idx.push(tc, top[j], top[(j + 1) % M]);
+      return { v: new Float32Array(v), i: new Uint16Array(idx) };
+    })();
+    // ---- small matrix helpers (column-major) ----
+    const mul = (a, b) => { const o = new Float32Array(16); for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3]; return o; };
+    const trans = (x, y, z) => new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1]);
+    const rotX = (a) => { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]); };
+    const rotY = (a) => { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]); };
+    const ortho = (l, r, b, t, n, f) => new Float32Array([2 / (r - l), 0, 0, 0, 0, 2 / (t - b), 0, 0, 0, 0, -2 / (f - n), 0, -(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1]);
+    const apply = (m, x, y, z) => [m[0] * x + m[4] * y + m[8] * z + m[12], m[1] * x + m[5] * y + m[9] * z + m[13]];
+    const norm = (x, y, z) => { const l = Math.hypot(x, y, z) || 1; return [x / l, y / l, z / l]; };
+    const lin = (c) => c.map((v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+    // the mark lies on the ground: its own height (z) points up, its top edge away from you
+    const model = rotX(-90 * RAD), view = mul(trans(0, 0, -60), mul(rotX(ELEV), rotY(AZIM)));
+    // lights and the eye, in the same (world) space as the normals
+    const key = norm(-0.35, 0.92, 0.18), fill = norm(0.55, 0.3, 0.75);
+    const eye = (() => { const s = Math.sin(ELEV), c = Math.cos(ELEV); return norm(-c * Math.sin(AZIM), s, c * Math.cos(AZIM)); })();
+    // ---- buffers ----
+    const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+    const vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo); gl.bufferData(gl.ARRAY_BUFFER, mesh.v, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
+    gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12);
+    const ibo = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.i, gl.STATIC_DRAW);
+    const cellBuf = gl.createBuffer(), moveBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(2, 1);
+    gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(3, 1);
+    gl.bindVertexArray(null);
+    area.prepend(canvas);
+    const ghost = document.createElement('canvas'); ghost.className = 'art-ghost'; area.prepend(ghost);
+    const shade = document.createElement('canvas'); shade.className = 'art-ghost'; shade.style.opacity = 0; ghost.after(shade);
+    area.classList.add('is-3d');
+    const slot = $('.art-mark', area);
+    const still = reduced();
+    // the hint names what the mark answers to; a still mark answers to nothing, so it has none
+    const hint = $('.art-hint', area); if (hint?.lastChild) { hint.lastChild.textContent = 'Hover, press or tap the mark'; hint.hidden = still; }
+    // ---- state ----
+    let n = 0, cols = 0, rows = 0, X, Y, SEED, DELAY, HGT, VEL, HEAT, move = new Float32Array(0), span = 1;
+    let W = 0, H = 0, dpr = 1, proj = null, frame2 = { cx: 0, cy: 0, hw: 1, hh: 1 }, foot = null, dark = true, base = lin([212, 0, 0]);
+    const hot = lin([255, 106, 82]);
+    let t = still ? 7.3 : 0, raf = 0, last = 0, drawnAt = 0, stopped = false, busy = true, glintAt = 3.2, nextRipple = 6, shown = -1;
+    const ptr = { a: 0, mx: -99, my: -99, down: false, id: null, sx: 0, sy: 0, travel: 0, press: 0, seen: -1e4 };
+    const ripples = [];
+    function readColours() {
+      dark = document.documentElement.dataset.theme !== 'light';
+      const probe = document.createElement('i'); probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#d40000';
+      document.body.appendChild(probe); const m = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g); probe.remove();
+      if (m && m.length >= 3) base = lin(m.slice(0, 3).map(Number));
+    }
+    // the emblem's boxes (SIDE of them along its longer side): sampled at four points per side of every box,
+    // kept where it covers enough
+    const emblem = new Image();
+    emblem.onload = () => {
+      const ratio = emblem.naturalHeight / emblem.naturalWidth || 1.3576, S = 4;
+      cols = ratio > 1 ? Math.round(SIDE / ratio) : SIDE; rows = ratio > 1 ? SIDE : Math.round(SIDE * ratio);
+      const c = document.createElement('canvas'); c.width = cols * S; c.height = rows * S;
+      const x = c.getContext('2d'); x.drawImage(emblem, 0, 0, c.width, c.height);
+      const a = x.getImageData(0, 0, c.width, c.height).data, cells = [];
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+        let sum = 0;
+        for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += a[((j * S + yy) * c.width + i * S + xx) * 4 + 3];
+        if (sum / (S * S * 255) >= 0.22) cells.push([i - (cols - 1) / 2, (rows - 1) / 2 - j]);
+      }
+      n = cells.length; X = new Float32Array(n); Y = new Float32Array(n); SEED = new Float32Array(n); DELAY = new Float32Array(n);
+      HGT = new Float32Array(n).fill(H_MIN); VEL = new Float32Array(n); HEAT = new Float32Array(n); move = new Float32Array(n * 4);
+      const far = Math.hypot(cols / 2, rows / 2), stat = new Float32Array(n * 4);
+      cells.forEach(([cx, cy], k) => {
+        X[k] = cx; Y[k] = cy; SEED[k] = Math.random();
+        DELAY[k] = 0.1 + (Math.hypot(cx, cy) / far) * 0.7 + Math.random() * 0.15; // the centre rises first
+        stat.set([cx, cy, SEED[k], 1], k * 4);
+      });
+      span = cols * 0.8 + rows * 0.5;
+      gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf); gl.bufferData(gl.ARRAY_BUFFER, stat, gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.bufferData(gl.ARRAY_BUFFER, move.byteLength, gl.DYNAMIC_DRAW);
+      layout(); update(0); draw(); request();
+    };
+    emblem.src = 'assets/brand/cleo-emblem.svg';
+    // ---- size, the orthographic frame around the mark, and the faint grid and shadow behind it in light mode ----
+    function layout() {
+      const w = area.offsetWidth, h = area.offsetHeight;
+      if (!w || !h || !rows) return;
+      readColours();
+      W = w; H = h; dpr = Math.min(2, devicePixelRatio || 1);
+      if (w * h * dpr * dpr > 3.6e6) dpr = Math.sqrt(3.6e6 / (w * h));
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      // the mark's footprint and its tallest pillars, seen through the fixed view, framed with room to spare
+      const m = mul(view, model);
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (const cx of [-cols / 2, cols / 2]) for (const cy of [-rows / 2, rows / 2]) for (const cz of [0, H_TALL]) {
+        const [px, py] = apply(m, cx, cy, cz); x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+      }
+      const asp = w / h;
+      let hw = Math.max((x1 - x0) / 2 / 0.78, ((y1 - y0) / 2 / 0.76) * asp); const hh = hw / asp;
+      frame2 = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hw, hh };
+      proj = ortho(frame2.cx - hw, frame2.cx + hw, frame2.cy - hh, frame2.cy + hh, 1, 200);
+      // the mark on screen: its footprint on the ground (light mode's shadow), and its outline at a pillar's
+      // height (where the loading screen's mark glides into)
+      const pm = mul(proj, m), onScreen = (z) => {
+        let sx0 = 1e9, sy0 = 1e9, sx1 = -1e9, sy1 = -1e9;
+        for (const cx of [-cols / 2, cols / 2]) for (const cy of [-rows / 2, rows / 2]) {
+          const [px, py] = apply(pm, cx, cy, z), sx = (px * 0.5 + 0.5) * w, sy = (0.5 - py * 0.5) * h;
+          sx0 = Math.min(sx0, sx); sx1 = Math.max(sx1, sx); sy0 = Math.min(sy0, sy); sy1 = Math.max(sy1, sy);
+        }
+        return { x: sx0, y: sy0, w: sx1 - sx0, h: sy1 - sy0 };
+      };
+      foot = onScreen(0);
+      ghostGrid();
+      if (slot) { const r = onScreen(1); Object.assign(slot.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` }); }
+    }
+    function ghostGrid() {
+      shadeLayer();
+      ghost.width = Math.round(W * dpr); ghost.height = Math.round(H * dpr);
+      const x = ghost.getContext('2d'); x.clearRect(0, 0, ghost.width, ghost.height);
+      if (dark) return; // dark mode: the background grid itself, dimmed on sign-in screens
+      x.scale(dpr, dpr);
+      const CELL = 18, BOX = 13, amb = document.querySelector('.ambient'), r = area.getBoundingClientRect(), ar = amb ? amb.getBoundingClientRect() : { left: 0, top: 0 };
+      const ox = (CELL - ((r.left - ar.left) % CELL) + CELL) % CELL, oy = (CELL - ((r.top - ar.top) % CELL) + CELL) % CELL, reach = Math.min(W, H) * 0.7;
+      for (let yy = oy - CELL; yy < H; yy += CELL) for (let xx = ox - CELL; xx < W; xx += CELL) {
+        const d = Math.hypot(xx + CELL / 2 - W / 2, (yy + CELL / 2 - H / 2) * 1.15) / reach, al = 0.035 * Math.max(0, 1 - d * d);
+        if (al < 0.004) continue;
+        x.fillStyle = `rgb(20 20 24 / ${al.toFixed(3)})`; x.beginPath(); x.roundRect(xx + 2.5, yy + 2.5, BOX, BOX, 3.5); x.fill();
+      }
+    }
+    // light mode: the mark's own soft shadow, a little toward you, so it stands on the page instead of floating
+    // over it. It is the shadow of a copy drawn off the canvas (shadow offsets and blur are in device pixels),
+    // and it grows in with the pillars (draw).
+    function shadeLayer() {
+      shade.width = Math.round(W * dpr); shade.height = Math.round(H * dpr);
+      if (dark || !foot) return;
+      const x = shade.getContext('2d');
+      x.shadowColor = 'rgb(20 20 24 / .14)'; x.shadowBlur = foot.h * 0.045 * dpr;
+      x.shadowOffsetX = 1e4 * dpr; x.shadowOffsetY = foot.h * 0.02 * dpr;
+      x.drawImage(emblem, (foot.x - 1e4) * dpr, foot.y * dpr, foot.w * dpr, foot.h * dpr);
+    }
+    // ---- motion: every pillar springs toward a height made of the waves, the pointer and the ripples ----
+    // the resting skyline: two slow waves of different lengths crossing the mark, and a little of each pillar's own
+    const skyline = (x, y, s, tt) => 0.5 + 0.28 * Math.sin(tt * 0.55 + x * 0.32 + Math.sin(tt * 0.21 + y * 0.18) * 1.4) + 0.22 * Math.sin(tt * 0.37 - y * 0.41 + x * 0.12 + s * 2.1);
+    function update(dt) {
+      const calm = still ? 1 : clamp((t - 1.4) / 1.2, 0, 1);
+      if (!still && t > glintAt + 1.6) glintAt = t + 4 + Math.random() * 3;
+      if (!still && t > nextRipple && n) { const k = Math.floor(Math.random() * n); ripples.push(...Ripple.make(X[k], Y[k], t, { speed: 7, life: 1.8, band: 0.8, splash: false }).map((r) => ({ ...r, k: 0.4 }))); nextRipple = t + 5 + Math.random() * 4; }
+      for (let k = ripples.length - 1; k >= 0; k--) if (t - ripples[k].t0 > ripples[k].life) ripples.splice(k, 1);
+      const live = ripples.filter((r) => Ripple.prepare(r, t));
+      ptr.press += ((ptr.down ? 1 : 0) - ptr.press) * (still ? 1 : 1 - Math.exp(-dt / 0.12));
+      let moving = false;
+      for (let k = 0; k < n; k++) {
+        const x = X[k], y = Y[k], since = t - DELAY[k];
+        let target = 0.4 + 1.35 * skyline(x, y, SEED[k], t) * (0.35 + 0.65 * calm), heat = since > 0 && !still ? Math.max(0, 1 - since / 0.8) * 0.8 : 0;
+        if (ptr.a > 0.01) {
+          const d = Math.hypot(x - ptr.mx, y - ptr.my);
+          const hill = Math.exp(-(d * d) / (2 * 2.3 * 2.3)) * ptr.a;
+          // hovering raises a soft hill; pressing sinks the middle of it and lifts a ring around the finger
+          const dent = Math.exp(-(d * d) / (2 * 1.5 * 1.5)), rim = Math.exp(-((d - 2.9) ** 2) / (2 * 0.9 * 0.9));
+          target += hill * 2.2 * (1 - ptr.press) + ptr.press * ptr.a * (rim * 1.3 - dent * target);
+          heat += hill * 0.55 * (1 - ptr.press) + ptr.press * ptr.a * rim * 0.5;
+        }
+        for (const r of live) { const s = Ripple.at(r, x - r.x, y - r.y, SEED[k] * TAU); if (s > 0.01) { target += 2.4 * s; heat += 0.9 * s; } }
+        target = Math.max(H_MIN, target);
+        if (still) HGT[k] = target;
+        else if (since > 0) {
+          const kk = (TAU / 0.4) ** 2, c = 2 * 0.52 * Math.sqrt(kk);
+          VEL[k] += (kk * (target - HGT[k]) - c * VEL[k]) * dt; HGT[k] = Math.max(H_MIN, HGT[k] + VEL[k] * dt);
+          // the drifting skyline alone is slow; anything faster (pointer, ripples, arrival) wants every frame
+          if (Math.abs(target - HGT[k]) > 0.12 || Math.abs(VEL[k]) > 0.6) moving = true;
+        }
+        HEAT[k] += (Math.min(1, heat) - HEAT[k]) * (still ? 1 : 1 - Math.exp(-dt / 0.16));
+        const scale = still ? 1 : since <= 0 ? 0.001 : 1 - (1 - Math.min(1, since / 0.18)) ** 3;
+        move.set([HGT[k], HEAT[k], scale, 0], k * 4);
+      }
+      return t < 2.6 || ptr.a > 0.01 || ptr.press > 0.01 || live.length > 0 || moving;
+    }
+    function draw() {
+      if (!n || !W || !proj) return;
+      const grown = still ? 1 : clamp((t - 0.3) / 1.2, 0, 1) ** 1.5;
+      if (grown !== shown) { shown = grown; shade.style.opacity = grown.toFixed(3); }
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
+      gl.useProgram(prog);
+      gl.uniformMatrix4fv(U.uProj, false, proj); gl.uniformMatrix4fv(U.uView, false, view); gl.uniformMatrix4fv(U.uModel, false, model);
+      gl.uniform1f(U.uBevel, BEV); gl.uniform3fv(U.uEye, eye);
+      gl.uniform3fv(U.uBase, base); gl.uniform3fv(U.uHot, hot); gl.uniform3fv(U.uKey, key); gl.uniform3fv(U.uFill, fill);
+      gl.uniform1f(U.uAmb, dark ? 0.2 : 0.32); gl.uniform1f(U.uEmis, dark ? 0.12 : 0.04);
+      gl.uniform1f(U.uGlint, still ? -9 : ((t - glintAt) / 1.6) * 1.6 - 0.3); gl.uniform1f(U.uSpan, span);
+      gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, move);
+      gl.bindVertexArray(vao); gl.drawElementsInstanced(gl.TRIANGLES, mesh.i.length, gl.UNSIGNED_SHORT, 0, n); gl.bindVertexArray(null);
+    }
+    function frame(now) {
+      raf = 0;
+      if (stopped) return;
+      if (!canvas.isConnected) { stop(); return; }
+      if (document.hidden) return;
+      // when nothing is touched the slow skyline needs no more than about 30 frames a second
+      if (!busy && last && now - drawnAt < 30) { raf = requestAnimationFrame(frame); return; }
+      // the springs step at most a 60th of a second at a time, so a slow frame keeps time without overshooting
+      const real = Math.min(0.25, last ? (now - last) / 1000 : 1 / 60), steps = Math.ceil(real * 60), dt = real / steps;
+      last = now; drawnAt = now;
+      for (let i = 0; i < steps; i++) {
+        t += dt;
+        ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.3));
+        busy = update(dt);
+      }
+      draw();
+      raf = requestAnimationFrame(frame);
+    }
+    function request() { if (!still && !raf && !stopped && canvas.isConnected) raf = requestAnimationFrame(frame); }
+    // ---- pointer: where it meets the mark, a little above the ground (about the height of the pillars) ----
+    function aim(e) {
+      const r = canvas.getBoundingClientRect();
+      const nx = ((e.clientX - r.left) / r.width) * 2 - 1, ny = 1 - ((e.clientY - r.top) / r.height) * 2;
+      const vx = frame2.cx + nx * frame2.hw, vy = frame2.cy + ny * frame2.hh;
+      // undo the view for the point under the pointer, then slide along the view until it meets that height
+      const se = Math.sin(ELEV), ce = Math.cos(ELEV), sa = Math.sin(AZIM), ca = Math.cos(AZIM), PLANE = 1;
+      const vz = (PLANE - ce * vy) / se, a = vx, c = -se * vy + ce * vz;
+      const wx = ca * a - sa * c, wz = sa * a + ca * c;
+      ptr.mx = wx; ptr.my = -wz;
+    }
+    canvas.addEventListener('pointermove', (e) => {
+      if (still) return;
+      aim(e); ptr.seen = performance.now();
+      if (ptr.down && e.pointerId === ptr.id) ptr.travel = Math.max(ptr.travel, Math.hypot(e.clientX - ptr.sx, e.clientY - ptr.sy));
+      request();
+    });
+    canvas.addEventListener('pointerdown', (e) => {
+      if (still || e.button > 0) return;
+      canvas.setPointerCapture(e.pointerId); canvas.classList.add('grabbing'); aim(e);
+      Object.assign(ptr, { down: true, id: e.pointerId, sx: e.clientX, sy: e.clientY, travel: 0, seen: performance.now() });
+      request();
+    });
+    const release = (e) => {
+      if (!ptr.down || (e && e.pointerId !== ptr.id)) return;
+      ptr.down = false; canvas.classList.remove('grabbing');
+      // a tap sends a full ripple through the pillars and the background grid; letting go after a press, a smaller one
+      const tap = ptr.travel < 8;
+      ripples.push(...Ripple.make(ptr.mx, ptr.my, t, { speed: tap ? 9 : 7, life: tap ? 1.9 : 1.4, band: tap ? 0.9 : 0.7, splash: tap }).map((r) => ({ ...r, k: r.k * (tap ? 1 : 0.6) })));
+      if (ripples.length > 14) ripples.splice(0, ripples.length - 14);
+      if (tap && e) ambient.pulse(e.clientX, e.clientY);
+      ptr.seen = performance.now(); request();
+    };
+    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+    canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.seen = performance.now() - 1500; });
+    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); canvas.remove(); ghost.remove(); shade.remove(); area.classList.remove('is-3d'); fallback?.(); });
+    const ro = new ResizeObserver(() => { layout(); if (n) { update(0); draw(); } }); ro.observe(area);
+    const onTheme = () => setTimeout(() => { readColours(); ghostGrid(); draw(); request(); }, 30);
+    document.addEventListener('cleo:theme', onTheme);
+    document.addEventListener('visibilitychange', request);
+    function stop() {
+      stopped = true; cancelAnimationFrame(raf); raf = 0; ro.disconnect();
+      document.removeEventListener('cleo:theme', onTheme); document.removeEventListener('visibilitychange', request);
+    }
+    return stop;
+  }
+  /* the sign-in art: the 3D mark where the panel sits beside the form, the 2D mark (gridMark) on narrow
+     screens, where it shows half-hidden behind the form and takes no touches */
+  function signArt(area) {
+    const wide = mq('(min-width: 901px)');
+    let stop = null, mode = '';
+    const pick = () => {
+      if (!area.isConnected && mode) { wide.removeEventListener('change', pick); stop?.(); return; }
+      const next = wide.matches ? '3d' : '2d';
+      if (next === mode) return;
+      stop?.(); stop = null;
+      area.querySelectorAll('canvas').forEach((c) => c.remove()); area.classList.remove('is-3d');
+      mode = next;
+      if (next === '3d') stop = emblem3d(area, () => { mode = '2d'; stop = gridMark(area); });
+      if (!stop) { mode = '2d'; stop = gridMark(area); }
+    };
+    pick(); wide.addEventListener('change', pick);
   }
 
   /* ---------- Terms and Conditions, Privacy Policy ----------
@@ -4611,9 +5251,8 @@ const Cleo = (() => {
           <div class="login-meta">${cloudStatus()}${aeso()}</div>
         </div>
         <div class="login-art" aria-hidden="true">
-          <div class="art-emblem"><span class="em"></span></div>
-          <div class="lens" data-lens tabindex="-1"></div>
-          <p class="lens-hint"><i class="ph ph-hand-grabbing"></i>Drag the glass</p>
+          <div class="art-mark"></div>
+          <p class="art-hint"><i class="ph ph-hand-pointing"></i>Drag across the mark</p>
         </div>
       </section>`);
     const card = $('.login-card', node), stepsEl = $('.steps', node);
@@ -4941,10 +5580,7 @@ const Cleo = (() => {
 
     requestAnimationFrame(() => {
       LiquidGlass.attach(card, { bezel: 24, tint: 'var(--glass)' });
-      const l = $('[data-lens]', node);
-      LiquidGlass.attach(l, { bezel: 70, scale: 120, tint: 'var(--lens-tint)' });
-      l.style.setProperty('--blur', '0.6px'); l.style.setProperty('--sat', '135%');
-      lens(l, $('.login-art', node));
+      signArt($('.login-art', node));
       if (!mq('(pointer: coarse)').matches) focusFirst(cur);
     });
     if (!CleoEnv.demo) $('[data-backup-line]', node).hidden = true;
@@ -5820,15 +6456,18 @@ const Cleo = (() => {
      - a 2px gap where marks touch (stacked parts, donut arcs);
      - a quiet grid: three hairlines and their values, nothing more;
      - one tooltip on hover and on keyboard focus (arrow keys); the dashboards add a table view.
+   Two charts are rounder: the revenue and profit columns (columns() with round: their parts stay joined
+   and only the top of each column is round, a semicircle) and the donut (round-capped arcs; a share too
+   small for an arc is a dot).
      columns()    trends and stacked parts: one column per period, parts stacked bottom up
-     donut()      part-to-whole: a ring of arcs with the figure in the middle
+     donut()      part-to-whole: a ring of round-capped arcs with the figure in the middle
      bars()       ranked rows: a rounded bar on a faint track per item
      heatmap()    day by hour: a tile per cell whose strength is the value
      waterfall()  the P&L bridge: floating columns joined by thin connectors
      calendar()   daily activity: a tile per day, one column per week (Owner › Activity)
-   Marks grow in once per draw (columns from the baseline, bars from the left, the donut
-   clockwise) with a short stagger. Redraws after a resize are instant, and reduced motion
-   skips the growth.
+   Marks grow in once per draw (columns with rise from the baseline, bars from the left, the donut
+   clockwise) with a short stagger. Redraws after a resize are instant, and reduced motion skips the
+   growth.
    ===================================================================== */
 const Charts = (() => {
   const { esc, reduced, clamp } = Cleo;
@@ -5863,13 +6502,14 @@ const Charts = (() => {
     const m = n <= 1 ? 1 : n <= 1.2 ? 1.2 : n <= 1.5 ? 1.5 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 3 ? 3 : n <= 4 ? 4 : n <= 5 ? 5 : n <= 6 ? 6 : n <= 8 ? 8 : 10;
     return m * p;
   }
-  // redraw (without the entrance animation) when the width changes, or, with grow, when the room gets taller
+  // redraw (without the entrance animation) when the width changes, or, with grow, when the room gets taller;
+  // a redraw while the first one is still growing in (a neighbour stretching the panel) keeps the growth
   function observe(el, fn, { grow = false } = {}) {
     if (el._ro) el._ro.disconnect();
     let w = el.clientWidth, h = el.clientHeight;
     el._ro = new ResizeObserver(() => {
       const dw = Math.abs(el.clientWidth - w) > 2, dh = grow && el.clientHeight - h > 2;
-      if (dw || dh) { w = el.clientWidth; h = el.clientHeight; fn(false); }
+      if (dw || dh) { w = el.clientWidth; h = el.clientHeight; fn(performance.now() - (el._grewAt || -1e9) < 700 ? 'again' : false); }
     });
     el._ro.observe(el);
   }
@@ -5886,17 +6526,20 @@ const Charts = (() => {
      cfg.columns: [{ label, tipLabel, segs: [{ from, to, color }], tip: [[name, value text, color]], top? }]
        segs are value ranges in that colour: stacked parts use consecutive ranges from zero, a bridge
        (P&L) uses floating ones. `top` is an optional label above the column.
-     cfg: { height, compact, fill?, allLabels?, links?, yMax?, yTick, label }
+     cfg: { height, compact, fill?, allLabels?, links?, round?, rise?, yMax?, yTick, label }
        fill       grow to the height the element is given (a panel stretched by a taller neighbour)
        allLabels  name every column; names that would collide alternate between two lines
        links      a value per column: a thin connector to the next column at that level (bridges)
+       round      the parts of a column stay joined and only its top is round, a semicircle
+       rise       the columns rise from the baseline one after another when drawn
      Returns { update(nextCfg) }. */
   function columns(el, cfg = {}) {
     const draw = (animate = true) => {
       const { compact = false, yTick = (v) => v, label = 'Column chart' } = cfg;
       const height = Math.max(80, number(cfg.height, 260));
       const cols = list(cfg.columns).map((c) => ({ ...c, segs: list(c.segs).map((s) => ({ ...s, from: number(s.from), to: number(s.to), color: color(s.color) })) }));
-      const n = cols.length; const anim = animate && !reduced();
+      const n = cols.length; const anim = !!animate && !reduced();
+      if (animate === true) el._grewAt = performance.now();
       if (!n) { empty(el); return; }
       const W = Math.max(compact ? 140 : 280, el.clientWidth), H = cfg.fill ? Math.max(height, Math.floor(el.clientHeight)) : height;
       const hasTop = cols.some((c) => c.top);
@@ -5911,7 +6554,8 @@ const Charts = (() => {
       const band = plotW / n;
       const bw = clamp(band * (compact ? 0.6 : 0.56), 3, compact ? 16 : 36);
       const colX = (i) => pad.l + band * i + (band - bw) / 2, centre = (i) => pad.l + band * (i + 0.5);
-      const R = Math.min(4, bw / 2), GAP = 2;
+      const round = !!cfg.round, grow = anim && !!cfg.rise, cid = ++uid;
+      const R = round ? bw / 2 : Math.min(4, bw / 2), GAP = 2;
 
       const svg = node('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, class: `viz cols${compact ? ' compact' : ''}`, tabindex: 0, role: 'img', 'aria-label': label });
       // the grid: hairlines at zero, half and the top, with their values on the left
@@ -5934,11 +6578,19 @@ const Charts = (() => {
       // one group per column: a hover band behind, then the marks
       const groups = cols.map((c, i) => {
         const g = node('g', { class: 'col', 'data-i': i });
-        g.appendChild(node('rect', { x: pad.l + band * i + Math.min(4, band * 0.08), y: pad.t - 6, width: Math.max(1, band - Math.min(8, band * 0.16)), height: ih + 6, rx: compact ? 4 : 8, class: 'band' }));
-        const mk = node('g', { class: `mk${anim ? ' grow' : ''}`, style: `--d:${Math.round(i * (compact ? 22 : 34))}ms` });
+        const bandW = Math.max(1, band - Math.min(8, band * 0.16));
+        g.appendChild(node('rect', { x: pad.l + band * i + Math.min(4, band * 0.08), y: pad.t - 6, width: bandW, height: ih + 6, rx: round ? Math.min(bandW / 2, 22) : compact ? 4 : 8, class: 'band' }));
+        const mk = node('g', { class: `mk${grow ? ' grow' : ''}`, style: `--d:${Math.round(i * (compact ? 22 : 34))}ms` });
         const segs = c.segs.map((s) => ({ lo: Math.min(s.from, s.to), hi: Math.max(s.from, s.to), color: s.color })).filter((s) => s.hi - s.lo > 0).sort((a, b) => a.lo - b.lo);
         const top = segs.length ? Math.max(...segs.map((s) => s.hi)) : 0;
-        segs.forEach((s, k) => {
+        if (round && segs.length) {
+          // one outline per column, a semicircle on top and square on the baseline; the parts fill it, joined
+          const lo = Math.min(...segs.map((s) => s.lo)), yt = y(top), yb = y(lo), id = `cc${cid}-${i}`;
+          const clip = node('clipPath', { id }); clip.appendChild(node('path', { d: barPath(colX(i), yt, bw, Math.max(1.5, yb - yt), R, lo <= 0 ? 0 : R) }));
+          const parts = node('g', { 'clip-path': `url(#${id})` });
+          segs.forEach((s) => { const a = y(s.hi), b = y(s.lo); parts.appendChild(node('rect', { x: colX(i), y: a, width: bw, height: Math.max(0, b - a) + 0.5, fill: s.color })); });
+          mk.append(clip, parts);
+        } else segs.forEach((s, k) => {
           let yt = y(s.hi); const yb = y(s.lo);
           const isTop = s.hi === top, onBase = s.lo <= 0, above = segs.slice(k + 1).some((o) => Math.abs(o.lo - s.hi) < 1e-6);
           if (above && yb - yt > GAP + 1) yt += GAP; // a sliver of surface between stacked parts
@@ -5946,7 +6598,7 @@ const Charts = (() => {
           mk.appendChild(node('path', { d: barPath(colX(i), yt, bw, h, isTop ? R : 0, onBase ? 0 : R), fill: s.color }));
         });
         g.appendChild(mk);
-        if (c.top) { const t = node('text', { x: centre(i), y: Math.max(12, y(top) - 8), 'text-anchor': 'middle', class: `col-top${anim ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 360)}ms` }); t.textContent = c.top; g.appendChild(t); }
+        if (c.top) { const t = node('text', { x: centre(i), y: Math.max(12, y(top) - 8), 'text-anchor': 'middle', class: `col-top${grow ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 360)}ms` }); t.textContent = c.top; g.appendChild(t); }
         return g;
       });
       groups.forEach((g) => svg.appendChild(g));
@@ -5954,7 +6606,7 @@ const Charts = (() => {
       if (cfg.links) cols.forEach((c, i) => {
         const v = cfg.links[i]; if (v == null || i === n - 1) return;
         const ly = Math.round(y(v)) + 0.5;
-        svg.appendChild(node('line', { x1: colX(i) + bw, x2: colX(i + 1), y1: ly, y2: ly, class: `link${anim ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 420)}ms` }));
+        svg.appendChild(node('line', { x1: colX(i) + bw, x2: colX(i + 1), y1: ly, y2: ly, class: `link${grow ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 420)}ms` }));
       });
       // hover and keyboard: one column at a time, the rest step back
       const hits = cols.map((c, i) => { const h = node('rect', { x: pad.l + band * i, y: 0, width: Math.max(1, band), height: H, fill: 'transparent', 'data-i': i }); svg.appendChild(h); return h; });
@@ -5987,19 +6639,21 @@ const Charts = (() => {
     segments = list(segments).map((s) => ({ ...s, value: Math.max(0, number(s.value)), color: color(s.color) }));
     size = Math.max(80, number(size, 184));
     const total = segments.reduce((a, s) => a + s.value, 0);
-    const c = size / 2, sw = Math.round(size * 0.1), r = c - sw / 2 - 2, C = 2 * Math.PI * r, GAP = 3;
+    const c = size / 2, sw = Math.round(size * 0.12), r = c - sw / 2 - 4, C = 2 * Math.PI * r, GAP = 5;
     const pct = (s) => `${(total ? (s.value / total) * 100 : 0).toFixed(1)}%`;
     const id = `dn${++uid}`, anim = !reduced();
     let at = 0;
     const arcs = segments.map((s, i) => {
       const len = total ? (s.value / total) * C : 0; const start = at; at += len;
       if (len <= 0) return '';
-      const dash = Math.max(0.6, len - GAP);
-      return `<circle class="arc" data-s="${i}" cx="${c}" cy="${c}" r="${r.toFixed(2)}" stroke="${esc(s.color)}" stroke-width="${sw}" stroke-dasharray="${dash.toFixed(2)} ${(C - dash).toFixed(2)}" stroke-dashoffset="${(-start - GAP / 2).toFixed(2)}"/>`;
+      // round caps reach half the ring's width past each end, so the dash is shortened by that much;
+      // a share too small for a dash becomes a dot
+      const dash = Math.max(0.01, len - GAP - sw), lead = (len - dash) / 2;
+      return `<circle class="arc" data-s="${i}" cx="${c}" cy="${c}" r="${r.toFixed(2)}" stroke="${esc(s.color)}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${dash.toFixed(2)} ${(C - dash).toFixed(2)}" stroke-dashoffset="${(-start - lead).toFixed(2)}"/>`;
     }).join('');
     el.innerHTML = `<div class="donut" style="--size:${size}px">
-        <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" tabindex="0" role="img" aria-label="${esc(`${centerLabel}: ${segments.map((s) => `${s.name} ${pct(s)}`).join(', ')}`)}">
-          <defs><mask id="${id}"><circle cx="${c}" cy="${c}" r="${r.toFixed(2)}" fill="none" stroke="#fff" stroke-width="${sw + 4}" stroke-dasharray="${C.toFixed(2)} ${C.toFixed(2)}" class="sweep${anim ? ' in' : ''}" style="--len:${C.toFixed(2)}px" transform="rotate(-90 ${c} ${c})"/></mask></defs>
+        <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" style="--sw:${sw}px" tabindex="0" role="img" aria-label="${esc(`${centerLabel}: ${segments.map((s) => `${s.name} ${pct(s)}`).join(', ')}`)}">
+          <defs><mask id="${id}"><circle cx="${c}" cy="${c}" r="${r.toFixed(2)}" fill="none" stroke="#fff" stroke-width="${sw + 16}" stroke-dasharray="${C.toFixed(2)} ${C.toFixed(2)}" class="sweep${anim ? ' in' : ''}" style="--len:${C.toFixed(2)}px" transform="rotate(-90 ${c} ${c})"/></mask></defs>
           <circle cx="${c}" cy="${c}" r="${r.toFixed(2)}" class="ring" stroke-width="${sw}"/>
           <g mask="url(#${id})" transform="rotate(-90 ${c} ${c})">${arcs}</g>
         </svg>
@@ -8603,7 +9257,7 @@ Cleo.bir = (() => {
           columns: t.map((x) => ({ label: x.l, tipLabel: x.tl,
             segs: [{ from: 0, to: x.cogs, color: TREND_PARTS[0][1] }, { from: x.cogs, to: x.cogs + x.exp, color: TREND_PARTS[1][1] }, { from: x.cogs + x.exp, to: x.net, color: TREND_PARTS[2][1] }],
             tip: [['Net sales', fmt.peso(x.net, 0)], ['Cost of goods sold', fmt.peso(x.cogs, 0), TREND_PARTS[0][1]], ['Expenses', fmt.peso(x.exp, 0), TREND_PARTS[1][1]], ['Net profit', fmt.peso(x.profit, 0), TREND_PARTS[2][1]]] })),
-          yTick: (v) => fmt.axis(v), height: 270, fill: true }; };
+          yTick: (v) => fmt.axis(v), height: 270, fill: true, round: true, rise: true }; };
         const chart = Charts.columns($('[data-chart="trend"]', node), trendCfg());
         seg($('[data-gran]', node), (g) => { state.gran = g; tableOff('trend'); chart.update(trendCfg()); });
         tableToggle(node, 'trend', () => { const t = tr(); return Charts.table({ head: ['Period', 'Net sales', 'COGS', 'Expenses', 'Net profit'], numeric: [1, 2, 3, 4], rows: t.map((x) => [esc(x.tl), fmt.peso(x.net, 0), fmt.peso(x.cogs, 0), fmt.peso(x.exp, 0), fmt.peso(x.profit, 0)]) }); });
@@ -14282,7 +14936,7 @@ Cleo.bir = (() => {
       body.innerHTML = `${head(`Looking for ${conn} printers`, conn === 'Network' ? 'Searching this network on port 9100. You can also type the IP address.' : 'Turn the printer on. Hold its feed button to make it visible if it is not found.')}
         <div style="display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start"><div class="radar small" aria-hidden="true"><span></span><span></span><span></span><i class="ph-fill ph-printer"></i></div>
         <div style="display:grid;gap:10px">${conn === 'Network' ? '<div style="display:flex;gap:8px"><input class="input num" placeholder="192.168.1.50" data-ip aria-label="Printer IP address"><button class="btn" data-ipgo>Connect</button></div>' : ''}<div class="found" data-found role="list"></div></div></div>
-        <div class="sheet-foot"><button class="btn btn-ghost" data-back><i class="ph ph-arrow-left"></i>Back</button><span></span></div>`;
+        <div class="sheet-foot"><button class="btn btn-ghost" data-back><i class="ph ph-caret-left"></i>Back</button><span></span></div>`;
       bindX(); $('[data-back]', body).addEventListener('click', step1);
       const FOUND = { Bluetooth: [['Epson TM-m30III', 'BT · 00:11:62:5C:02:7A', 80, 3], ['Xprinter XP-P323B', 'BT · 66:22:3F:91:0C:1B', 58, 2]], USB: [['Epson TM-T20III', 'USB · 04b8:0e28', 80, 3]], Network: [['Epson TM-T82III', '192.168.1.44:9100', 80, 3], ['Star mC-Print3', '192.168.1.52:9100', 80, 2]] }[conn];
       const list = $('[data-found]', body);
@@ -14299,7 +14953,7 @@ Cleo.bir = (() => {
         <div class="field"><label for="ap-n">Name</label><input id="ap-n" class="input" value="${roles.has('receipt') ? 'Front counter' : 'Kitchen 2'}"></div>
         <div class="opt-group"><h3>Paper width</h3><div class="opts" data-pw>${[58, 80].map((w) => `<button class="opt" data-v="${w}" aria-pressed="${paper === w}" style="min-width:120px">${w} mm</button>`).join('')}</div></div>
         <div class="opt-group"><h3>Prints <span>Pick any</span></h3><div class="opts" data-roles>${Object.entries(ROLE).map(([k, l]) => `<button class="opt" data-v="${k}" aria-pressed="${roles.has(k)}">${l}</button>`).join('')}</div></div>
-        <div class="sheet-foot"><button class="btn btn-ghost" data-back><i class="ph ph-arrow-left"></i>Back</button><button class="btn btn-primary btn-lg" data-save><i class="ph ph-receipt"></i>Print test page and save</button></div>`;
+        <div class="sheet-foot"><button class="btn btn-ghost" data-back><i class="ph ph-caret-left"></i>Back</button><button class="btn btn-primary btn-lg" data-save><i class="ph ph-receipt"></i>Print test page and save</button></div>`;
       bindX(); $('[data-back]', body).addEventListener('click', () => step2(conn));
       $('[data-pw]', body).addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (!b) return; paper = +b.dataset.v; $$('[data-pw] [data-v]', body).forEach((x) => x.setAttribute('aria-pressed', String(x === b))); });
       $('[data-roles]', body).addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (!b) return; roles.has(b.dataset.v) ? roles.delete(b.dataset.v) : roles.add(b.dataset.v); b.setAttribute('aria-pressed', String(roles.has(b.dataset.v))); });
@@ -14726,7 +15380,7 @@ Cleo.bir = (() => {
           : st.kind === 'cart'
             ? `<div class="cd-lines">${d.lines.map((l) => `<div class="cd-line"><span class="q num">${l.q}</span><span class="n"><b>${esc(l.n)}</b>${l.m ? `<small>${esc(l.m)}</small>` : ''}</span><span class="a num">${P2(l.a)}</span></div>`).join('')}</div>
                <div class="cd-sums">${(d.t.promos || []).map((p) => `<div class="r good"><span><i class="ph-fill ph-tag"></i>${esc(p.name)}</span><span>-${P2(p.amount)}</span></div>`).join('')}${d.t.disc ? `<div class="r good"><span>Discounts</span><span>-${P2(d.t.disc)}</span></div>` : ''}${d.t.svc ? `<div class="r"><span>Service charge</span><span>${P2(d.t.svc)}</span></div>` : ''}${d.t.del ? `<div class="r"><span>Delivery fee</span><span>${P2(d.t.del)}</span></div>` : ''}<div class="cd-total"><span>Total</span><b class="num">${P2(d.t.total)}</b></div></div>`
-            : `<div class="cd-idle"><img src="assets/brand/cleo-emblem.png" alt="" class="cd-mark"><p>${esc(biz)}</p></div>`;
+            : `<div class="cd-idle"><img src="assets/brand/cleo-emblem.svg" alt="" class="cd-mark"><p>${esc(biz)}</p></div>`;
       $('#app').replaceChildren(el(`<section class="screen cdisp">
         <aside class="cd-brand glass"><span class="cd-logo">${esc(biz.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase())}</span><div><h1>${msg[0]}</h1><p>${msg[1]}</p></div>
           ${promoLine().length ? `<div class="cd-promos"><p class="t-cap">Today</p>${promoLine().map((p) => `<span><i class="ph-fill ph-tag"></i>${esc(p.name)}</span>`).join('')}</div>` : '<span></span>'}
