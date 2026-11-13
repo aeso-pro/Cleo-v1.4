@@ -47,7 +47,7 @@ Frontend only:
 - The apps sit on plain light or dark backgrounds.
 - The theme switch moved into each app's Settings.
 - The sign-in mark has no shine, and hovering dims it.
-- The loading screen lights the emblem in the grid, fades the logo in and slides the wordmark out.
+- The loading screen is only the emblem lighting up in the background grid, as at the foot of the landing page, with no logo image or wordmark.
 - The plan logos now grow from a seed (Free) to a bonsai (Enterprise), and each plan has its own look.
 - The landing page is dark only, with no pause or theme button.
 

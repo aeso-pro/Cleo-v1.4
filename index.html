@@ -601,16 +601,11 @@ button.chip:active { transform: scale(.96); }
 /* ---------- Boot screen ---------- */
 .boot { display: grid; place-items: center; position: relative; overflow: hidden; }
 .boot-center { display: grid; justify-items: center; gap: 26px; }
-/* the logo: the emblem, then the wordmark, which slides out from behind it. boot() sets --h, the emblem's
-   height, to a whole number of the background grid's boxes, as large as the screen allows. */
-.boot-lockup { --h: 216px; --em: calc(var(--h) * .7366); display: flex; align-items: center; }
-.boot-mark { position: relative; z-index: 1; display: block; flex: none; width: var(--em); height: var(--h); view-transition-name: cleo-mark; }
-/* the wordmark's box reaches back into the emblem's notch (.444 of the emblem's width) and clips what lies
-   left of it, so the word comes out of the notch and passes behind the lobes; it settles an eighth of the
-   emblem's height from it, as in the brand lockup */
-.boot-word { flex: none; margin-left: calc(var(--h) * .123 - var(--em) * .444); padding-left: calc(var(--em) * .444); overflow: hidden; }
-.boot-word .w { display: block; height: calc(var(--h) * .449); aspect-ratio: 1890 / 746; background: var(--ink); -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
-.boot-app { font-size: 17px; color: var(--ink-3); font-weight: 400; letter-spacing: -.005em; }
+/* the emblem's place: an image that is never shown. The background grid lights the boxes it covers (the
+   landing page's closing mark), so the grid alone draws the logo. boot() sets --h, its height, to a whole
+   number of the grid's boxes, as large as the screen allows. */
+.boot-lockup { --h: 216px; display: flex; }
+.boot-mark { display: block; width: calc(var(--h) * .7366); height: var(--h); visibility: hidden; }
 /* there is no progress bar: organic ripples from behind the mark (the background grid) carry the wait */
 .boot-foot { position: absolute; bottom: 28px; left: 0; right: 0; display: flex; justify-content: center; opacity: 0; }
 
@@ -3620,7 +3615,9 @@ const Cleo = (() => {
     document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
     document.addEventListener('cleo:theme', () => setTimeout(start, 30));
     mq('(prefers-reduced-motion: reduce)').addEventListener?.('change', start);
-    return { start, mode, settle, pulse, mark, refresh: () => { readColours(); start(); } };
+    // the lit mark goes out now, if it was set to hold
+    const unmark = () => { if (shape && shape.fadeAt === Infinity) { shape.fadeAt = performance.now() / 1000; start(); } };
+    return { start, mode, settle, pulse, mark, unmark, refresh: () => { readColours(); start(); } };
   })();
   // the lights follow the brand colour (applyBrand sets --amb-1 … --amb-3)
   config.onChange(({ path }) => { if (path === '*' || path.startsWith('brand')) setTimeout(ambient.refresh, 30); });
@@ -4268,12 +4265,12 @@ const Cleo = (() => {
   /* ---------- boot / loading screen ----------
      BACKEND: the step labels are cosmetic. Real start-up work (session check, config, catalog,
      the terminal's local database) can run while this plays; await it before the caller continues. */
-  /* The loading screen is the logo alone, over a background grid dimmed almost to nothing. The emblem first
-     lights up in the grid's own boxes, centre first (the landing page's closing mark); then the real emblem
-     fades in slowly over them as they go out, and the wordmark slides out from behind it. Organic ripples of
-     light spread through the grid from behind the logo, now and then and at every finished step. There is
-     no visible progress bar; the progress and the current step are announced to assistive technology.
-     A short loading screen (minTotal under 2 s) shows the finished logo straight away.
+  /* The loading screen is the landing page's closing animation alone, over a background grid dimmed almost
+     to nothing: the emblem lights up in the grid's own boxes, centre first, and holds there until loading
+     ends, then goes out. There is no logo image and no wordmark. Organic ripples of light spread through the
+     grid from behind the emblem, now and then and at every finished step. There is no visible progress bar;
+     the progress and the current step are announced to assistive technology, and the screen is labelled
+     with the app's name. A short loading screen (minTotal under 2 s) lights the emblem at once.
      work: optional [[label, async fn], ...]. Each step runs its task (no step is faked); a task that fails
      ends the loading screen early and boot() resolves { node, error }. Without work, steps are the labels
      of start-up that happens elsewhere (the demo's own data loads instantly). */
@@ -4282,18 +4279,17 @@ const Cleo = (() => {
     const node = el(`
       <section class="screen boot" aria-label="Loading Cleo ${esc(app)}">
         <div class="boot-center">
-          <div class="boot-lockup" role="img" aria-label="Cleo"><img class="boot-mark" src="assets/brand/cleo-emblem.svg" alt=""><span class="boot-word" aria-hidden="true"><span class="w"></span></span></div>
-          <p class="boot-app">${esc(app)}</p>
+          <div class="boot-lockup" aria-hidden="true"><img class="boot-mark" src="assets/brand/cleo-emblem.svg" alt=""></div>
         </div>
         <div class="sr-only" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress></div>
         <p class="sr-only" aria-live="polite" data-step>${esc(steps[0])}</p>
         <div class="boot-foot">${aeso()}</div>
       </section>`);
     root().replaceChildren(node);
-    const mark = $('.boot-mark', node), lockup = $('.boot-lockup', node), word = $('.boot-word .w', node), name = $('.boot-app', node), foot = $('.boot-foot', node);
+    const mark = $('.boot-mark', node), lockup = $('.boot-lockup', node), foot = $('.boot-foot', node);
     const prog = $('[data-progress]', node), status = $('[data-step]', node);
     const red = reduced(), quick = red || minTotal < 2000;
-    // the logo as large as the screen allows, in whole boxes of the background grid (18px), so its lit copy fits
+    // the emblem as large as the screen allows, in whole boxes of the background grid (18px)
     const W = node.clientWidth || innerWidth, H = node.clientHeight || innerHeight;
     lockup.style.setProperty('--h', `${clamp(Math.floor(Math.min(W * 0.43, H * 0.34) / 18), 8, 16) * 18}px`);
     // the background grid shows while loading, dimmed almost to nothing, with ripples from behind the logo
@@ -4306,23 +4302,13 @@ const Cleo = (() => {
     let idle = 0;
     const drift = () => { if (!mark.isConnected) return; ripple(); idle = setTimeout(drift, 1100 + Math.random() * 1000); };
     const t0 = performance.now();
-    if (quick) {
-      [mark, word, name].forEach((x) => x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'both' }));
-      foot.style.opacity = 1;
-    } else {
-      const out = 'cubic-bezier(.22, 1, .36, 1)';
-      // 1. the emblem lights up in the grid's boxes, as soon as the image is ready (its place is already laid out)
-      (mark.decode ? mark.decode() : Promise.resolve()).then(() => {
-        if (mark.isConnected) ambient.mark(mark, { born: (t0 + 120) / 1000, fadeAt: (t0 + 1350) / 1000 });
-      }).catch(() => {});
-      // 2. the real emblem fades in slowly over the boxes as they go out
-      mark.animate([{ opacity: 0, filter: 'blur(10px)' }, { opacity: 1, filter: 'blur(0)' }], { duration: 1000, delay: 1050, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'both' });
-      // 3. the wordmark slides out from behind it: from where its box is clipped, inside the emblem's notch
-      const hide = -(word.offsetWidth + mark.offsetWidth * 0.444 + 4);
-      word.animate([{ transform: `translateX(${hide}px)` }, { transform: 'none' }], { duration: 1000, delay: 1900, easing: out, fill: 'both' });
-      name.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: 2600, easing: out, fill: 'both' });
-      foot.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 1100, fill: 'both' });
-    }
+    // the emblem lights up in the grid's boxes as soon as its image is ready (its place is already laid out),
+    // and holds until loading ends
+    (mark.decode ? mark.decode() : Promise.resolve()).then(() => {
+      if (mark.isConnected) ambient.mark(mark, { born: (quick ? performance.now() : t0 + 120) / 1000 });
+    }).catch(() => {});
+    if (quick) foot.style.opacity = 1;
+    else foot.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 1100, fill: 'both' });
     // the first ripple as the emblem completes in the grid, then a quiet drift of them until loading ends
     await wait(quick ? 200 : 650);
     ripple(true); idle = setTimeout(drift, 900);
@@ -4338,7 +4324,9 @@ const Cleo = (() => {
       if (!work) await wait(per);
     }
     status.textContent = 'Ready';
-    await wait(red ? 160 : 420);
+    // the lit emblem goes out, centre first, before the next screen
+    ambient.unmark();
+    await wait(red ? 160 : quick ? 420 : 900);
     // the next screen decides whether the grid stays (sign-in) or fades away (show() reads data-amb)
     done();
     return node;
