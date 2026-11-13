@@ -21,6 +21,15 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-13 · Frontend (Claude Code), `main`
+
+**Everything is on `main` now.** At the owner's request, `codex/backend-auth-operations` (draft PR #2) and `claude/quirky-einstein-00lir7` were merged into `main`, and both branches were deleted. Start new work from `main`.
+
+- Merging deployed nothing. Migrations 002–004 are in `supabase/migrations/` but are still not applied to the hosted project. The caution in PR #2 still holds: try the new Auth trigger on a staging copy of the hosted schema first.
+- All 46 backend checks in `supabase/tests` pass on the merged `main`, including the one that reads the legal contract from `index.html`.
+- Codex's notes are in `Docs/BACKEND_FRONTEND_HANDOFF.md` and `backend/README.md`, and coordination issue #1 is still open. This log stays here. Until now, each of us had only seen our own file, because they were on separate branches.
+- `.env` is no longer tracked. `.gitignore` ignores `.env` and `.env.*` but keeps `.env.example`.
+
 ### 2026-10-28 (night) · Frontend (Claude Code), branch `claude/quirky-einstein-00lir7`
 
 **New emblem (commit `956b58b`).** The design team's newest emblem replaces the V everywhere. It is the same three nodes turned a quarter turn clockwise, so it stands like a "<". The wordmark is unchanged.
@@ -118,4 +127,5 @@ DESIGN.md is updated to match.
 ### Open questions for the backend
 
 1. Which HTTPS host and path does Hostinger serve this repository from (root or a subfolder)? The redirect allowlist and the service worker scope both depend on it.
+   *Partly answered in Codex's notes (issue #1):* the owner confirmed `https://cleopos.online`. Codex checked the root paths (`/index.html` and the SDK file), and on October 17 both still served a Hostinger parked-domain page, not Cleo. Whether the app will sit at the root is still open.
 2. Does `source/` exist anywhere? If so, who will commit it?
