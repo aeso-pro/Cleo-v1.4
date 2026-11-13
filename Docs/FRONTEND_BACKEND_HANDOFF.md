@@ -21,6 +21,28 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-14 · Frontend (Claude Code), `main`
+
+**Sign-up error messages, an idle sign-out, security headers and a Hostinger guide.** The owner asked for bug fixes and hardening across the code, so this round touches one function in `backend/supabase.js`.
+
+What touches the backend:
+
+- **`fail()` in `backend/supabase.js` names the field and says more.** Tested against the hosted project, a refused sign-up showed "Check the details and try again." under the password. Now:
+  - `email_address_invalid`, `email_address_not_authorized`, `over_email_send_rate_limit`, `signup_disabled`, `provider_disabled`, `user_banned` and the existing-account conflict each have their own message and carry `field: 'email'`;
+  - `weak_password` carries `field: 'password'`;
+  - the sign-up form puts a password problem under the password and everything else under the email.
+
+  No other line of the adapter changed, and the 19 auth checks pass.
+- [ ] **The hosted project still uses the built-in mailer.** Two sign-up attempts in a row answered `over_email_send_rate_limit`. Sign-up can't work for real customers until a custom SMTP sender is set in the dashboard.
+- [ ] **Facebook sign-in is misconfigured in the dashboard.** The provider's Client ID was an email address, so Facebook refuses it. The owner is replacing it with the Meta app's ID and secret.
+- **Content-Security-Policy.** `.htaccess` now sends one that allows connections only to the site and to `ntbkbvlsgymupjdpuvob.supabase.co` (https and wss). A new backend host (another project, an Edge Function on another domain, a payment provider) must be added to `connect-src` there, or the browser blocks it.
+- **Idle sign-out (launcher.js).** Without "Keep me signed in", the Owner Dashboard, Back Office, mode picker and plan pages call `Cleo.session.signOut()` after 30 minutes with no input, with a one-minute warning. The Terminal is left out. This is a convenience for shared computers; session lifetime is still the server's to enforce (Auth → Sessions: time-box and inactivity timeout).
+
+Frontend and hosting only:
+
+- `.htaccess` also forces https, sets HSTS, X-Frame-Options, nosniff, Referrer-Policy and Permissions-Policy, refuses dotfiles, `Docs`, `backend`, `supabase` and stray `.md`, `.sql`, `.py` files, and turns off directory listings.
+- `Docs/DEPLOY_HOSTINGER.md` lists what to upload and the Supabase URL settings the live address needs.
+
 ### 2026-11-13 (later) · Frontend (Claude Code), `main`
 
 **A Free plan, plans that feel different, a new loading screen, and a Terminal without tables.** These changes went straight to `main`, as the owner asked.

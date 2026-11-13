@@ -1,8 +1,73 @@
-# On Apache, serve the public landing at the directory URL.
-# Explicit index.html remains the operational application.
+# Cleo POS on Apache or LiteSpeed (Hostinger). Upload this file with the site, in the same folder as
+# landing.html. It needs no editing unless the Supabase project changes (see Content-Security-Policy).
+
+# The public landing answers the bare address; index.html is the app itself.
 DirectoryIndex landing.html index.html
 
-# Never serve dotfiles (for example a local .env with build settings).
+# No folder listings, and no guessing a file from a similar name.
+Options -Indexes -MultiViews
+
+# ---------- HTTPS everywhere ----------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Send plain http to https (also behind a proxy that ends TLS). Local testing on localhost is left alone.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # Only the site's own files are public. Notes, database migrations, build settings and
+  # version-control data are refused even if they are uploaded by mistake. (.well-known stays
+  # open: the host uses it to renew the HTTPS certificate.)
+  RewriteCond %{REQUEST_URI} !^/\.well-known/
+  RewriteRule (^|/)\. - [F,L]
+  RewriteRule ^(Docs|docs|backend|supabase|source|node_modules|tests)(/|$) - [F,L,NC]
+  RewriteRule \.(sql|py|sh|env|log|bak|zip|toml|lock|map)$ - [F,L,NC]
+  # content/plans.md is the one Markdown file the app reads.
+  RewriteCond %{REQUEST_URI} !/content/plans\.md$
+  RewriteRule \.md$ - [F,L,NC]
+</IfModule>
+
+# Where mod_rewrite is missing, still refuse dotfiles (for example a local .env).
 <FilesMatch "^\.">
   Require all denied
 </FilesMatch>
+
+# ---------- Security headers ----------
+<IfModule mod_headers.c>
+  # Browsers remember to use https for a year.
+  Header always set Strict-Transport-Security "max-age=31536000"
+  # Files are what their type says; nothing is guessed.
+  Header always set X-Content-Type-Options "nosniff"
+  # Cleo can't be shown inside another site's frame (stops click-hijacking overlays).
+  Header always set X-Frame-Options "DENY"
+  # Other sites learn only that a visitor came from Cleo, never the page or its address details.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Browser features Cleo doesn't use stay off, even for injected code. The camera stays on for
+  # barcode scanning, and USB and serial for printers, scanners and cash drawers.
+  Header always set Permissions-Policy "geolocation=(), microphone=(), payment=(), midi=(), gyroscope=(), accelerometer=(), magnetometer=(), browsing-topics=(), camera=(self), usb=(self), serial=(self)"
+  # Windows opened from Cleo can't reach back into it.
+  Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+  # What the pages may load and where they may send data: their own files, and the Supabase
+  # project for sign-in and data. No other site's scripts run, no plugins, no outside frames,
+  # and forms post only to Cleo. Update the two supabase.co addresses if the project changes.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://ntbkbvlsgymupjdpuvob.supabase.co wss://ntbkbvlsgymupjdpuvob.supabase.co; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
+</IfModule>
+
+# ---------- Fresh pages, cached assets ----------
+<IfModule mod_headers.c>
+  # The pages and the service worker are always checked for a new version, so a fix reaches every device.
+  <FilesMatch "\.(html|webmanifest)$|^sw\.js$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(woff2|png|svg|jpg|jpeg|webp|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+
+# Markdown and the install manifest are served as text the browser can read.
+AddType text/markdown .md
+AddType application/manifest+json .webmanifest
+AddDefaultCharset utf-8

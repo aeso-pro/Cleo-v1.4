@@ -5506,7 +5506,7 @@ const Cleo = (() => {
       catch { btnState(b, null); if (request === authEpoch) invalid('semail', 'Couldn’t connect. Check your connection and try again.'); return; }
       btnState(b, null);
       if (request !== authEpoch) return;
-      if (!r.ok) { invalid(r.field === 'email' ? 'semail' : 'spw', r.message); shake(); return; }
+      if (!r.ok) { invalid(r.field === 'password' ? 'spw' : 'semail', r.message); shake(); return; }
       account = r.account || { name, email: em, role: '', needsBusiness: true }; method = 'email'; pendingSocial = false;
       if (r.needsVerification === false) { openBusiness('Email confirmed. Tell us about your business.'); return; }
       $('[data-su-email]', node).textContent = em;
@@ -7718,14 +7718,20 @@ const Charts = (() => {
   function fail(error, operation) {
     if (error instanceof CleoError) return error;
     const code = String(error?.code || ''), status = Number(error?.status || 0);
-    let kind = 'unknown', message = '';
+    let kind = 'unknown', message = '', field = '';
     if (/invalid_credentials/.test(code)) { kind = 'validation'; message = 'That email and password do not match.'; }
     else if (/email_not_confirmed/.test(code)) { kind = 'validation'; message = 'Confirm your email before signing in. Use the latest confirmation email.'; }
     else if (/otp_expired|otp_disabled|mfa_verification_failed|mfa_challenge_expired/.test(code)) { kind = 'validation'; message = 'That code is invalid or expired. Request a new code and try again.'; }
-    else if (/weak_password|same_password/.test(code)) { kind = 'validation'; message = 'Choose a different password with at least 8 characters.'; }
+    else if (/weak_password|same_password/.test(code)) { kind = 'validation'; field = 'password'; message = 'Choose a different password with at least 8 characters.'; }
+    // sign-up answers that name the email address, so the form can show them under that field
+    else if (/email_address_invalid/.test(code)) { kind = 'validation'; field = 'email'; message = 'That email address isn’t accepted. Check it for typos, or use a different one.'; }
+    else if (/email_address_not_authorized/.test(code)) { kind = 'forbidden'; field = 'email'; message = 'Cleo can’t send email to that address yet. Use a different address, or contact support.'; }
+    else if (/over_email_send_rate_limit/.test(code)) { kind = 'rate_limited'; field = 'email'; message = 'Too many emails were sent just now. Wait a few minutes, then try again.'; }
+    else if (/signup_disabled|email_provider_disabled|provider_disabled/.test(code)) { kind = 'forbidden'; field = 'email'; message = 'New accounts can’t be created this way right now. Contact support.'; }
+    else if (/user_banned/.test(code)) { kind = 'forbidden'; field = 'email'; message = 'This account has been turned off. Contact support.'; }
     else if (/current_password_mismatch/.test(code)) { kind = 'validation'; message = 'Your current password is incorrect.'; }
     else if (/reauthentication_needed/.test(code)) { kind = 'validation'; message = 'Sign in again before changing your password.'; }
-    else if (/user_already_exists|email_exists|23505/.test(code)) { kind = 'conflict'; message = 'That account already exists. Sign in instead.'; }
+    else if (/user_already_exists|email_exists|23505/.test(code)) { kind = 'conflict'; field = 'email'; message = 'That account already exists. Sign in instead.'; }
     else if (/over_.*rate_limit|rate_limit/.test(code) || status === 429) kind = 'rate_limited';
     else if (/session_not_found|session_expired|refresh_token|bad_jwt|not_authenticated/.test(code) || status === 401) kind = 'unauthorized';
     else if (/42501/.test(code) || status === 403) kind = 'forbidden';
@@ -7733,7 +7739,7 @@ const Charts = (() => {
     else if (/22023|validation_failed|email_address_invalid|password/.test(code) || status === 400 || status === 422) kind = 'validation';
     else if (status >= 500) kind = 'unavailable';
     else if (error instanceof TypeError || /fetch|network/i.test(String(error?.name || ''))) kind = 'network';
-    return new CleoError(kind, message, { operation, cause: error });
+    return new CleoError(kind, message, { operation, cause: error, ...(field ? { field } : {}) });
   }
   async function request(promise, operation) {
     let result;
@@ -15838,6 +15844,38 @@ Cleo.bir = (() => {
     const m = route.mode() || (location.hash === '#/' || !location.hash ? 'picker' : active);
     if (active && m !== active && !(active === 'picker' && !m)) { if (m === 'picker') store.tab.set('pick', 1); location.reload(); }
   });
+
+  /* ---------- an unattended session ends ----------
+     Unless the person chose "Keep me signed in on this device", the Owner Dashboard, the Back Office, the mode
+     picker and the plan pages sign out after 30 minutes with no click, touch, scroll or key. In the last
+     minute a dialog offers to stay. A device that slept past the limit signs out as it wakes. The Terminal
+     is left out: a counter sits idle between customers, and it has its own PIN lock.
+     NOTE: this protects a shared or unattended computer; the server still decides how long a session lives. */
+  const IDLE_LIMIT = 30 * 60000, IDLE_WARN = 60000;
+  let lastActive = Date.now(), idleBox = null;
+  const keptSignedIn = () => (DEMO ? !!store.get('session', null) : store.tab.get('auth-keep', store.get('auth-keep', false)) === true);
+  const idleGuarded = () => ['owner', 'backoffice', 'picker', 'plans'].includes(active) && !!Cleo.session.get() && !keptSignedIn();
+  const idleOut = () => { clearInterval(idleT); store.tab.set('idle-out', 1); Cleo.session.signOut(); };
+  ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach((t) => addEventListener(t, () => { if (!idleBox) lastActive = Date.now(); }, { passive: true, capture: true }));
+  const idleT = setInterval(() => {
+    if (!idleGuarded()) { lastActive = Date.now(); return; }
+    const idle = Date.now() - lastActive, left = Math.ceil((IDLE_LIMIT + IDLE_WARN - idle) / 1000);
+    if (left <= 0) { idleOut(); return; }
+    if (idle < IDLE_LIMIT) return;
+    if (!idleBox) {
+      idleBox = overlay({ label: 'Still there?', dismissable: false, html: `
+        <div class="dialog-head"><div><h2 class="t-title">Still there?</h2><p>For your security, Cleo signs out after 30 minutes without activity. You’ll be signed out in <b class="num" data-idle-left></b>.</p></div></div>
+        <div class="dialog-foot"><button class="btn" data-idle-out>${Cleo.actIcon('signOut')}Sign out now</button><button class="btn btn-primary" data-idle-stay autofocus>Stay signed in</button></div>` });
+      $('[data-idle-stay]', idleBox.panel).addEventListener('click', () => { lastActive = Date.now(); idleBox.close(); idleBox = null; });
+      $('[data-idle-out]', idleBox.panel).addEventListener('click', idleOut);
+    }
+    $('[data-idle-left]', idleBox.panel).textContent = `${left} second${left === 1 ? '' : 's'}`;
+  }, 1000);
+  // back at sign-in after an idle sign-out: say why
+  if (store.tab.get('idle-out', 0)) {
+    store.tab.remove('idle-out');
+    setTimeout(() => toast({ title: 'You were signed out', body: 'Cleo signs out after 30 minutes without activity. Tick “Keep me signed in” on a device only you use.', tone: 'info', icon: 'lock-simple', duration: 9000 }), 4600);
+  }
 
   /* BACKEND: the service worker caches the app for offline use (see sw.js). It only runs over https or on localhost.
      NOTE: on a local preview (localhost) it is off, so a rebuild or a saved edit to content/plans.md always shows:
