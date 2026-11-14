@@ -32,7 +32,8 @@ What touches the backend:
   - `weak_password` carries `field: 'password'`;
   - the sign-up form puts a password problem under the password and everything else under the email.
 
-  No other line of the adapter changed, and the 19 auth checks pass.
+- **`initialize()` in `backend/supabase.js` explains a refused Google or Facebook return.** It reads `error`, `error_code` and `error_description` from the callback address before cleaning it, and maps them to a message (cancelled, no email shared, address not on the redirect allow list, provider turned off, sign-ups closed, provider couldn't finish). The raw provider text is never shown.
+  No other lines of the adapter changed, and the 19 auth checks pass.
 - [ ] **The hosted project still uses the built-in mailer.** Two sign-up attempts in a row answered `over_email_send_rate_limit`. Sign-up can't work for real customers until a custom SMTP sender is set in the dashboard.
 - [ ] **Facebook sign-in is misconfigured in the dashboard.** The provider's Client ID was an email address, so Facebook refuses it. The owner is replacing it with the Meta app's ID and secret.
 - **Content-Security-Policy.** `.htaccess` now sends one that allows connections only to the site and to `ntbkbvlsgymupjdpuvob.supabase.co` (https and wss). A new backend host (another project, an Edge Function on another domain, a payment provider) must be added to `connect-src` there, or the browser blocks it.

@@ -7782,6 +7782,8 @@ const Charts = (() => {
       const hash = new URLSearchParams(url.hash.slice(1));
       const code = q.get('code'), tokenHash = q.get('token_hash'), otpType = q.get('type');
       const flowId = q.get('sb_flow_id'), denied = q.has('error') || hash.has('error');
+      // what the provider or Supabase said, read before the address is cleaned (never shown raw: mapped below)
+      const why = `${q.get('error_code') || hash.get('error_code') || ''} ${q.get('error_description') || hash.get('error_description') || ''} ${q.get('error') || hash.get('error') || ''}`.toLowerCase();
       const recovery = q.get('auth') === 'recovery' || (tokenHash && otpType === 'recovery');
       const hasTokens = hash.has('access_token') || hash.has('refresh_token');
       if (code || tokenHash || denied || hasTokens) {
@@ -7790,7 +7792,17 @@ const Charts = (() => {
         if (hasTokens || hash.has('error')) url.hash = '#/';
         history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash || '#/'}`);
       }
-      if (denied) throw new CleoError('validation', 'Sign-in was cancelled or could not finish. Please try again.');
+      if (denied) {
+        // the common reasons a Google or Facebook sign-in comes back refused, in words the owner can act on
+        const reason = /access_denied|cancel|denied/.test(why) && !/email/.test(why) ? 'Sign-in was cancelled. Try again when you’re ready.'
+          : /email/.test(why) ? 'The provider didn’t share your email address, which Cleo needs. Allow email access when asked, or sign in with your email instead.'
+          : /redirect|url/.test(why) ? 'This copy of Cleo isn’t on the sign-in allow list yet. The owner adds its address in Supabase › Authentication › URL Configuration.'
+          : /provider.*(disabled|not enabled)|unsupported provider/.test(why) ? 'This sign-in option is turned off. Sign in with your email instead.'
+          : /signup.*(disabled|not allowed)/.test(why) ? 'New accounts can’t be created this way right now. Contact support.'
+          : /server_error|unexpected_failure|exchange|profile|client/.test(why) ? 'The provider couldn’t finish signing you in. Try again, or sign in with your email.'
+          : 'Sign-in was cancelled or could not finish. Please try again.';
+        throw new CleoError('validation', reason);
+      }
       if (hasTokens) throw new CleoError('validation', 'This sign-in link uses an older sign-in flow. Start a fresh sign-in from Cleo.');
       if (code) {
         await request(flowId ? c.auth.exchangeCodeForSession(code, { flowId }) : c.auth.exchangeCodeForSession(code), 'callback');
