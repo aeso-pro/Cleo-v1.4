@@ -14,8 +14,9 @@ The hosted project (`ntbkbvlsgymupjdpuvob`) has only migration 001. In **Supabas
 2. `202610170003_operations.sql`
 3. `202610170004_transfers.sql`
 4. `202611140005_platform_admin.sql`
+5. `202611150006_billing.sql` (plan payments; see [PAYMENTS.md](PAYMENTS.md))
 
-Do not run 001 again; it refuses. 005 also refuses a second run.
+Do not run 001 again; it refuses. 005 and 006 also refuse a second run.
 
 ### 1.2 Make yourself the first admin
 
@@ -57,7 +58,7 @@ A sign-in made by someone who is not in the app's roles is the only real test of
 
 - **Email.** The project uses Supabase's built-in mailer, which sends a few emails an hour. Sign-up confirmations stop arriving. Set a custom SMTP sender in **Authentication › Emails**.
 - **The domain.** `https://cleopos.online` still serves a Hostinger parked page. See `DEPLOY_HOSTINGER.md`.
-- **Plans.** After sign-in a real business reaches "Choose your plan" and cannot go further: no subscription or payment API exists yet. That is unfinished backend work, not a sign-in fault.
+- **Plans.** After sign-in a real business reaches "Choose your plan". Paying for one is built, but it works only after the PayMongo steps in [PAYMENTS.md](PAYMENTS.md): until then the page says payments aren't switched on.
 
 ## 2. What changed
 
@@ -112,7 +113,7 @@ npm --prefix supabase/tests ci --ignore-scripts
 npm --prefix supabase/tests test
 ```
 
-63 database checks (46 earlier, 17 for migration 005), in a disposable in-memory PostgreSQL. Nothing touches the hosted project.
+71 database checks (46 earlier, 17 for migration 005, 8 for billing), in a disposable in-memory PostgreSQL. Nothing touches the hosted project.
 
 ```bash
 node supabase/tests/e2e-server.mjs

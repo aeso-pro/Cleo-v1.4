@@ -9,15 +9,19 @@
 // What is imitated: Supabase Auth (password sign-in, the PKCE code exchange, TOTP) and the
 // provider itself. "Continue with Facebook" comes straight back with whatever outcome was
 // chosen at POST /__test/scenario, including Facebook's "#_=_" on the return address.
+// Plan payments run the real Edge Function logic (supabase/functions/_shared/billing-core.js)
+// against a stand-in PayMongo at /__paymongo: its checkout page has a "Pay" and a "Cancel"
+// link, and paying sends the signed webhook (scenario { webhook: 'lost' } drops it).
 //
 // It never contacts the hosted project, Facebook or Google, holds no real credentials, and
 // answers on this machine only. The accounts and the password below exist only here.
 import http from 'node:http';
-import { randomUUID, randomBytes } from 'node:crypto';
+import { randomUUID, randomBytes, createHmac } from 'node:crypto';
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import { database, ids, legalVersion } from './helpers.mjs';
+import { Refusal, startCheckout, verifyReturn, webhook } from '../functions/_shared/billing-core.js';
 
 const require = createRequire(import.meta.url);
 const { ROOT, serveStatic, securityHeaders } = require('../../tools/serve.js');
@@ -111,8 +115,8 @@ async function callRpc(name, args, session, headers) {
   if (!known.length || keys.some((k) => !/^[a-z_][a-z0-9_]{0,62}$/.test(k))) return [404, { code: 'PGRST202', message: `Could not find the function public.${name} in the schema cache`, details: null, hint: null }];
   const values = keys.map((k) => (args[k] !== null && typeof args[k] === 'object' ? JSON.stringify(args[k]) : args[k]));
   const list = keys.map((k, i) => `${k} => $${i + 1}${args[k] !== null && typeof args[k] === 'object' ? '::jsonb' : ''}`).join(', ');
-  const role = session ? 'authenticated' : 'anon';
-  const claims = session ? { sub: session.userId, role, aal: session.aal, session_id: session.sessionId } : { role };
+  const role = session?.service ? 'service_role' : session ? 'authenticated' : 'anon';
+  const claims = session && !session.service ? { sub: session.userId, role, aal: session.aal, session_id: session.sessionId } : { role };
   return exclusive(async () => {
     await db.exec(`BEGIN; SET LOCAL ROLE ${role};`);
     try {
@@ -125,11 +129,26 @@ async function callRpc(name, args, session, headers) {
       await db.exec('ROLLBACK');
       const code = String(error.code || 'XX000');
       // the statuses PostgREST gives these SQLSTATEs
-      const status = code === '42501' ? (session ? 403 : 401) : /^(23503|23505)$/.test(code) ? 409 : /^(42883|42P01)$/.test(code) ? 404 : /^(P0001|22023|22P02)$/.test(code) ? 400 : /^(P0|40|XX)/.test(code) ? 500 : 400;
+      const status = code === '42501' ? (session && !session.service ? 403 : 401) : /^(23503|23505)$/.test(code) ? 409 : /^(42883|42P01)$/.test(code) ? 404 : /^(P0001|22023|22P02)$/.test(code) ? 400 : /^(P0|40|XX)/.test(code) ? 500 : 400;
       return [status, { code, message: String(error.message || ''), details: error.detail || null, hint: error.hint || null }];
     }
   });
 }
+
+/* ---------- plan payments: the real function logic, a stand-in provider ---------- */
+const billingEnv = { PAYMONGO_SECRET_KEY: 'sk_test_local_stand_in', PAYMONGO_WEBHOOK_SECRET: 'whsk_local_stand_in', CLEO_APP_URL: ORIGIN,
+  PAYMONGO_API_URL: `${ORIGIN}/__paymongo`, PAYMONGO_CHECKOUT_ORIGIN: ORIGIN };
+const checkouts = new Map();   // checkout session id -> attributes
+/** what supabase/functions/_shared/edge.js does on Supabase: call the database as the owner or the service role */
+const billingRpc = (session) => async (name, args, as) => {
+  const [status, body] = await callRpc(name, args, as === 'service' ? { service: true } : session, {});
+  if (status === 200) return body;
+  const code = String(body?.code || '');
+  throw new Refusal(code === '42501' ? 'forbidden' : code === 'P0002' ? 'not_found' : 'validation', String(body?.message || 'That couldn’t be done.'), status >= 500 && !/^(P0|40)/.test(code) ? 502 : 400);
+};
+const peso = (centavos) => `PHP ${(centavos / 100).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const readText = (req) => new Promise((resolve) => { let text = ''; req.on('data', (c) => { text += c; if (text.length > 2e6) req.destroy(); }); req.on('end', () => resolve(text)); });
 
 /* ---------- HTTP ---------- */
 const json = (res, status, body) => { const text = body === undefined ? '' : JSON.stringify(body); res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Length': Buffer.byteLength(text) }); res.end(text); };
@@ -145,7 +164,9 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { scenario, sessions: sessions.size,
         legal: (await sql('SELECT u.email,a.method FROM public.cleo_legal_acceptances a JOIN auth.users u ON u.id=a.user_id ORDER BY a.accepted_at')).rows,
         businesses: (await sql('SELECT name FROM public.cleo_businesses ORDER BY created_at')).rows.map((r) => r.name),
-        suspended: (await sql('SELECT u.email FROM public.cleo_account_suspensions s JOIN auth.users u ON u.id=s.user_id WHERE s.lifted_at IS NULL')).rows.map((r) => r.email) });
+        suspended: (await sql('SELECT u.email FROM public.cleo_account_suspensions s JOIN auth.users u ON u.id=s.user_id WHERE s.lifted_at IS NULL')).rows.map((r) => r.email),
+        payments: (await sql('SELECT b.name AS business,p.plan,p.method,p.status,p.amount_centavos::int AS centavos FROM public.cleo_payments p JOIN public.cleo_businesses b ON b.id=p.business_id ORDER BY p.created_at')).rows,
+        subscriptions: (await sql('SELECT b.name AS business,s.plan,s.terminals,s.cycle,s.method FROM public.cleo_subscriptions s JOIN public.cleo_businesses b ON b.id=s.business_id ORDER BY s.since')).rows });
     }
 
     /* Auth */
@@ -224,6 +245,60 @@ const server = http.createServer(async (req, res) => {
         await sql("UPDATE auth.mfa_factors SET status='verified' WHERE id=$1 AND user_id=$2", [id, session.userId]);
         return json(res, 200, await issue(session.userId, 'aal2', session.sessionId));
       }
+    }
+
+    /* Edge Functions */
+    if (route === '/functions/v1/billing' && req.method === 'POST') {
+      const session = bearer(req);
+      if (!session) return json(res, 401, { code: 401, message: 'Invalid JWT' });
+      try {
+        const input = await readBody(req), rpc = billingRpc(session);
+        if (input.action === 'checkout') return json(res, 200, await startCheckout({ input, rpc, env: billingEnv }));
+        if (input.action === 'verify') return json(res, 200, await verifyReturn({ input, rpc, env: billingEnv }));
+        throw new Refusal('validation', 'Unknown billing action.');
+      } catch (failure) {
+        if (failure instanceof Refusal) return json(res, 200, { ok: false, code: failure.code, message: failure.message });
+        throw failure;
+      }
+    }
+    if (route === '/functions/v1/billing-webhook' && req.method === 'POST') {
+      const result = await webhook({ rawBody: await readText(req), signature: String(req.headers['paymongo-signature'] || ''), rpc: billingRpc(null), env: billingEnv });
+      res.writeHead(result.status); return res.end();
+    }
+
+    /* a stand-in PayMongo */
+    const paymongo = route.match(/^\/__paymongo\/(v1\/checkout_sessions|checkout)(?:\/(cs_test_[0-9a-f]+))?(\/pay)?$/);
+    if (paymongo) {
+      const [, kind, id, payNow] = paymongo;
+      if (kind === 'v1/checkout_sessions') {
+        if (req.headers.authorization !== `Basic ${Buffer.from(`${billingEnv.PAYMONGO_SECRET_KEY}:`).toString('base64')}`) return json(res, 401, { errors: [{ code: 'authentication_invalid' }] });
+        if (req.method === 'POST' && !id) {
+          const attributes = (await readBody(req))?.data?.attributes || {}, created = `cs_test_${randomBytes(12).toString('hex')}`;
+          checkouts.set(created, { ...attributes, checkout_url: `${ORIGIN}/__paymongo/checkout/${created}`, livemode: false, status: 'active', payments: [] });
+          return json(res, 200, { data: { id: created, type: 'checkout_session', attributes: checkouts.get(created) } });
+        }
+        if (req.method === 'GET' && checkouts.has(id)) return json(res, 200, { data: { id, type: 'checkout_session', attributes: checkouts.get(id) } });
+        return json(res, 404, { errors: [{ code: 'resource_not_found' }] });
+      }
+      const checkout = checkouts.get(id);
+      if (!checkout) { res.writeHead(404); return res.end('No such checkout'); }
+      const amount = checkout.line_items.reduce((sum, item) => sum + item.amount * item.quantity, 0);
+      if (!payNow) {
+        const page = `<!doctype html><meta charset="utf-8"><title>Stand-in checkout</title><body style="font:16px/1.5 system-ui;max-width:32rem;margin:12vh auto;padding:0 1.5rem">
+          <p style="color:#666">Stand-in for PayMongo's checkout page. Test server only: no money moves.</p>
+          <h1 style="margin:0">${escapeHtml(peso(amount))}</h1>
+          <p>${escapeHtml(checkout.line_items[0].name)}<br>Pay with: <b data-methods>${escapeHtml(checkout.payment_method_types.join(', '))}</b><br>Reference: <span data-reference>${escapeHtml(checkout.reference_number)}</span></p>
+          <p><a data-pay href="/__paymongo/checkout/${id}/pay">Pay ${escapeHtml(peso(amount))}</a> &nbsp; <a data-cancel href="${escapeHtml(checkout.cancel_url)}">Cancel</a></p>`;
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(page);
+      }
+      if (!checkout.payments.length) checkout.payments.push({ id: `pay_test_${randomBytes(8).toString('hex')}`, type: 'payment', attributes: { status: 'paid', amount, currency: 'PHP', paid_at: Math.floor(Date.now() / 1000) } });
+      if (scenario.webhook !== 'lost') {
+        // the provider's signed message, delivered to the webhook function
+        const rawBody = JSON.stringify({ data: { id: `evt_${randomBytes(8).toString('hex')}`, type: 'event', attributes: { type: 'checkout_session.payment.paid', livemode: false, data: { id, type: 'checkout_session', attributes: checkout } } } });
+        const t = Math.floor(Date.now() / 1000), te = createHmac('sha256', billingEnv.PAYMONGO_WEBHOOK_SECRET).update(`${t}.${rawBody}`).digest('hex');
+        await webhook({ rawBody, signature: `t=${t},te=${te},li=`, rpc: billingRpc(null), env: billingEnv });
+      }
+      res.writeHead(302, { Location: checkout.success_url }); return res.end();
     }
 
     /* PostgREST */

@@ -7711,7 +7711,7 @@ const Charts = (() => {
   const { store } = Cleo;
   const { CleoError } = Cleo.errors;
   const env = Cleo.env.supabase;
-  const state = { session: null, snapshot: null, plan: null, subscription: null, billingMethod: null, invoices: [], transfers: [], audit: [], salesRequest: null };
+  const state = { session: null, snapshot: null, plan: null, subscription: null, billingMethod: null, billingNotice: null, invoices: [], transfers: [], audit: [], salesRequest: null };
   const authState = { account: null, twoFactor: false, recovery: false, callbackError: null, intent: null, agreed: null, redirecting: false };
   let sb = null, initialized = null, factorId = null;
   const memoryStorage = new Map();
@@ -7983,6 +7983,36 @@ const Charts = (() => {
     return user;
   }
   const notConfigured = () => !env.configured || typeof window.supabase?.createClient !== 'function';
+  /* plan payments: the `billing` Edge Function (supabase/functions/billing). The server works out the
+     price and opens the payment provider's own page; card and wallet details never pass through Cleo. */
+  async function billing(body) {
+    let result;
+    try { result = await client().functions.invoke('billing', { body }); }
+    catch (error) { throw fail(error, 'billing'); }
+    if (result?.error) {
+      const status = Number(result.error?.context?.status || 0);
+      if (status === 404) throw new CleoError('integration_pending', 'Payments aren’t switched on yet. Nothing was charged.', { operation: 'billing' });
+      if (status === 401) throw new CleoError('unauthorized', '', { operation: 'billing' });
+      throw new CleoError(status ? 'unavailable' : 'network', status ? 'Payments are having trouble. Nothing was charged. Try again in a moment.' : '', { operation: 'billing' });
+    }
+    const data = result?.data;
+    if (!data || data.ok !== true) throw new CleoError(String(data?.code || 'unavailable'), typeof data?.message === 'string' ? data.message.slice(0, 200) : '', { operation: 'billing' });
+    return data;
+  }
+  // Back from the provider's page (?billing=paid&ref=…): ask the server where the payment stands, once,
+  // and take the outcome out of the address so a reload doesn't ask again.
+  async function billingReturn() {
+    const url = new URL(location.href), outcome = url.searchParams.get('billing'), reference = url.searchParams.get('ref') || '';
+    if (!outcome) return;
+    url.searchParams.delete('billing'); url.searchParams.delete('ref');
+    history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash || '#/'}`);
+    const waiting = { title: 'We’re confirming your payment', body: 'This can take a minute. Reload this page shortly; you won’t be charged twice.', tone: 'info', duration: 12000 };
+    if (outcome !== 'paid' || !/^CLEO-[0-9A-F]{16}$/.test(reference)) { state.billingNotice = { title: 'Payment cancelled', body: 'Nothing was charged. Choose a plan when you’re ready.', tone: 'info' }; return; }
+    try {
+      const r = await billing({ action: 'verify', reference });
+      state.billingNotice = r.status === 'paid' ? { title: 'Payment received', body: 'Thank you. Your plan is active.', icon: 'seal-check', duration: 7000 } : waiting;
+    } catch { state.billingNotice = waiting; }
+  }
   const pending = (operation) => async () => { throw new CleoError(notConfigured() ? 'not_configured' : 'integration_pending', '', { operation }); };
 
   const api = {
@@ -8009,6 +8039,7 @@ const Charts = (() => {
     },
     async bootstrap() {
       await requireUser({ strong: true });
+      await billingReturn();
       const snapshot = await request(client().rpc('cleo_bootstrap'), 'bootstrap');
       if (!snapshot?.data || typeof snapshot.data !== 'object') throw new CleoError('unavailable');
       state.snapshot = snapshot; state.plan = snapshot.plan || null; state.subscription = snapshot.subscription || null;
@@ -8181,10 +8212,24 @@ const Charts = (() => {
     changePlan: pending('changePlan'),
     billingMethod() { return state.billingMethod; },
     invoices() { return state.invoices; },
-    linkWallet: pending('linkWallet'),
-    addCard: pending('addCard'),
+    // How to pay is chosen on Cleo's page and paid on the provider's: nothing is linked or stored here.
+    async linkWallet() { await requireUser({ strong: true }); return { ok: true }; },
+    async addCard() { await requireUser({ strong: true }); return { ok: true }; },
     subscription() { return state.subscription; },
-    subscribe: pending('subscribe'),
+    // Free starts at once. A paid plan leaves for the provider's checkout page; the subscription exists
+    // only after the provider confirms the payment to the server (never because this page says so).
+    async subscribe({ plan, terminals = 1, cycle = 'monthly', branches = 1, method = 'card' } = {}) {
+      await requireUser({ strong: true });
+      const r = await billing({ action: 'checkout', plan, terminals, branches, cycle, method });
+      if (r.free) { state.plan = r.subscription?.plan || plan; state.subscription = r.subscription || null; state.billingMethod = null; return { ok: true }; }
+      let target = null;
+      try { target = new URL(r.checkoutUrl); } catch { /* refused below */ }
+      const local = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(env.url);   // a local Supabase stand-in pays on itself
+      if (!target || !(target.origin === 'https://checkout.paymongo.com' || (local && target.origin === env.url))) throw new CleoError('unavailable', 'The payment page couldn’t be opened. Nothing was charged.');
+      location.assign(target.href);
+      await new Promise((resolve) => setTimeout(resolve, 20000));
+      throw new CleoError('unavailable', 'The payment page didn’t open. Nothing was charged. Try again.');
+    },
     salesRequest() { return state.salesRequest; },
     requestSalesCall: pending('requestSalesCall'),
   };
@@ -15586,7 +15631,7 @@ Cleo.bir = (() => {
           <h1 id="pl-h" tabindex="-1">${sub ? 'Change your plan' : 'Choose your plan'}</h1>
           ${subtitle ? `<p class="lede">${esc(subtitle)}.</p>` : ''}
           ${notice ? `<p class="onboard-note"><i class="ph ph-info" aria-hidden="true"></i>${esc(notice)}</p>` : ''}
-          ${!DEMO && !sub ? '<p class="onboard-note" role="status"><i class="ph ph-info" aria-hidden="true"></i>Your account and business are saved. Subscription payments are not connected yet, so a paid plan cannot be activated here.</p>' : ''}
+          ${!DEMO && !sub ? '<p class="onboard-note" role="status"><i class="ph ph-info" aria-hidden="true"></i>Your account and business are saved. Choose a plan to open Cleo. You pay on the payment provider’s secure page.</p>' : ''}
         </header>
         ${tabbed ? `<div class="plan-tabs" role="tablist" aria-label="Plan type">
           <button type="button" role="tab" id="pt-growth" aria-controls="pp-growth" aria-selected="${planView === 'growth'}" tabindex="${planView === 'growth' ? 0 : -1}"><b>Growth plans</b><span>${esc(nameList(list))}</span></button>
@@ -15787,9 +15832,9 @@ Cleo.bir = (() => {
       store.set('quote-draft', { plan: pid, terminals: n, branches, cycle });
       const m = M[pick], wallet = pick !== 'card';
       $$('[data-pm]', P0).forEach((b) => { const on = b.dataset.pm === pick; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
-      $('[data-f="pm-m"]', P0).hidden = !wallet || keepWallet();
+      $('[data-f="pm-m"]', P0).hidden = !DEMO || !wallet || keepWallet();
       if (wallet) { $('[data-pm-ml]', P0).textContent = `Mobile number registered to ${m.app}`; $('[data-pm-help]', P0).textContent = `Next, you approve automatic payments in the ${m.app} app.`; }
-      $('[data-pm-safe]', P0).textContent = wallet ? `Cleo never sees your ${m.app} MPIN or one-time codes.` : 'Card details are typed on the payment provider’s page and never stored in Cleo.';
+      $('[data-pm-safe]', P0).textContent = wallet ? `Cleo never sees your ${m.app} MPIN or one-time codes.${DEMO ? '' : ' You pay again when the period ends; nothing renews by itself.'}` : 'Card details are typed on the payment provider’s page and never stored in Cleo.';
       go.innerHTML = update ? 'Save subscription changes' : `<i class="ph ph-lock-key" aria-hidden="true"></i>${DEMO ? 'Simulate payment' : 'Pay'} · ${fmt.peso(t)}`;
     };
     const setN = (v) => { if (busy) return; n = clamp(Math.round(+v || 1), 1, cap); branches = Math.min(branches, n); paint(); };
@@ -15810,19 +15855,21 @@ Cleo.bir = (() => {
     go.addEventListener('click', async () => {
       if (busy) return;
       const m = M[pick], wallet = pick !== 'card';
-      const digits = wallet && !keepWallet() ? Cleo.billing.mobile(mob.value) : '';
-      if (wallet && !keepWallet() && !digits) { $('[data-f="pm-m"]', P0).classList.add('invalid'); mob.setAttribute('aria-invalid', 'true'); mob.focus(); return; }
+      const digits = DEMO && wallet && !keepWallet() ? Cleo.billing.mobile(mob.value) : '';
+      if (DEMO && wallet && !keepWallet() && !digits) { $('[data-f="pm-m"]', P0).classList.add('invalid'); mob.setAttribute('aria-invalid', 'true'); mob.focus(); return; }
       busy = true; paint(); btnState(go, 'loading');
       const keep = !!saved && pick === saved.kind;
       try {
         if (!keep) {
-          state(wallet
+          state(wallet && !DEMO
+            ? `${chip(pick)}<b>Continue on the secure page</b><p>You pay with ${esc(m.name)} on the payment provider’s page, then come back here.</p><p class="ps-wait"><span class="spinner"></span>Opening the payment page</p>`
+            : wallet
             ? `${chip(pick)}<b>Approve in the ${esc(m.app)} app</b><p>We sent a request to ${esc(digits.slice(0, 4))} ··· ${esc(digits.slice(-4))}. Open ${esc(m.app)} and approve automatic payments to Aeso Technologies for Cleo.</p><p class="ps-wait"><span class="spinner"></span>Waiting for approval</p>`
             : `${chip('card')}<b>Finish on the secure page</b><p>Your card is added on the payment provider’s page, then you come back here.</p><p class="ps-wait"><span class="spinner"></span>Waiting for the payment provider</p>`);
           const r = wallet ? await Cleo.api.linkWallet({ kind: pick, mobile: digits }) : await Cleo.api.addCard();
           if (!r.ok) throw new Error(r.message);
         }
-        const s = await Cleo.api.subscribe({ plan: p.id, terminals: n, cycle, branches, expectedTotal: total() });
+        const s = await Cleo.api.subscribe({ plan: p.id, terminals: n, cycle, branches, expectedTotal: total(), method: pick });
         if (!s.ok) throw new Error(s.message);
         btnState(go, 'done');
         const only = p.modes.length === 1;
@@ -15961,8 +16008,14 @@ Cleo.bir = (() => {
     if (!setup && DEMO) await Cleo.boot({ app: mode && !needSignIn ? MODES[mode].title : 'Point of sale', steps: mode && !needSignIn ? MODES[mode].steps : ['Starting Cleo', 'Checking this device', 'Checking your session', 'Ready'], minTotal: forcePick ? 1500 : 2400 });
     if (needSignIn) await signIn(mode, { setup });
     if (!await loadBusiness(mode ? MODES[mode].title : 'Point of sale')) return;
+    if (!DEMO) {
+      if (Cleo.api.subscription()) store.remove('onboarding');
+      const backend = Cleo.backend.supabase.state;
+      if (backend.billingNotice) { const note = backend.billingNotice; backend.billingNotice = null; setTimeout(() => toast(note), 600); }
+    }
     // a new account (or the plan page's address) chooses a plan and pays; then the plan decides what opens
-    if (toPlans || store.get('onboarding', false) === true || (!DEMO && !!Cleo.session.get() && !Cleo.api.subscription())) {
+    // "unpaid" was judged before the business loaded; a plan paid for a moment ago (back from the provider's page) counts now
+    if (plansRoute || (unpaid && !Cleo.api.subscription()) || store.get('onboarding', false) === true || (!DEMO && !!Cleo.session.get() && !Cleo.api.subscription())) {
       const paid = await plansFlow(plansRoute?.[1]);
       if (paid) store.remove('onboarding');
       const next = allowedModes();

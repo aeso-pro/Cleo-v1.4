@@ -3,10 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node auth-onboarding.test.mjs && node --test --test-concurrency=1 operations.test.mjs transfers.test.mjs admin.test.mjs",
+    "test": "node auth-onboarding.test.mjs && node --test --test-concurrency=1 operations.test.mjs transfers.test.mjs admin.test.mjs billing.test.mjs",
     "test:auth": "node auth-onboarding.test.mjs",
     "test:operations": "node --test --test-concurrency=1 operations.test.mjs transfers.test.mjs",
-    "test:admin": "node --test --test-concurrency=1 admin.test.mjs"
+    "test:admin": "node --test --test-concurrency=1 admin.test.mjs",
+    "test:billing": "node --test --test-concurrency=1 billing.test.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.10"

@@ -21,6 +21,17 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-15 (later) · Claude Code (owner's session on his laptop), `main`
+
+**Plan payments through PayMongo.** The owner asked for the payment methods to work. Setup and limits are in [PAYMENTS.md](PAYMENTS.md). Nothing is deployed: the migration, the two Edge Functions and their secrets are the owner's to apply.
+
+- **Migration `202611150006_billing.sql`**: `cleo_plan_prices` (the same figures as `content/plans.md`), `cleo_payments`, `cleo_subscriptions`; `cleo_billing_start` (owner only, prices the plan itself) and `cleo_billing_status` for browsers; `cleo_billing_attach`, `_confirm` and `_close` for the service role only. **`cleo_bootstrap()` now returns `plan`, `subscription`, `billingMethod` and `invoices`** (it wraps the 003 version, renamed `cleo_operations_bootstrap`). `plan` is null when nothing is in force, as before.
+- **Edge Functions** `billing` (`{ action: 'checkout' | 'verify' }`, needs the owner's session) and `billing-webhook` (PayMongo; `verify_jwt` off, signature checked, then PayMongo is asked directly). Logic is in `supabase/functions/_shared/billing-core.js` so the test server runs the same code.
+- **`backend/supabase.js`**: `subscribe`, `addCard` and `linkWallet` are no longer pending. `subscribe({ plan, terminals, cycle, branches, method })` leaves for the provider's checkout page and does not resolve; Free resolves `{ ok: true }`. `bootstrap()` first handles a return from the provider (`?billing=paid|cancelled&ref=…`). `changePlan`, `invoices` and the rest of billing are unchanged.
+- **`launcher.js`**: the payment page passes `method` to `subscribe`; outside the demo a wallet needs no mobile number (it is paid on the provider's page); `start()` clears the onboarding flag once a subscription exists and shows the outcome of a return.
+- **A prices change now has two homes**: `content/plans.md` and `cleo_plan_prices`. Change both, the second with a new migration.
+- [x] *Plan activation* (below) is built. [ ] It is not live until the owner follows PAYMENTS.md.
+
 ### 2026-11-15 · Claude Code (owner's session on his laptop), `main`
 
 **Facebook sign-in return handling, account suspension, a platform admin console, and scripts by fingerprint.** The owner asked for the Facebook login and the backend to be fixed, an admin page, and hardening. This round crosses the ownership table, on his instruction: it edits `backend/supabase.js` and adds a migration. Setup steps are in [ADMIN_AND_SECURITY.md](ADMIN_AND_SECURITY.md).

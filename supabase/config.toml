@@ -1,0 +1,11 @@
+# Supabase CLI settings for Cleo's Edge Functions (supabase functions deploy).
+project_id = "ntbkbvlsgymupjdpuvob"
+
+# The owner's own session is required: Supabase checks the token before the function runs.
+[functions.billing]
+verify_jwt = true
+
+# PayMongo calls this one, so it has no Supabase session. The function checks PayMongo's
+# signature itself and then asks PayMongo directly before it settles anything.
+[functions.billing-webhook]
+verify_jwt = false
