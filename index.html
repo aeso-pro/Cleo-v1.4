@@ -32,6 +32,17 @@
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = destination;
   if (typeof document === 'undefined') return;
+  // Cleo never runs inside another site's frame (click-hijacking overlays). The server's headers
+  // refuse that first; this also covers a host that drops them.
+  if (window.top !== window.self) {
+    let own = false;
+    try { own = window.top.location.origin === location.origin; } catch { /* another site's frame */ }
+    if (!own) {
+      document.documentElement.style.display = 'none';
+      try { window.top.location = location.href; } catch { /* stays blank */ }
+      return;
+    }
+  }
   const next = destination(document.documentElement.dataset.page, location.href);
   if (next) location.replace(next);
 })();
@@ -5112,7 +5123,7 @@ const Cleo = (() => {
     google: { name: 'Google', svg: '<svg class="soc-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>' },
     facebook: { name: 'Facebook', svg: '<svg class="soc-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M16.671 15.563l.532-3.49h-3.328V9.809c0-.956.465-1.886 1.956-1.886h1.513V4.952s-1.374-.235-2.686-.235c-2.741 0-4.533 1.671-4.533 4.697v2.659H7.078v3.49h3.047V24h3.75v-8.437h2.796z"/><path fill="#0866FF" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.026 1.792-4.697 4.533-4.697 1.312 0 2.686.235 2.686.235v2.971H15.83c-1.491 0-1.956.93-1.956 1.886v2.264h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>' },
   };
-  function loginScreen({ app, demoEmail = '', sub, onDone, initialStep = 1, resumeAccount = null, recovery = false, twoFactor = false, authError = null, fine = 'Use your email or a connected sign-in provider. Accounts with two-step sign-in also need an authenticator code.', fineIcon = 'shield-check' }) {
+  function loginScreen({ app, demoEmail = '', sub, onDone, initialStep = 1, resumeAccount = null, recovery = false, twoFactor = false, authError = null, agreedVersion = '', fine = 'Use your email or a connected sign-in provider. Accounts with two-step sign-in also need an authenticator code.', fineIcon = 'shield-check' }) {
     // The connected Supabase project issues eight-digit email codes. Its TOTP
     // authenticator codes remain six digits; the separate demo uses six for both.
     const emailCodeLength = CleoEnv.demo ? 6 : 8;
@@ -5144,6 +5155,7 @@ const Cleo = (() => {
                 <h1>Sign in</h1>
                 <p class="lede">${esc(sub)}</p>
                 ${offlineNote()}
+                ${authError ? `<p class="onboard-note" role="alert" data-auth-error><i class="ph ph-warning-circle" aria-hidden="true"></i><span>${esc(authError.message || 'Sign-in didn’t finish. Start again from this page.')}</span></p>` : ''}
                 ${social('signin')}
                 ${or('or sign in with email')}
                 <form novalidate data-form="1">
@@ -5157,7 +5169,7 @@ const Cleo = (() => {
                     <div class="input-wrap"><i class="ph ph-lock-simple lead-icon"></i><input id="lg-pw" class="input" type="password" autocomplete="current-password" placeholder="Your password" aria-describedby="lg-pw-err"><span class="trail"><button type="button" class="icon-btn" data-reveal="pw" aria-label="Show password" aria-pressed="false"><i class="ph ph-eye"></i></button></span></div>
                     <p class="err" id="lg-pw-err"><i class="ph-fill ph-warning-circle"></i><span>Enter your password to continue.</span></p>
                   </div>
-                  <label class="check"><input type="checkbox" id="lg-keep" checked> Keep me signed in on this device</label>
+                  <label class="check"><input type="checkbox" id="lg-keep"> Keep me signed in on this device</label>
                   ${terms('terms1')}
                   <button class="btn btn-primary btn-lg btn-block" type="submit" data-submit>Sign in</button>
                 </form>
@@ -5256,7 +5268,8 @@ const Cleo = (() => {
     // which way a step slides in: sign-in sits left of its code, reset and sign-up screens
     const ORDER = { 1: 0, 2: 1, 3: 1, 4: 2, 5: 1, 6: 2, 7: 3 };
     let cur = 1, hT = 0, focusT = 0, authEpoch = 0;
-    const signInHash = location.hash === '#/setup' ? '#/' : location.hash || '#/';
+    // only a Cleo route is kept in the address (never a provider's leftover fragment such as "#_=_")
+    const signInHash = /^#\//.test(location.hash) && location.hash !== '#/setup' ? location.hash : '#/';
     const focusFirst = (n) => {
       clearTimeout(focusT);
       // Do not open a software keyboard just for changing pages.
@@ -5342,10 +5355,16 @@ const Cleo = (() => {
       const p = b.dataset.social; const name = SOCIAL[p].name;
       const request = ++authEpoch;
       btnState(b, 'loading');
-      const r = await Cleo.api.socialAuth({ provider: p, intent, keep: $('#lg-keep', node).checked });
+      // the box was ticked for this version of both documents: carried through the provider's page and back
+      const r = await Cleo.api.socialAuth({ provider: p, intent, keep: $('#lg-keep', node).checked, agreed: legal.version });
       if (request !== authEpoch) { btnState(b, null); return; }
       if (!r.ok) { btnState(b, null); toast({ title: `${name} sign-in didn't finish`, body: r.message || 'Try again, or use your email instead.', tone: 'bad' }); return; }
-      if (r.redirecting) return;
+      if (r.redirecting) {
+        // The page is leaving for the provider. If it is still here after a while (the provider's page
+        // never opened), the button must not stay busy; coming Back from the provider is handled below.
+        setTimeout(() => { if (node.isConnected && b.dataset.state === 'loading') { btnState(b, null); toast({ title: `${name} didn’t open`, body: 'Check your connection and try again, or use your email instead.', tone: 'bad' }); } }, 15000);
+        return;
+      }
       btnState(b, 'done'); await wait(380); btnState(b, null);
       if (request !== authEpoch) return;
       if (CleoEnv.demo) toast({ title: `Demo: ${name} is simulated`, body: `A live build opens ${name}'s own sign-in window here.`, tone: 'info', duration: 2800 });
@@ -5353,6 +5372,13 @@ const Cleo = (() => {
       if (r.isNew || account?.needsBusiness) { pendingSocial = true; openBusiness(`Signed up with ${name}. Last step: tell us about your business.`); return; }
       finish();
     }));
+    // Pressing Back on Facebook's or Google's page restores this screen exactly as it was left,
+    // with the button still busy. Make it usable again.
+    const reviveSocial = (e) => {
+      if (!node.isConnected) { removeEventListener('pageshow', reviveSocial); return; }
+      if (e.persisted) { authEpoch++; $$('[data-social]', node).forEach((b) => btnState(b, null)); }
+    };
+    addEventListener('pageshow', reviveSocial);
 
     // 1. email and password
     $('[data-form="1"]', node).addEventListener('submit', async (e) => {
@@ -5580,10 +5606,17 @@ const Cleo = (() => {
       if (!mq('(pointer: coarse)').matches) focusFirst(cur);
     });
     if (!CleoEnv.demo) $('[data-backup-line]', node).hidden = true;
-    if (authError) requestAnimationFrame(() => toast({ title: 'Sign-in didn’t finish', body: authError.message || 'Start sign-in again from this page.', tone: 'bad' }));
+    // why a sign-in that left for Facebook, Google or an email link didn't finish: said in a toast, and kept on
+    // the card (above), because the reason can be longer than a toast stays up
+    if (authError) requestAnimationFrame(() => toast({ title: 'Sign-in didn’t finish', body: authError.message || 'Start sign-in again from this page.', tone: 'bad', duration: 12000 }));
     if (resumeAccount) {
       email.value = resumeAccount.email || '';
       $('#lg-remail', node).value = resumeAccount.email || '';
+      // Back from Facebook or Google: the agreement was ticked before leaving, for these documents.
+      // Nobody is asked to tick it twice, and an account that needs nothing else continues by itself.
+      const agreed = !!agreedVersion && agreedVersion === legal.version;
+      if (agreed) $$('[data-terms]', node).forEach((box) => { box.checked = true; });
+      if (agreed && !twoFactor && !recovery && !resumeAccount.needsBusiness) requestAnimationFrame(() => { if (node.isConnected && cur === 1) $('[data-form="1"]', node).requestSubmit(); });
       if (recovery) {
         $('[data-f="rcode"]', node).hidden = true;
         $('[data-step="4"] .lede', node).textContent = 'Your reset link is verified. Choose a new password.';
@@ -5760,8 +5793,10 @@ const Cleo = (() => {
             const cur = String(config.get('brand.accent')).toLowerCase();
             host.innerHTML = `<div class="swatches" role="radiogroup" aria-label="Accent color">${BRAND_PRESETS.map(([h, n]) => `<button class="swatch" role="radio" data-hex="${h}" aria-checked="${cur === h}" aria-label="${n}" style="--sw:${h}"><i></i><span>${n}</span></button>`).join('')}
               <label class="swatch custom" aria-label="Pick a custom color"><input type="color" value="${cur}" data-custom-hex><i style="--sw:${cur}"></i><span>Custom</span></label></div>
-              <div class="brand-preview glass-thin"><button class="btn btn-primary" tabindex="-1">Charge ₱286.00</button><span class="chip" aria-pressed="true">Coffee</span><span class="badge accent">Consolidated</span><a href="#" tabindex="-1" onclick="return false">Forgot password?</a><span class="seg" aria-hidden="true"><button aria-pressed="true">Today</button><button aria-pressed="false">7 days</button></span></div>`;
+              <div class="brand-preview glass-thin"><button class="btn btn-primary" tabindex="-1">Charge ₱286.00</button><span class="chip" aria-pressed="true">Coffee</span><span class="badge accent">Consolidated</span><a href="#" tabindex="-1" data-sample-link>Forgot password?</a><span class="seg" aria-hidden="true"><button aria-pressed="true">Today</button><button aria-pressed="false">7 days</button></span></div>`;
             seg($('.brand-preview .seg', host));
+            // a sample link that goes nowhere (a listener, so the page needs no inline script permission)
+            $('.brand-preview [data-sample-link]', host).addEventListener('click', (e) => e.preventDefault());
           };
           draw();
           host.addEventListener('click', (e) => { const b = e.target.closest('[data-hex]'); if (!b) return; config.set('brand.accent', b.dataset.hex); draw(); });
@@ -7677,11 +7712,16 @@ const Charts = (() => {
   const { CleoError } = Cleo.errors;
   const env = Cleo.env.supabase;
   const state = { session: null, snapshot: null, plan: null, subscription: null, billingMethod: null, invoices: [], transfers: [], audit: [], salesRequest: null };
-  const authState = { account: null, twoFactor: false, recovery: false, callbackError: null, intent: null, redirecting: false };
+  const authState = { account: null, twoFactor: false, recovery: false, callbackError: null, intent: null, agreed: null, redirecting: false };
   let sb = null, initialized = null, factorId = null;
   const memoryStorage = new Map();
   let keepSession = store.tab?.get('auth-keep', store.get('auth-keep', false)) === true;
   const storageArea = (persist) => { try { return persist ? window.localStorage : window.sessionStorage; } catch { return null; } };
+  // A sign-in that leaves the page (Facebook, Google, an email link) can come back in another tab:
+  // the Facebook app and mail apps open the return address in a new one, where this tab's storage
+  // is empty. The one-time PKCE verifier therefore lives in localStorage whatever "Keep me signed in"
+  // says. It is useless without its matching code and is removed as soon as it is exchanged.
+  const isVerifierKey = (key) => typeof key === 'string' && key.endsWith('-code-verifier');
   const authStorage = {
     getItem(key) {
       try { return storageArea(false)?.getItem(key) ?? storageArea(true)?.getItem(key) ?? memoryStorage.get(key) ?? null; }
@@ -7689,7 +7729,8 @@ const Charts = (() => {
     },
     setItem(key, value) {
       memoryStorage.set(key, value);
-      try { storageArea(keepSession)?.setItem(key, value); storageArea(!keepSession)?.removeItem(key); } catch { /* use this page's memory when browser storage is blocked */ }
+      const persist = keepSession || isVerifierKey(key);
+      try { storageArea(persist)?.setItem(key, value); storageArea(!persist)?.removeItem(key); } catch { /* use this page's memory when browser storage is blocked */ }
     },
     removeItem(key) {
       memoryStorage.delete(key);
@@ -7715,11 +7756,53 @@ const Charts = (() => {
     store.tab?.set('auth-keep', keepSession);
     if (keepSession) store.set('auth-keep', true); else store.remove('auth-keep');
   }
+  // What Supabase reports when a provider sign-in (Facebook, Google) comes back with an error, in words
+  // for the person signing in. The server's own text is matched, never shown: it can carry addresses.
+  function callbackFailure(code, description, provider) {
+    const text = `${code || ''} ${description || ''}`.toLowerCase();
+    const name = provider === 'facebook' ? 'Facebook' : provider === 'google' ? 'Google' : '';
+    const their = name ? `your ${name} account` : 'that account';
+    if (/error getting user email|email.{0,30}(not|isn.t).{0,20}(provided|available|returned|shared)|missing.{0,20}email/.test(text)) {
+      // Facebook only asks again for a permission that was declined once when told to (see socialAuth).
+      store.tab?.set('auth-rerequest', provider || 'facebook');
+      return new CleoError('validation', `${name || 'The sign-in provider'} didn’t share an email address, and Cleo needs one for your account. Try again and allow the email permission, add a confirmed email to ${their}, or create your account with an email and password instead.`);
+    }
+    if (/provider_email_needs_verification|unverified email/.test(text)) return new CleoError('validation', `Confirm your email to finish. A confirmation link was sent to the address on ${their}.`);
+    if (/access_denied|user_denied|user denied|permissions error|cancel/.test(text)) return new CleoError('validation', `${name ? `${name} sign-in` : 'Sign-in'} was cancelled. Nothing was changed.`);
+    if (/signup_disabled|signups? not allowed|signup.*(disabled|not allowed)/.test(text)) return new CleoError('forbidden', 'New accounts can’t be created this way right now. Contact support.');
+    if (/user_banned|banned/.test(text)) return new CleoError('forbidden', 'This account has been turned off. Contact support.');
+    if (/bad_oauth_state|bad_oauth_callback|flow_state|invalid.{0,12}state|otp_expired|expired/.test(text)) return new CleoError('validation', 'That sign-in took too long or was opened in a different browser. Start again from this page.');
+    if (/redirect|\burl\b/.test(text)) return new CleoError('forbidden', 'This copy of Cleo isn’t on the sign-in allow list yet. The owner adds its address in Supabase › Authentication › URL Configuration.');
+    if (/provider_disabled|unsupported provider|provider.*(disabled|not enabled)/.test(text)) return new CleoError('forbidden', `${name ? `${name} sign-in` : 'This sign-in option'} is turned off. Sign in with your email instead.`);
+    if (/database error|unexpected_failure|server_error|temporarily_unavailable|exchange|profile|client/.test(text)) return new CleoError('unavailable', `${name || 'The provider'} couldn’t finish signing you in. Try again, or sign in with your email instead.`);
+    return new CleoError('validation', 'Sign-in was cancelled or could not finish. Please try again.');
+  }
+  // A provider sign-in in progress, remembered for a few minutes across tabs (the provider may return in a new one).
+  const PENDING_AUTH_MS = 20 * 60000;
+  function takePendingAuth() {
+    const p = store.get('auth-pending', null); store.remove('auth-pending');
+    if (!p || typeof p !== 'object' || !(Date.now() - Number(p.at) < PENDING_AUTH_MS)) return null;
+    return {
+      provider: ['google', 'facebook'].includes(p.provider) ? p.provider : '',
+      intent: p.intent === 'signup' ? 'signup' : 'signin',
+      // the legal version whose agreement box was ticked before leaving for the provider
+      agreed: typeof p.agreed === 'string' && p.agreed.length <= 80 ? p.agreed : '',
+      // only a real mode address is restored: #/terminal, #/owner/<view>, #/backoffice/<view>
+      route: typeof p.route === 'string' && /^#\/(terminal|owner|backoffice)(\/[\w-]+)?$/.test(p.route) ? p.route : '',
+    };
+  }
   function fail(error, operation) {
     if (error instanceof CleoError) return error;
     const code = String(error?.code || ''), status = Number(error?.status || 0);
+    const said = String(error?.message || ''), hint = String(error?.hint || '');
+    // Cleo's own database functions (supabase/migrations) raise short messages written for the person
+    // using the app. Those are shown. Anything PostgreSQL or the API says on its own never is.
+    const ours = /^(P0002|22023|40001|42501|23505)$/.test(code) && said.length > 0 && said.length <= 180 &&
+      !/[<>{}[\]`$\\]|permission denied|violates|relation |function |column |syntax|schema|constraint|null value|duplicate key|row-level|policy/i.test(said);
     let kind = 'unknown', message = '', field = '';
-    if (/invalid_credentials/.test(code)) { kind = 'validation'; message = 'That email and password do not match.'; }
+    if (/cleo_account_suspended/.test(hint) || (ours && /account has been suspended/i.test(said))) { kind = 'forbidden'; message = 'This account has been suspended. Contact Cleo support.'; }
+    else if (/pkce_code_verifier_not_found|flow_state_not_found|flow_state_expired|bad_code_verifier/.test(code) || /code verifier/i.test(said)) { kind = 'validation'; message = 'That sign-in link was opened in a different browser, or it has expired. Start again from this page, in this browser.'; }
+    else if (/invalid_credentials/.test(code)) { kind = 'validation'; message = 'That email and password do not match.'; }
     else if (/email_not_confirmed/.test(code)) { kind = 'validation'; message = 'Confirm your email before signing in. Use the latest confirmation email.'; }
     else if (/otp_expired|otp_disabled|mfa_verification_failed|mfa_challenge_expired/.test(code)) { kind = 'validation'; message = 'That code is invalid or expired. Request a new code and try again.'; }
     else if (/weak_password|same_password/.test(code)) { kind = 'validation'; field = 'password'; message = 'Choose a different password with at least 8 characters.'; }
@@ -7731,12 +7814,15 @@ const Charts = (() => {
     else if (/user_banned/.test(code)) { kind = 'forbidden'; field = 'email'; message = 'This account has been turned off. Contact support.'; }
     else if (/current_password_mismatch/.test(code)) { kind = 'validation'; message = 'Your current password is incorrect.'; }
     else if (/reauthentication_needed/.test(code)) { kind = 'validation'; message = 'Sign in again before changing your password.'; }
-    else if (/user_already_exists|email_exists|23505/.test(code)) { kind = 'conflict'; field = 'email'; message = 'That account already exists. Sign in instead.'; }
+    else if (/user_already_exists|email_exists/.test(code)) { kind = 'conflict'; field = 'email'; message = 'That account already exists. Sign in instead.'; }
+    // a duplicate or a stale write reported by a database function: never the account message above
+    else if (/^(23505|40001)$/.test(code)) { kind = 'conflict'; if (ours) message = said; }
+    else if (/^P0002$/.test(code)) { kind = 'not_found'; if (ours) message = said; }
     else if (/over_.*rate_limit|rate_limit/.test(code) || status === 429) kind = 'rate_limited';
     else if (/session_not_found|session_expired|refresh_token|bad_jwt|not_authenticated/.test(code) || status === 401) kind = 'unauthorized';
-    else if (/42501/.test(code) || status === 403) kind = 'forbidden';
+    else if (/42501/.test(code) || status === 403) { kind = 'forbidden'; if (ours) message = said; }
     else if (/PGRST202|42883|42P01/.test(code)) { kind = 'integration_pending'; message = 'Account setup is not available on the server yet. Contact the business owner.'; }
-    else if (/22023|validation_failed|email_address_invalid|password/.test(code) || status === 400 || status === 422) kind = 'validation';
+    else if (/22023|validation_failed|email_address_invalid|password/.test(code) || status === 400 || status === 422) { kind = 'validation'; if (ours) message = said; }
     else if (status >= 500) kind = 'unavailable';
     else if (error instanceof TypeError || /fetch|network/i.test(String(error?.name || ''))) kind = 'network';
     return new CleoError(kind, message, { operation, cause: error, ...(field ? { field } : {}) });
@@ -7750,7 +7836,7 @@ const Charts = (() => {
   function clearState() {
     state.session = null; state.snapshot = null; state.plan = null; state.subscription = null;
     state.billingMethod = null; state.invoices = []; state.transfers = []; state.audit = []; state.salesRequest = null;
-    authState.account = null; authState.twoFactor = false; authState.recovery = false; authState.redirecting = false; authState.intent = null;
+    authState.account = null; authState.twoFactor = false; authState.recovery = false; authState.redirecting = false; authState.intent = null; authState.agreed = null;
     factorId = null; store.tab?.remove('auth-recovery'); store.remove('auth-keep');
   }
   function client() {
@@ -7782,27 +7868,26 @@ const Charts = (() => {
       const hash = new URLSearchParams(url.hash.slice(1));
       const code = q.get('code'), tokenHash = q.get('token_hash'), otpType = q.get('type');
       const flowId = q.get('sb_flow_id'), denied = q.has('error') || hash.has('error');
-      // what the provider or Supabase said, read before the address is cleaned (never shown raw: mapped below)
-      const why = `${q.get('error_code') || hash.get('error_code') || ''} ${q.get('error_description') || hash.get('error_description') || ''} ${q.get('error') || hash.get('error') || ''}`.toLowerCase();
       const recovery = q.get('auth') === 'recovery' || (tokenHash && otpType === 'recovery');
       const hasTokens = hash.has('access_token') || hash.has('refresh_token');
-      if (code || tokenHash || denied || hasTokens) {
+      // Facebook ends every return address with "#_=_", and browsers carry that fragment through
+      // Supabase's redirect into this page. It is not a Cleo route and must not stay in the address.
+      const strayHash = /^#_(=_)?$/.test(url.hash);
+      // what the provider or Supabase said, read before the address is cleaned (never shown raw: callbackFailure maps it)
+      const errorCode = `${q.get('error') || hash.get('error') || ''} ${q.get('error_code') || hash.get('error_code') || ''}`;
+      const errorText = q.get('error_description') || hash.get('error_description') || '';
+      const callback = !!(code || tokenHash || denied || hasTokens);
+      const pendingAuth = callback ? takePendingAuth() : null;
+      if (callback || strayHash) {
         // Strip credentials before a request or external asset can propagate them through a referrer.
         for (const key of ['code', 'token_hash', 'type', 'error', 'error_code', 'error_description', 'auth', 'sb_flow_id']) q.delete(key);
-        if (hasTokens || hash.has('error')) url.hash = '#/';
+        // A provider sign-in started from a mode's address goes back to that mode. A stray or
+        // credential-bearing fragment never stays.
+        if (hasTokens || hash.has('error') || strayHash || !url.hash) url.hash = (code && pendingAuth?.route) || '#/';
         history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash || '#/'}`);
       }
-      if (denied) {
-        // the common reasons a Google or Facebook sign-in comes back refused, in words the owner can act on
-        const reason = /access_denied|cancel|denied/.test(why) && !/email/.test(why) ? 'Sign-in was cancelled. Try again when you’re ready.'
-          : /email/.test(why) ? 'The provider didn’t share your email address, which Cleo needs. Allow email access when asked, or sign in with your email instead.'
-          : /redirect|url/.test(why) ? 'This copy of Cleo isn’t on the sign-in allow list yet. The owner adds its address in Supabase › Authentication › URL Configuration.'
-          : /provider.*(disabled|not enabled)|unsupported provider/.test(why) ? 'This sign-in option is turned off. Sign in with your email instead.'
-          : /signup.*(disabled|not allowed)/.test(why) ? 'New accounts can’t be created this way right now. Contact support.'
-          : /server_error|unexpected_failure|exchange|profile|client/.test(why) ? 'The provider couldn’t finish signing you in. Try again, or sign in with your email.'
-          : 'Sign-in was cancelled or could not finish. Please try again.';
-        throw new CleoError('validation', reason);
-      }
+      // the common reasons a Google or Facebook sign-in comes back refused, in words the owner can act on
+      if (denied) throw callbackFailure(errorCode, errorText, pendingAuth?.provider);
       if (hasTokens) throw new CleoError('validation', 'This sign-in link uses an older sign-in flow. Start a fresh sign-in from Cleo.');
       if (code) {
         await request(flowId ? c.auth.exchangeCodeForSession(code, { flowId }) : c.auth.exchangeCodeForSession(code), 'callback');
@@ -7812,7 +7897,9 @@ const Charts = (() => {
       }
       if (code || tokenHash) {
         if (recovery) { authState.recovery = true; store.tab?.set('auth-recovery', true); }
-        authState.intent = store.tab?.get('auth-intent', null); store.tab?.remove('auth-intent');
+        authState.intent = store.tab?.get('auth-intent', null) || pendingAuth?.intent || null; store.tab?.remove('auth-intent');
+        authState.agreed = (code && pendingAuth?.agreed) || null;
+        store.tab?.remove('auth-rerequest');
       }
       authState.recovery ||= store.tab?.get('auth-recovery', false) === true;
     })().catch((error) => { authState.callbackError = fail(error, 'callback').toResult(); });
@@ -7832,7 +7919,18 @@ const Charts = (() => {
       forgetCredentials();
       clearState(); return null;
     }
-    if (!user?.id || !user?.email) return null;
+    if (!user?.id) return null;
+    if (!user.email) {
+      // A provider account that shares no email address (a Facebook account made with a phone number,
+      // or the email permission declined) cannot own a Cleo account. Say so instead of looping back to
+      // sign-in with a session that never opens anything.
+      const refusal = callbackFailure('', 'error getting user email', user.app_metadata?.provider).toResult();
+      try { await request(c.auth.signOut({ scope: 'local' }), 'signOut'); } catch { /* forgotten locally below */ }
+      forgetCredentials();
+      clearState();
+      authState.callbackError = refusal;
+      return null;
+    }
     state.session = session.session;
     return user;
   }
@@ -7864,7 +7962,18 @@ const Charts = (() => {
     if (!user?.id || !user?.email) throw new CleoError('unauthorized');
     authState.callbackError = null;
     const twoFactor = await assurance();
-    const account = await contextFor(user);
+    let account;
+    try { account = await contextFor(user); }
+    catch (error) {
+      if (error?.code === 'forbidden') {
+        // The server refuses this account outright (suspended, or its email was never confirmed).
+        // Forget the session, so the device isn't left holding one that can never open anything.
+        try { await request(client().auth.signOut({ scope: 'local' }), 'signOut'); } catch { /* forgotten locally below */ }
+        forgetCredentials();
+        clearState();
+      }
+      throw error;
+    }
     return { ok: true, account, twoFactor, isNew: account.needsBusiness };
   }
   async function requireUser({ strong = false } = {}) {
@@ -7888,7 +7997,14 @@ const Charts = (() => {
       const user = await currentUser();
       if (!user) { authState.account = null; return null; }
       if (authState.callbackError) return null;
-      const result = await signedIn(user);
+      let result;
+      try { result = await signedIn(user); }
+      catch (error) {
+        // a refused account returns to sign-in with the reason, rather than "Cleo isn't connected"
+        if (error?.code !== 'forbidden') throw error;
+        authState.account = null; authState.callbackError = error.toResult();
+        return null;
+      }
       return { ...result.account, twoFactor: result.twoFactor, recovery: authState.recovery };
     },
     async bootstrap() {
@@ -7929,12 +8045,21 @@ const Charts = (() => {
       await request(client().auth.resend({ type: 'signup', email: String(email || '').trim(), options: { emailRedirectTo: redirectUrl() } }), 'resendVerification');
       return { ok: true };
     },
-    async socialAuth({ provider, intent = 'signin', keep = false } = {}) {
+    async socialAuth({ provider, intent = 'signin', keep = false, agreed = '' } = {}) {
       const c = client(); await initialize();
       if (!['google', 'facebook'].includes(provider)) throw new CleoError('validation', 'Choose Google or Facebook to continue.');
       authState.recovery = false; store.tab?.remove('auth-recovery');
-      remember(keep); store.tab?.set('auth-intent', intent === 'signup' ? 'signup' : 'signin');
-      await request(c.auth.signInWithOAuth({ provider, options: { redirectTo: redirectUrl() } }), 'socialAuth');
+      authState.callbackError = null;
+      const wanted = intent === 'signup' ? 'signup' : 'signin';
+      remember(keep); store.tab?.set('auth-intent', wanted);
+      // Kept for a few minutes where another tab can read it: the provider may come back in a new one.
+      store.set('auth-pending', { provider, intent: wanted, agreed: String(agreed || ''), route: location.hash, at: Date.now() });
+      const options = { redirectTo: redirectUrl() };
+      // Facebook asks again for a permission that was declined once (the email address) only when told to.
+      if (provider === 'facebook' && store.tab?.get('auth-rerequest', null) === 'facebook') options.queryParams = { auth_type: 'rerequest' };
+      store.tab?.remove('auth-rerequest');
+      const data = await request(c.auth.signInWithOAuth({ provider, options }), 'socialAuth');
+      if (!data?.url) { store.remove('auth-pending'); throw new CleoError('unavailable', 'The sign-in page couldn’t be opened. Check your connection and try again.'); }
       authState.redirecting = true;
       return { ok: true, redirecting: true };
     },
@@ -15753,11 +15878,12 @@ Cleo.bir = (() => {
       recovery: auth?.recovery === true,
       twoFactor: auth?.twoFactor === true,
       authError: auth?.callbackError || null,
+      agreedVersion: auth?.agreed || '',
       demoEmail: DEMO ? Cleo.data.people.owner?.email || '' : '',
       sub: 'One account for the Terminal, Owner Dashboard and Back Office.',
       onDone: ({ account, keep, isNew, business }) => {
         Cleo.session.set(account, { keep });
-        if (auth) auth.intent = null;
+        if (auth) { auth.intent = null; auth.agreed = null; }
         // a new account chooses a plan and pays before anything opens
         if (isNew) { welcome = { name: account.name, business }; store.set('onboarding', true); }
         resolve();
@@ -15805,8 +15931,9 @@ Cleo.bir = (() => {
     return false;
   }
   async function start() {
-    const r = route.parse();
-    if (!DEMO && !(r.mode === 'terminal' && r.view === 'display')) await connect(MODES[r.mode]?.title);
+    let r = route.parse();
+    // connect() consumes a sign-in callback, which can restore the mode a provider sign-in started from
+    if (!DEMO && !(r.mode === 'terminal' && r.view === 'display')) { await connect(MODES[r.mode]?.title); r = route.parse(); }
     const setup = location.hash === '#/setup';
     const plansRoute = location.hash.match(/^#\/plans(?:\/([\w-]+))?$/);
     if (r.mode === 'terminal' && r.view === 'display') { active = 'display'; document.body.dataset.mode = 'display'; Cleo.apps.terminal.display(); return; }
