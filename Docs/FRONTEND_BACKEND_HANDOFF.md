@@ -21,6 +21,36 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-15 · Claude Code (owner's session on his laptop), `main`
+
+**Facebook sign-in return handling, account suspension, a platform admin console, and scripts by fingerprint.** The owner asked for the Facebook login and the backend to be fixed, an admin page, and hardening. This round crosses the ownership table, on his instruction: it edits `backend/supabase.js` and adds a migration. Setup steps are in [ADMIN_AND_SECURITY.md](ADMIN_AND_SECURITY.md).
+
+For the frontend:
+
+- **Run `node tools/update-security.js` after every edit to `index.html` or `landing.html`.** `.htaccess` no longer allows `'unsafe-inline'` scripts: `script-src` lists the SHA-256 of each inline script. An edited inline script that is not re-fingerprinted leaves the page blank. The tool rewrites the header line and the service worker's cache name, so do not hand-edit `CACHE` in `sw.js`.
+- **No inline event handlers or `javascript:` links.** The policy blocks them, and the tool refuses to run if it finds one. The one that existed (the brand preview's sample link in `core.js`) is now a listener.
+- `loginScreen()` in `core.js`: takes `agreedVersion`, shows `authError` on the card (`[data-auth-error]`) as well as in a toast, revives the social buttons on `pageshow`, and **Keep me signed in** starts unticked.
+- `start()` in `launcher.js` parses the route again after `connect()`, because a provider return can restore the mode it started from.
+- Both entry-page guards (the first inline script of `index.html` and `landing.html`) refuse to run inside another site's frame. Keep the two copies identical: they share one fingerprint.
+- New files: `admin.html`, `assets/admin/` (no inline script or style; it has its own stricter policy), `tools/serve.js`, `tools/update-security.js`.
+
+For the backend:
+
+- **`backend/supabase.js` changed** (merged with the 2026-11-14 entry's `initialize()` mapping, which now lives in `callbackFailure()` with every case it had):
+  - `authStorage` keeps keys ending `-code-verifier` in localStorage whatever "Keep me signed in" says, so a return in another tab finishes;
+  - `socialAuth` records `cleo:auth-pending` (provider, intent, the agreed legal version, the route) for 20 minutes, and sends `auth_type=rerequest` to Facebook after a "no email" refusal;
+  - `initialize()` removes Facebook's `#_=_`, and restores a mode route only when it matches `#/(terminal|owner|backoffice)[/view]`;
+  - `fail()` shows the short messages Cleo's own functions raise (SQLSTATE 42501, 22023, 40001, 23505, P0002), never PostgreSQL's own text, and `23505` no longer reads "That account already exists";
+  - `signedIn()` signs out locally when `cleo_auth_context` refuses the account, and `currentUser()` does the same for a user with no email.
+- **Migration `202611140005_platform_admin.sql`** (apply after 001 to 004; the 46 earlier checks still pass, with 17 new ones in `supabase/tests/admin.test.mjs`):
+  - replaces `cleo_session_is_strong()`, `cleo_auth_context()` and `cleo_register_verified_profile()`. Contracts are unchanged except: a suspended or banned account gets `42501` with hint `cleo_account_suspended` from `cleo_auth_context()`, and the trigger no longer aborts a sign-up;
+  - `cleo_audit_log` is append-only for every role (`UPDATE`, `DELETE` and `TRUNCATE` raise). Keep that in mind for any future retention job;
+  - a `BEFORE INSERT OR UPDATE OF data` trigger on `cleo_records` bounds record size (64 KiB), text length (2,000) and the types of `sku`, `barcode`, `cat`, `station`, `taxType`, `cost`, `available`, `icon` and the customer fields. New record fields must fit, or the limits move in a new migration;
+  - three private tables and ten `cleo_admin_*` RPCs. `auth.users.banned_until`, `last_sign_in_at` and `raw_app_meta_data` are read; nothing in `auth` is written.
+- `supabase/tests/helpers.mjs` gives the fixture `auth.users` those columns. `supabase/tests/e2e-server.mjs` serves the real pages in front of the real migrations with a stand-in Auth, for browser tests of sign-in and the admin console.
+- [x] *Facebook sign-in is misconfigured in the dashboard* (2026-11-14 entry): the authorize redirect now carries a 16-digit Client ID, not an email address. The Meta-side checks (Live mode, Advanced Access for the `email` permission) are still the owner's to confirm.
+- [ ] **Migrations 002 to 005 are not applied to the hosted project.** Until they are, the admin console answers "Admin tools aren't installed yet" and suspension does nothing.
+
 ### 2026-11-14 · Frontend (Claude Code), `main`
 
 **Sign-up error messages, an idle sign-out, security headers and a Hostinger guide.** The owner asked for bug fixes and hardening across the code, so this round touches one function in `backend/supabase.js`.

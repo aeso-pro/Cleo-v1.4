@@ -9,7 +9,7 @@
    BACKEND: never cache API responses here; the terminal's offline sales
    queue belongs in IndexedDB, uploaded by the app when the connection returns.
    ===================================================================== */
-const CACHE = 'cleo-4483e238a7';
+const CACHE = 'cleo-b4ce283a10';
 const FILES = [
   "landing.html",
   "index.html",
@@ -54,6 +54,8 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   const requestURL = new URL(req.url);
   if (req.method !== 'GET' || requestURL.origin !== location.origin) return;
+  // The admin console is never cached: it always comes from the server, with its own headers.
+  if (/\/admin\.html$/.test(requestURL.pathname) || requestURL.pathname.includes('/assets/admin/')) return;
   // Authentication callbacks must never leave codes or token hashes in cache
   // request keys, or replay an old callback while offline.
   if (['code', 'token_hash', 'access_token', 'refresh_token', 'sb_flow_id', 'error', 'error_code', 'error_description', 'auth'].some((key) => requestURL.searchParams.has(key))) {

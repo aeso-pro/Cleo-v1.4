@@ -7,7 +7,7 @@
 --        - a suspended or banned account loses access at once, not when its token expires;
 --        - business audit history becomes append-only for every role;
 --        - stored records get size, type and character limits.
---   2. The platform admin console (admin.html): three private tables and nine RPCs.
+--   2. The platform admin console (admin.html): three private tables and ten RPCs.
 --      Every admin RPC checks, on the server, that the caller is an active platform admin
 --      with a confirmed email AND a session that completed two-step verification (aal2).
 --
@@ -639,6 +639,7 @@ AS $function$
 DECLARE
   reason text := btrim(COALESCE(p_reason, ''));
   member public.cleo_memberships%ROWTYPE;
+  business_name text;
   changed boolean := false;
 BEGIN
   PERFORM public.cleo_require_admin(true);
@@ -646,7 +647,7 @@ BEGIN
     RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'Choose a member and give a short reason.';
   END IF;
   -- The same lock every business write takes first, so this cannot interleave with one.
-  PERFORM 1 FROM public.cleo_businesses b WHERE b.id = p_business_id FOR UPDATE;
+  SELECT b.name INTO business_name FROM public.cleo_businesses b WHERE b.id = p_business_id FOR UPDATE;
   IF NOT FOUND THEN
     RAISE EXCEPTION USING ERRCODE = 'P0002', MESSAGE = 'That business no longer exists.';
   END IF;
@@ -670,7 +671,8 @@ BEGIN
   IF changed THEN
     PERFORM public.cleo_admin_log(CASE WHEN p_revoked THEN 'membership.revoke' ELSE 'membership.restore' END,
       'membership', p_user_id::text,
-      jsonb_build_object('businessId', p_business_id, 'role', member.role, 'reason', reason));
+      jsonb_build_object('email', COALESCE((SELECT u.email FROM auth.users u WHERE u.id = p_user_id), ''),
+        'business', business_name, 'businessId', p_business_id, 'role', member.role, 'reason', reason));
     PERFORM public.cleo_write_audit(p_business_id, NULL,
       CASE WHEN p_revoked THEN 'admin.membership.revoke' ELSE 'admin.membership.restore' END,
       p_user_id::text, NULL, jsonb_build_object('role', member.role, 'by', 'Cleo support'));
@@ -788,7 +790,7 @@ BEGIN
     'admins', (SELECT COALESCE(jsonb_agg(jsonb_build_object('email', COALESCE(u.email, ''), 'role', a.role,
         'since', a.created_at,
         'twoStep', EXISTS (SELECT 1 FROM auth.mfa_factors f WHERE f.user_id = a.user_id AND f.status::text = 'verified'))
-        ORDER BY a.created_at, a.user_id), '[]'::jsonb)
+        ORDER BY a.created_at, COALESCE(u.email, ''), a.user_id), '[]'::jsonb)
       FROM public.cleo_platform_admins a LEFT JOIN auth.users u ON u.id = a.user_id
       WHERE a.revoked_at IS NULL),
     'generatedAt', now());

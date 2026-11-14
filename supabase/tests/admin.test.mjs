@@ -201,6 +201,8 @@ await test('membership revoke and restore are audited on both sides and keep one
   assert.equal(await count('public.cleo_memberships WHERE user_id=$1 AND revoked_at IS NULL', [ids.manager]), 1);
   const history = (await db.query("SELECT action,detail FROM public.cleo_admin_audit WHERE target_type='membership' ORDER BY id")).rows;
   assert.deepEqual(history.map((h) => [h.action, h.detail.reason]), [['membership.revoke', 'Left the company'], ['membership.restore', 'Rehired'], ['membership.revoke', 'Moved to Beta']]);
+  // the history names the person and the business, so it reads without looking ids up
+  assert.deepEqual([history[0].detail.email, history[0].detail.business, history[0].detail.role], ['manager@example.test', 'Alpha Foods', 'manager']);
   // an owner's revocation leaves the business without an owner, and the list says so
   await adm('cleo_admin_set_membership', [ids.other, beta.business.id, true, 'Account takeover']);
   assert.equal((await adm('cleo_admin_list_businesses', ['beta', 25, 0])).rows[0].hasOwner, false);

@@ -21,7 +21,7 @@ Options -Indexes -MultiViews
   # open: the host uses it to renew the HTTPS certificate.)
   RewriteCond %{REQUEST_URI} !^/\.well-known/
   RewriteRule (^|/)\. - [F,L]
-  RewriteRule ^(Docs|docs|backend|supabase|source|node_modules|tests)(/|$) - [F,L,NC]
+  RewriteRule ^(Docs|docs|backend|supabase|source|node_modules|tests|tools|Cleo-v1\.4-main)(/|$) - [F,L,NC]
   RewriteRule \.(sql|py|sh|env|log|bak|zip|toml|lock|map)$ - [F,L,NC]
   # content/plans.md is the one Markdown file the app reads.
   RewriteCond %{REQUEST_URI} !/content/plans\.md$
@@ -46,12 +46,18 @@ Options -Indexes -MultiViews
   # Browser features Cleo doesn't use stay off, even for injected code. The camera stays on for
   # barcode scanning, and USB and serial for printers, scanners and cash drawers.
   Header always set Permissions-Policy "geolocation=(), microphone=(), payment=(), midi=(), gyroscope=(), accelerometer=(), magnetometer=(), browsing-topics=(), camera=(self), usb=(self), serial=(self)"
+  # Flash and PDF plugins get no cross-domain policy, and other sites cannot embed Cleo's files as their own.
+  Header always set X-Permitted-Cross-Domain-Policies "none"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
   # Windows opened from Cleo can't reach back into it.
   Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
   # What the pages may load and where they may send data: their own files, and the Supabase
   # project for sign-in and data. No other site's scripts run, no plugins, no outside frames,
   # and forms post only to Cleo. Update the two supabase.co addresses if the project changes.
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://ntbkbvlsgymupjdpuvob.supabase.co wss://ntbkbvlsgymupjdpuvob.supabase.co; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+  # script-src lists the fingerprint of each inline script the pages contain, so injected markup
+  # cannot run. After ANY edit to index.html or landing.html, run:  node tools/update-security.js
+  # (it rewrites this line). A page that shows blank with a policy error in the console needs that.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-DHNogkMKyaKYt2dSEEjnv3kTvKM+J0i4d9EymcE0X14=' 'sha256-IMwimV6jRgr/a2PsXNroQkbt9uSgGRyApjcy7NDbJug=' 'sha256-NH9cb5xyIT+rUtBttCRfULXYJDPRyL1TZHMSvduNwqU=' 'sha256-R+gkQwfK1Rct+u4s961CqSoa2ABzSrcsH2OmqDA68uo=' 'sha256-gx6+JvlTei/kXjGFTJVvM4rmPaUh2fseF/9losGFB3k=' 'sha256-pVl/Phbye+nOH1JHjj32KiyLDD8OvwjHUNWms0yGm3A=' 'sha256-yMOLZZMFSImZIF8asxb7AHo6S+CfGgYJIZ589MW3+2g='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://ntbkbvlsgymupjdpuvob.supabase.co wss://ntbkbvlsgymupjdpuvob.supabase.co; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
   Header always unset X-Powered-By
   Header unset X-Powered-By
 </IfModule>
@@ -65,6 +71,14 @@ Options -Indexes -MultiViews
   <FilesMatch "\.(woff2|png|svg|jpg|jpeg|webp|ico)$">
     Header set Cache-Control "public, max-age=604800"
   </FilesMatch>
+</IfModule>
+
+# The admin console is never stored by a browser or a proxy, and never listed by a search engine.
+<IfModule mod_headers.c>
+  <Files "admin.html">
+    Header set Cache-Control "no-store"
+    Header set X-Robots-Tag "noindex, nofollow, noarchive"
+  </Files>
 </IfModule>
 
 # Markdown and the install manifest are served as text the browser can read.

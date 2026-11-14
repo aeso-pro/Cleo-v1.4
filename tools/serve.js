@@ -62,7 +62,8 @@ function send(res, status, body, headers = {}) {
   res.end(body);
 }
 
-const server = http.createServer((req, res) => {
+/** Serve one static file request. `rewrite(html, pathname)` lets a test server adjust a page as it goes out. */
+function serveStatic(req, res, { rewrite = null, headers: extra = {} } = {}) {
   if (!['GET', 'HEAD'].includes(req.method)) return send(res, 405, 'Method not allowed', { Allow: 'GET, HEAD' });
   let pathname;
   try { pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname); }
@@ -77,8 +78,14 @@ const server = http.createServer((req, res) => {
     if (error || !stat.isFile()) return send(res, 404, 'Not found');
     const ext = path.extname(file).toLowerCase();
     const fresh = ext === '.html' || ext === '.webmanifest' || ext === '.md' || path.basename(file) === 'sw.js';
+    if (rewrite && ext === '.html') {
+      const body = Buffer.from(rewrite(fs.readFileSync(file, 'utf8'), pathname));
+      res.writeHead(200, { ...securityHeaders(), ...extra, 'Content-Type': TYPES[ext], 'Content-Length': body.length, 'Cache-Control': 'no-cache' });
+      return res.end(req.method === 'HEAD' ? undefined : body);
+    }
     res.writeHead(200, {
       ...securityHeaders(),
+      ...extra,
       'Content-Type': TYPES[ext] || 'application/octet-stream',
       'Content-Length': stat.size,
       // Local previews always show the saved file.
@@ -87,7 +94,13 @@ const server = http.createServer((req, res) => {
     if (req.method === 'HEAD') return res.end();
     fs.createReadStream(file).on('error', () => res.destroy()).pipe(res);
   });
-});
+}
+
+// Used by supabase/tests/e2e-server.mjs, which serves the same files next to a stand-in backend.
+module.exports = { ROOT, serveStatic, securityHeaders, send };
+if (require.main !== module) return;
+
+const server = http.createServer((req, res) => serveStatic(req, res));
 
 server.on('error', (error) => {
   console.error(error.code === 'EADDRINUSE' ? `Port ${PORT} is already in use. Close the other server, or run with PORT=5176.` : error.message);
