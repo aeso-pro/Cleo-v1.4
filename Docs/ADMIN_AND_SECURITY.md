@@ -19,6 +19,8 @@ A read-only check afterwards found row-level security on all 19 Cleo tables, not
 
 ### 1.2 Make yourself the first admin
 
+**Done on 2026-11-17:** `main.code.aeso@gmail.com` is the first superadmin. Add more admins on the console's **Admins** page; the SQL below is only for recovering access if no superadmin is left.
+
 Only the first admin is made in SQL; after that, superadmins add, change and remove admins on the console's **Admins** page. The account must exist and have a confirmed email first. Sign up in Cleo, or add the user in **Supabase › Authentication › Users** (you choose the password there; never put it in a file or a chat). Then, in the SQL Editor:
 
 ```sql

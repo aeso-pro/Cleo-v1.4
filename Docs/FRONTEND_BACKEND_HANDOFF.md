@@ -30,7 +30,7 @@ The README describes building from `Frontend/source/` with `node source/build.js
 - **Frontend**: Facebook was removed from the code by the cloud session's entry below (commit 1b519f5); this session's one-flag hide was dropped in favour of it when merging.
 - **Migration `202611170007_admin_controls.sql`**: `cleo_admin_account`, `_confirm_email` (writes `auth.users.email_confirmed_at`), `_set_name`, `_set_member` (role, branch, or add to a business; keeps one owner), `_rename_business` (also updates `cleo_settings`), `_business_billing`, `_set_plan` (a subscription without payment, `method = ''`), `_payments`, `_admins`, `_set_admin`, `_billing_overview`, `_business_plans`. **Admins can now be added from the console** by a superadmin (no self-change; one superadmin with two-step always remains). 19 new checks in `supabase/tests/admin-controls.test.mjs`; 79 in all pass.
 - **The console moved** to `admin/index.html` (served at `/admin`, with `admin/.htaccess` for no-store and noindex). `admin.html` is a meta-refresh to it. `tools/serve.js` serves folders and redirects `/admin` to `/admin/`; `tools/update-security.js` checks `admin/index.html`; `sw.js` never caches `/admin`.
-- [ ] **No admin exists yet.** The owner creates the admin account (password chosen by them, not in any file), then the INSERT in ADMIN_AND_SECURITY.md §1.2.
+- [x] **First admin**: `main.code.aeso@gmail.com` was made superadmin on 2026-11-17 at the owner's request (SQL in ADMIN_AND_SECURITY.md §1.2). Further admins are added on the console's Admins page.
 
 ### 2026-11-17 · Claude Code (cloud session), `main`
 
