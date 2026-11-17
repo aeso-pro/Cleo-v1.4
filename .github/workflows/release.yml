@@ -15,6 +15,9 @@ name: Release apps
 on:
   push:
     tags: ['v*.*.*']
+    # a change to the apps on main builds both (as a check, without publishing); tags ignore these paths
+    branches: [main]
+    paths: ['apps/**', 'tools/build-app-web.js', '.github/workflows/release.yml']
   workflow_dispatch:   # builds both apps as workflow artifacts, without publishing a release
 
 permissions:
@@ -64,7 +67,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: android-actions/setup-android@v3
+      # GitHub's Ubuntu machines come with the Android SDK (ANDROID_HOME); licenses are accepted here
+      - name: Android SDK licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
       - name: Version from the tag
         if: startsWith(github.ref, 'refs/tags/v')
         working-directory: apps/android
