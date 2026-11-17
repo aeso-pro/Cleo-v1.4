@@ -1,0 +1,139 @@
+# Builds Cleo POS for Windows (.exe) and Android (.apk) and publishes them as a GitHub release.
+#
+# Make a release: push a version tag, for example
+#   git tag v1.4.1 && git push origin v1.4.1
+# The tag is the version (1.4.1). The landing page's download buttons always point at the latest
+# release, the Windows app updates itself from it, and the Android app offers the new APK.
+#
+# Android signing: add these repository secrets (Settings › Secrets and variables › Actions) so every
+# release is signed with the same key and installs over the last one. Docs/APP_RELEASES.md shows how
+# to make the key. Without them the APK is signed with a temporary key, and phones must uninstall the
+# old version first.
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+name: Release apps
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:   # builds both apps as workflow artifacts, without publishing a release
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    name: Windows installer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Version from the tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        working-directory: apps/desktop
+        run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version --allow-same-version
+      - name: Build
+        working-directory: apps/desktop
+        run: |
+          npm ci --no-audit --no-fund
+          npm run dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            apps/desktop/dist/Cleo-Setup.exe
+            apps/desktop/dist/Cleo-Setup.exe.blockmap
+            apps/desktop/dist/latest.yml
+          if-no-files-found: error
+
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v3
+      - name: Version from the tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        working-directory: apps/android
+        run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version --allow-same-version
+      - name: Android project
+        working-directory: apps/android
+        run: |
+          npm ci --no-audit --no-fund
+          npm run prepare-android
+      - name: Build
+        working-directory: apps/android/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+      - name: Sign
+        working-directory: apps/android
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          TOOLS="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          "$TOOLS/zipalign" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk aligned.apk
+          if [ -n "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            "$TOOLS/apksigner" sign --ks "$RUNNER_TEMP/release.jks" --ks-pass env:ANDROID_KEYSTORE_PASSWORD \
+              --ks-key-alias "$ANDROID_KEY_ALIAS" --key-pass env:ANDROID_KEY_PASSWORD --out Cleo.apk aligned.apk
+            rm -f "$RUNNER_TEMP/release.jks"
+          else
+            echo "::warning title=Temporary Android key::No signing secrets are set, so this APK is signed with a key made for this build only. Phones must uninstall the previous version before installing it. See Docs/APP_RELEASES.md."
+            keytool -genkeypair -keystore "$RUNNER_TEMP/temporary.jks" -storepass temporary -keypass temporary -alias temporary \
+              -keyalg RSA -keysize 2048 -validity 3650 -dname "CN=Cleo POS temporary build"
+            "$TOOLS/apksigner" sign --ks "$RUNNER_TEMP/temporary.jks" --ks-pass pass:temporary --out Cleo.apk aligned.apk
+          fi
+          "$TOOLS/apksigner" verify Cleo.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: apps/android/Cleo.apk
+          if-no-files-found: error
+
+  release:
+    name: Publish the release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Cleo POS ${{ github.ref_name }}
+          make_latest: true
+          body: |
+            Cleo POS ${{ github.ref_name }}.
+
+            - **Windows 10 or 11 (64-bit):** Cleo-Setup.exe. Installed copies update themselves.
+            - **Android 9 or later:** Cleo.apk. The app tells you when a newer version is out.
+
+            Sign in with your Cleo account after installing. Your business's data stays in your account.
+          files: |
+            out/Cleo-Setup.exe
+            out/Cleo-Setup.exe.blockmap
+            out/latest.yml
+            out/Cleo.apk
+          fail_on_unmatched_files: true

@@ -33,8 +33,8 @@ await test('unconfirmed and missing-email users cannot accept legal terms or rea
  }
 });
 await test('business onboarding and legal consent prepare isolated tenants',async()=>{
- const c=await onboard(owner,'Owner shop');business=c.business.id;branch=c.branch.id;
- const o=await onboard(other,'Other shop');otherBusiness=o.business.id;otherBranch=o.branch.id;
+ const c=await onboard(owner,'Owner shop','max');business=c.business.id;branch=c.branch.id;
+ const o=await onboard(other,'Other shop','max');otherBusiness=o.business.id;otherBranch=o.branch.id;
  secondBranch=randomUUID();
  await db.query("INSERT INTO public.cleo_branches(id,business_id,code,name) VALUES($1,$2,'SECOND','Second branch')",[secondBranch,business]);
  for(const [id,role] of [[ids.manager,'manager'],[ids.cashier,'cashier'],[ids.clerk,'clerk']]){

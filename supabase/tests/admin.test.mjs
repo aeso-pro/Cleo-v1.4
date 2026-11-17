@@ -14,8 +14,8 @@ for (const [id, email, name] of [[admin, 'root@example.test', 'Root Admin'], [su
 await db.query("INSERT INTO public.cleo_platform_admins(user_id,role,note) VALUES($1,'superadmin','test'),($2,'support','test')", [admin, support]);
 await db.query("INSERT INTO auth.mfa_factors(user_id,status) VALUES($1,'verified'),($2,'verified')", [admin, support]);
 
-const alpha = await onboard(ids.owner, 'Alpha Foods');
-const beta = await onboard(ids.other, 'Beta Retail');
+const alpha = await onboard(ids.owner, 'Alpha Foods', 'max');
+const beta = await onboard(ids.other, 'Beta Retail', 'max');
 for (const [id, role] of [[ids.manager, 'manager'], [ids.cashier, 'cashier'], [ids.clerk, 'clerk']]) {
   await db.query('INSERT INTO public.cleo_memberships(user_id,business_id,branch_id,role) VALUES($1,$2,$3,$4)', [id, alpha.business.id, alpha.branch.id, role]);
   await as(id, 'cleo_accept_legal', [legalVersion, 'email']);

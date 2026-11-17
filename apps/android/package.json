@@ -1,0 +1,20 @@
+{
+  "name": "cleo-pos-android",
+  "version": "1.4.0",
+  "description": "Cleo POS for Android",
+  "author": "Aeso Technologies Inc.",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "web": "node ../../tools/build-app-web.js www",
+    "prepare-android": "npm run web && npx cap add android && npx cap sync android && node configure-android.js"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0"
+  }
+}

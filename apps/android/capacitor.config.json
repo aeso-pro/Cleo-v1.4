@@ -1,0 +1,7 @@
+{
+  "appId": "online.cleopos.app",
+  "appName": "Cleo POS",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "android": { "allowMixedContent": false, "captureInput": true, "webContentsDebuggingEnabled": false }
+}

@@ -54,7 +54,7 @@ async function addUser(email, name, { provider = 'email', confirmed = true, days
   return id;
 }
 for (const [key, id] of Object.entries(ids)) if (key !== 'missingEmail') people.set(`${key}@example.test`, { id });
-const alpha = await onboard(ids.owner, 'Alpha Foods');
+const alpha = await onboard(ids.owner, 'Alpha Foods', 'max');
 const beta = await onboard(ids.other, 'Beta Retail');
 for (const [id, role] of [[ids.manager, 'manager'], [ids.cashier, 'cashier'], [ids.clerk, 'clerk']]) {
   await sql('INSERT INTO public.cleo_memberships(user_id,business_id,branch_id,role) VALUES($1,$2,$3,$4)', [id, alpha.business.id, alpha.branch.id, role]);

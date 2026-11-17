@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {database,ids,legalVersion} from './helpers.mjs';
 const {db,as,asRole,onboard}=await database();
-const c=await onboard(ids.owner,'Sender');const business=c.business.id,source=c.branch.id,target=randomUUID();
-const other=await onboard(ids.other,'Other tenant');
+const c=await onboard(ids.owner,'Sender','max');const business=c.business.id,source=c.branch.id,target=randomUUID();
+const other=await onboard(ids.other,'Other tenant','max');
 await db.query("INSERT INTO public.cleo_branches(id,business_id,code,name) VALUES($1,$2,'TGT','Target')",[target,business]);
 for(const [id,role,branch] of [[ids.manager,'manager',source],[ids.clerk,'clerk',target]]){
  await db.query('INSERT INTO public.cleo_memberships(user_id,business_id,branch_id,role) VALUES($1,$2,$3,$4)',[id,business,branch,role]);

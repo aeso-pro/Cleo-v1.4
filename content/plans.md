@@ -4,8 +4,9 @@
 <!-- Editable pricing source. PHP amounts. Price/Annual cover the first terminal in
 one branch; Additional/Annual additional cover each extra terminal in that branch.
 Annual extras are twelve monthly fees, paid upfront. Branches limits connected
-branch management. A Price of 0 is the free plan: one terminal, no billing, and
-nothing that costs Cleo to run (no cloud sync, backup or remote support). Basic
+branch management. A Price of 0 is the free plan: one terminal, no billing, an
+account sign-in that keeps its data apart, and nothing that costs Cleo to run
+(no multi-terminal sync, backup or remote support). Basic
 terminals operate independently. Inclusions are proposed,
 not implementation claims. See source/licensing.js for the full feature matrix.
 Summary is the one sentence a plan card shows while its feature list is folded.
@@ -23,7 +24,7 @@ Run node source/build.js and node source/export-data.js after editing.
 - Terminals: 1
 - Branches: 1
 - Tagline: One counter, free for as long as you like
-- Summary: Sell, print receipts and close shifts on one terminal, with everything kept on that device.
+- Summary: Sell, print receipts and close shifts on one terminal, signed in to your own Cleo account.
 - Tab: quiet
 - Modes: Terminal
 
@@ -34,7 +35,7 @@ Run node source/build.js and node source/export-data.js after editing.
 - Refunds, voids and shifts for one cashier
 - Daily sales summary on the terminal
 - Data export to a file
-- Everything stays on the device: no cloud sync, backup or remote support
+- Your own account: sales and products kept apart from every other business (no backup or remote support)
 
 ## Basic
 

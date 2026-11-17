@@ -26,7 +26,7 @@ If the owner cancels, nothing is charged and they are back on the payment page. 
 Start in **test mode**. PayMongo's test keys move no money, and you can go live later by repeating steps 3 and 5 with the live keys.
 
 1. **Open a PayMongo account** at paymongo.com. Test keys are available at once; live keys need PayMongo to verify your business.
-2. **Database: done.** Migration 006 was applied to the hosted project on 2026-11-17, with 002 to 005 and 007.
+2. **Database: done.** Migration 006 was applied to the hosted project on 2026-11-17, with 002 to 005 and 007; 008 (plan limits) on 2026-11-18.
 3. **Add three secrets** in Supabase › Edge Functions › Secrets. Paste them there yourself; never into a file, a chat or the app.
 
    | Name | Value |
@@ -69,11 +69,14 @@ Check with PayMongo that every method you want (GCash, Maya, QR Ph) is enabled o
 
 Tests: `npm --prefix supabase/tests test` (8 billing checks among 71), and `node supabase/tests/e2e-server.mjs`, which runs the same function logic against a stand-in PayMongo at `/__paymongo` so a whole purchase can be clicked through at `http://localhost:5180/`.
 
-## 5. Not built yet
+## 5. Plan limits
+
+Enforced on the server since migration 008: the terminals and branches a subscription pays for, Free's 100 products and one cashier, and each plan's features (see `cleo_features()` and `Docs/FRONTEND_BACKEND_HANDOFF.md`, 2026-11-18). A business with no plan in force reads its data but changes nothing until it chooses one.
+
+## 6. Not built yet
 
 - **Automatic renewal** and saved cards or linked wallets. PayMongo's subscription product is a separate integration.
 - **Invoices and receipts inside Cleo.** PayMongo emails a receipt; Plan and billing lists none yet.
 - **Refunds** are made in PayMongo's dashboard and do not change the plan in Cleo.
-- **Limits by plan** (terminal and branch counts) are recorded but not yet enforced on the server.
 - **VAT and BIR treatment** of the subscription itself is still to be confirmed with an accountant.
 - The real PayMongo was not exercised from here: that needs your account. The signature check follows PayMongo's published format (`t=…,te=…,li=…`); confirm it with a test event in step 6.

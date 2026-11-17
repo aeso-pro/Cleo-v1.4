@@ -30,7 +30,7 @@ const TYPES = {
   '.woff': 'font/woff', '.woff2': 'font/woff2', '.otf': 'font/otf', '.ttf': 'font/ttf',
 };
 // Folders and file types that are never public (the same list .htaccess refuses).
-const PRIVATE_DIRS = new Set(['docs', 'backend', 'supabase', 'source', 'node_modules', 'tests', 'tools', 'cleo-v1.4-main']);
+const PRIVATE_DIRS = new Set(['docs', 'backend', 'supabase', 'source', 'node_modules', 'tests', 'tools', 'apps', 'cleo-v1.4-main']);
 const PRIVATE_EXT = new Set(['.sql', '.py', '.sh', '.env', '.log', '.bak', '.zip', '.toml', '.lock', '.map']);
 
 /** The security headers of .htaccess, so a local preview enforces what production enforces. */

@@ -1,0 +1,44 @@
+{
+  "name": "cleo-pos",
+  "productName": "Cleo POS",
+  "version": "1.4.0",
+  "description": "Cleo POS for Windows",
+  "author": "Aeso Technologies Inc.",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "web": "node ../../tools/build-app-web.js web --with-server",
+    "start": "npm run web && electron .",
+    "dist": "npm run web && electron-builder --win --x64 --publish never"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.11"
+  },
+  "devDependencies": {
+    "electron": "45.2.1",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "online.cleopos.desktop",
+    "productName": "Cleo POS",
+    "copyright": "Copyright © 2026 Aeso Technologies Inc.",
+    "artifactName": "Cleo-Setup.exe",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["main.js", "package.json", "web/**/*", "web/.htaccess"],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "../../assets/brand/cleo-icon-512.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Cleo POS",
+      "artifactName": "Cleo-Setup.exe"
+    },
+    "publish": [{ "provider": "github", "owner": "aeso-pro", "repo": "Cleo-v1.4", "releaseType": "release" }]
+  }
+}

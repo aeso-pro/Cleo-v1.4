@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node auth-onboarding.test.mjs && node --test --test-concurrency=1 operations.test.mjs transfers.test.mjs admin.test.mjs billing.test.mjs admin-controls.test.mjs",
+    "test": "node auth-onboarding.test.mjs && node --test --test-concurrency=1 operations.test.mjs transfers.test.mjs admin.test.mjs billing.test.mjs admin-controls.test.mjs plans.test.mjs",
     "test:auth": "node auth-onboarding.test.mjs",
     "test:operations": "node --test --test-concurrency=1 operations.test.mjs transfers.test.mjs",
     "test:admin": "node --test --test-concurrency=1 admin.test.mjs admin-controls.test.mjs",

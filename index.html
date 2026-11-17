@@ -1200,6 +1200,12 @@ a.plan-tab:active { transform: scale(.98); }
 
 
 /* ===================== licensing.css · Plan quotations, proposed feature comparison and licensing terms ===================== */
+/* a feature the plan doesn't include: a quiet lock in the navigation, and a short panel in place of the page */
+.nav-lock { margin-left: auto; font-size: 14px; color: var(--ink-3); }
+.plan-lock { display: grid; justify-items: center; gap: 10px; padding: 44px 24px; text-align: center; }
+.plan-lock h3 { font-size: 19px; font-weight: 600; margin: 4px 0 0; }
+.plan-lock p { max-width: 460px; color: var(--ink-2); margin: 0 0 8px; }
+.plan-lock-ic { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--wash, rgba(127,127,127,.12)); font-size: 22px; color: var(--ink-2); }
 /* Uses Cleo's existing glass materials, typography and controls. */
 
 /* ---------- a plan priced by quote (the Enterprise tab): the plan on the left, what it adds and how it works on the right ---------- */
@@ -2834,8 +2840,9 @@ body.is-terminal { overflow: hidden; background: #050506; }
 <!-- Editable pricing source. PHP amounts. Price/Annual cover the first terminal in
 one branch; Additional/Annual additional cover each extra terminal in that branch.
 Annual extras are twelve monthly fees, paid upfront. Branches limits connected
-branch management. A Price of 0 is the free plan: one terminal, no billing, and
-nothing that costs Cleo to run (no cloud sync, backup or remote support). Basic
+branch management. A Price of 0 is the free plan: one terminal, no billing, an
+account sign-in that keeps its data apart, and nothing that costs Cleo to run
+(no multi-terminal sync, backup or remote support). Basic
 terminals operate independently. Inclusions are proposed,
 not implementation claims. See source/licensing.js for the full feature matrix.
 Summary is the one sentence a plan card shows while its feature list is folded.
@@ -2853,7 +2860,7 @@ Run node source/build.js and node source/export-data.js after editing.
 - Terminals: 1
 - Branches: 1
 - Tagline: One counter, free for as long as you like
-- Summary: Sell, print receipts and close shifts on one terminal, with everything kept on that device.
+- Summary: Sell, print receipts and close shifts on one terminal, signed in to your own Cleo account.
 - Tab: quiet
 - Modes: Terminal
 
@@ -2864,7 +2871,7 @@ Run node source/build.js and node source/export-data.js after editing.
 - Refunds, voids and shifts for one cashier
 - Daily sales summary on the terminal
 - Data export to a file
-- Everything stays on the device: no cloud sync, backup or remote support
+- Your own account: sales and products kept apart from every other business (no backup or remote support)
 
 ## Basic
 
@@ -6029,7 +6036,8 @@ const Cleo = (() => {
    quote there and confirm provider payment before granting a subscription. */
 (() => {
   // each row: [id, label, the first tier that includes it]. Tiers: 0 Free, 1 Basic, 2 Pro, 3 Max (Enterprise has all).
-  // Free has only what runs on the one device at no cost to Cleo: no sync, backup or remote support.
+  // Free: one terminal, signed in to the business's own account (its data kept apart from every other business),
+  // with nothing that costs Cleo to run: no multi-terminal sync, backup or remote support.
   const groups = [
     ['Point of Sale', [
       ['checkout', 'Sales and checkout', 0], ['catalog', 'Product and category management', 0],
@@ -6091,6 +6099,67 @@ const Cleo = (() => {
   if (typeof Cleo === 'undefined') return;
   Cleo.licensing = api;
   const { $, $$, el, esc, fmt, store } = Cleo;
+
+  /* ---------- what the business's plan includes ----------
+     The server enforces the same matrix (cleo_features, migration 008): these only decide what the screens
+     offer, so nobody fills in a form the server will refuse. Before a business has a plan, nothing beyond Free. */
+  const tierName = (t) => ['Free', 'Basic', 'Pro', 'Max'][t] || 'Enterprise';
+  Cleo.plans.has = (feature, id) => includes(id || Cleo.api?.plan?.() || 'free', feature);
+  /** the first plan that includes a feature ("Pro"), and the feature's name */
+  Cleo.plans.from = (feature) => tierName(groups.flatMap(([, rows]) => rows).find(([id]) => id === feature)?.[2]);
+  Cleo.plans.featureName = (feature) => groups.flatMap(([, rows]) => rows).find(([id]) => id === feature)?.[1] || feature;
+  /** a locked feature, in place of its page: what it is, which plan opens it, and the way to the plans */
+  Cleo.plans.locked = (feature, detail = '') => `<div class="plan-lock" role="note"><span class="plan-lock-ic" aria-hidden="true"><i class="ph ph-lock-simple"></i></span>
+    <h3>${esc(Cleo.plans.featureName(feature))} ${/s$/.test(Cleo.plans.featureName(feature)) ? 'are' : 'is'} on the ${Cleo.plans.from(feature)} plan and up</h3>
+    <p>${esc(detail || `You're on ${Cleo.plans.current().name}. Upgrade any time; your data stays as it is.`)}</p>
+    <button class="btn btn-primary" type="button" data-see-plans>See plans</button></div>`;
+  // "See plans" anywhere opens the plan page (the launcher reloads into it, and Back returns here)
+  document.addEventListener('click', (e) => { if (e.target.closest?.('[data-see-plans]')) location.hash = '#/plans'; });
+
+  /* ---------- Add branch (Owner Dashboard and Back Office) ----------
+     Owners and head office only. Free, Basic and Pro are for one branch, so they see the way to Max instead
+     of a form; on Max the server checks the branches the subscription pays for (migration 008). */
+  const DEMO_ON = () => !!Cleo.env?.demo;
+  Cleo.canAddBranch = () => DEMO_ON() || /^(owner|hq)$/i.test(String(Cleo.session?.get()?.role || ''));
+  Cleo.branchMenuItem = () => (Cleo.canAddBranch()
+    ? `<div class="menu-sep" role="separator"></div><button class="menu-item" role="menuitem" data-add-branch><i class="ph ph-plus"></i><span class="grow">Add a branch<small>${Cleo.plans.current().branches === Infinity ? 'Its own terminals, stock and invoices' : `Max manages more than one`}</small></span></button>`
+    : '');
+  Cleo.addBranchDialog = () => {
+    const { overlay, btnState, toast } = Cleo;
+    const plan = Cleo.plans.current(), sub = Cleo.api.subscription();
+    if (plan.branches !== Infinity && Cleo.data.branches.length >= plan.branches) {
+      return overlay({ label: 'Add a branch', className: 'mid', html: `
+        <div class="dialog-head"><div><h2 class="sheet-title">More branches come with Max</h2><p>${esc(plan.name)} is for one branch. Max runs every branch from one place, with stock transfers and consolidated reports.</p></div><button class="icon-btn" data-close aria-label="Close"><i class="ph ph-x"></i></button></div>
+        <div class="sheet-foot"><span></span><button class="btn btn-primary btn-lg" type="button" data-see-plans>See plans</button></div>` });
+    }
+    const covered = !DEMO_ON() && sub?.branches ? ` Your ${esc(plan.name)} subscription covers ${sub.branches} branch${sub.branches === 1 ? '' : 'es'}; add more in Plan and billing.` : '';
+    const o = overlay({ label: 'Add a branch', className: 'mid', html: `
+      <div class="dialog-head"><div><h2 class="sheet-title">Add a branch</h2><p>It gets its own terminals, stock and BIR invoice series.${covered}</p></div><button class="icon-btn" data-close aria-label="Close"><i class="ph ph-x"></i></button></div>
+      <form novalidate data-branch-form style="display:grid;gap:18px">
+        <div class="field" data-f="br-n"><label for="br-n">Branch name</label><input id="br-n" class="input" maxlength="120" autocomplete="off" placeholder="Example: SM North" aria-describedby="br-n-err"><p class="err" id="br-n-err" role="alert"><i class="ph-fill ph-warning-circle"></i><span>Give the branch a name.</span></p></div>
+        <div class="field"><label for="br-c">City <span class="ink-3">(optional)</span></label><input id="br-c" class="input" maxlength="120" autocomplete="address-level2" placeholder="Example: Quezon City"></div>
+        <div class="field"><label for="br-a">Address <span class="ink-3">(optional)</span></label><input id="br-a" class="input" maxlength="300" autocomplete="street-address" placeholder="Street, building and unit"></div>
+        <p data-br-err role="alert" hidden style="margin:0;color:var(--bad);font-size:14px"></p>
+        <div class="sheet-foot" style="margin-top:4px"><span></span><button class="btn btn-primary btn-lg" type="submit" data-save><i class="ph ph-plus"></i>Add branch</button></div>
+      </form>` });
+    const nameIn = $('#br-n', o.panel), err = $('[data-br-err]', o.panel);
+    nameIn.addEventListener('input', () => { nameIn.closest('.field').classList.remove('invalid'); nameIn.removeAttribute('aria-invalid'); });
+    requestAnimationFrame(() => nameIn.focus());
+    $('[data-branch-form]', o.panel).addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const b = $('[data-save]', o.panel); if (b.dataset.state) return;
+      const name = nameIn.value.trim().replace(/\s+/g, ' ');
+      if (!name) { nameIn.closest('.field').classList.add('invalid'); nameIn.setAttribute('aria-invalid', 'true'); nameIn.focus(); return; }
+      err.hidden = true; btnState(b, 'loading');
+      const r = await Cleo.api.addBranch({ name, city: $('#br-c', o.panel).value.trim(), address: $('#br-a', o.panel).value.trim() });
+      if (!r?.ok) { btnState(b, null); err.textContent = r?.message || 'The branch wasn’t added. Try again.'; err.hidden = false; return; }
+      btnState(b, 'done'); await Cleo.wait(360); o.close();
+      toast({ title: `${name} added`, body: 'Register its terminals in the Terminal, on a device at that branch.', icon: 'storefront' });
+      document.dispatchEvent(new CustomEvent('cleo:branch-added', { detail: r.branch }));
+    });
+    return o;
+  };
+  document.addEventListener('click', (e) => { if (e.target.closest?.('[data-add-branch]')) Cleo.addBranchDialog(); });
   api.subscriptionQuote = () => {
     const sub = Cleo.api.subscription(), p = Cleo.plans.current();
     return p.price == null ? null : quote(p, sub?.terminals || 1, sub?.cycle || 'monthly', sub?.branches || 1);
@@ -6337,6 +6406,7 @@ const Cleo = (() => {
     ['resendVerification', 'async', 'auth', 'Send a new sign-up code.'],
     ['socialAuth', 'async', 'auth', 'Google sign-in or sign-up: { ok, isNew, account }.'],
     ['createBusiness', 'async', 'onboarding', 'Create the business, its first branch and the owner role for a new account.'],
+    ['addBranch', 'async', 'onboarding', 'Add a branch ({ name, city, address }) as the owner or head office: { ok, branch }. The plan decides how many (Max: as many as its subscription covers).'],
     ['acceptLegal', 'async', 'auth', 'Record which version of the Terms and Privacy Policy the account accepted.'],
     ['verifyCode', 'async', 'auth', 'The two-step sign-in code (TOTP).'],
     ['verifyBackupCode', 'async', 'auth', 'A one-time backup code instead of the TOTP code.'],
@@ -6351,6 +6421,9 @@ const Cleo = (() => {
     ['unregisterTerminal', 'sync', 'terminal', 'Forget this device’s registration (the server frees the slot through an authenticated call).'],
     ['checkPin', 'async', 'terminal', 'Verify a staff PIN for this terminal: { ok } with failures counted by the server or the device’s secure store.'],
     ['clock', 'async', 'terminal', 'Clock a staff member in or out; returns the attendance record.'],
+    ['addStaff', 'async', 'terminal', 'Add someone who signs in to the Terminal with a 4-digit PIN ({ branch, name, role, pin, color }): { ok, user }. The plan limits how many (Free: one cashier).'],
+    ['setStaffPin', 'async', 'terminal', 'Give a staff member a new PIN ({ id, pin }); the old one stops working at once: { ok }.'],
+    ['removeStaff', 'async', 'terminal', 'Remove a staff member; their PIN stops working: { ok }.'],
     // sales and payments (SYS-01, SYS-02, PAY-*)
     ['uploadSale', 'async', 'sales', 'Upload one issued sale document. Must be idempotent per (terminal, series, number); the server recomputes totals.'],
     ['createQrIntent', 'async', 'payments', 'A dynamic QR Ph payment intent from the gateway; confirmation arrives by webhook, never by the client.'],
@@ -6400,7 +6473,7 @@ const Cleo = (() => {
     ['add', 'async', 'catalog', 'Add a product.'],
     ['saveMany', 'async', 'catalog', 'Change several products at once.'],
     ['remove', 'async', 'catalog', 'Archive products (invoices still name them).'],
-    ['apply', 'async', 'catalog', 'One Catalog › Edit session: new, changed and removed products in one call.'],
+    ['apply', 'async', 'catalog', 'One Catalog › Edit session: new, changed and removed products in one call ({ add, change, remove }, and optional new { categories }).'],
   ];
   const ITEMS = [
     ['list', 'sync', 'inventory', 'Active stock items (archived ones left out).'],
@@ -7192,6 +7265,8 @@ const Charts = (() => {
     mag: { cogs: 0.334, ticket: 162, mix: [0.53, 0.36, 0.08, 0.03] },
     ceb: { cogs: 0.312, ticket: 176, mix: [0.43, 0.39, 0.13, 0.05] },
   };
+  // a branch added in the demo (Add branch) trades like a small new store
+  for (const b of B) RATES[b.id] ||= { cogs: 0.32, ticket: 180, mix: [0.4, 0.37, 0.17, 0.06] };
   const EXP = [
     { id: 'sal', name: 'Salaries and wages', r: 0.214 },
     { id: 'rent', name: 'Rent', r: 0.108 },
@@ -7209,7 +7284,7 @@ const Charts = (() => {
   function dayNet(bid, ago) {
     const b = B.find((x) => x.id === bid), d = dayInfo(ago);
     const r = rng(bid + d.key)();
-    return BASE * b.w * F.weekdayW[d.weekday] * (0.9 + r * 0.2);
+    return BASE * (b?.w ?? 0.3) * F.weekdayW[d.weekday] * (0.9 + r * 0.2);
   }
   function progress() {
     const m = Cleo.manila(); const h = m.hour + m.minute / 60;
@@ -7437,6 +7512,8 @@ const Charts = (() => {
     terminals: () => F.terminals,
     'product-patches': () => [],
     'item-patches': () => [],
+    // branches added in this browser with Add branch
+    'branch-adds': () => [],
     // the electronic journal (Cleo.bir): a copy of every document every terminal printed, in order
     ejournal: () => Cleo.demo.journal(),
     approvals: () => F.seeds.approvals(),
@@ -7519,6 +7596,37 @@ const Charts = (() => {
     unregisterTerminal() { store.remove('t-device'); },
     async checkPin({ pin }) { await wait(140); return { ok: pin !== '0000' }; },
     async clock({ who, name, b, kind }) { await latency(500); return Cleo.db.put('attendance', { id: uid('at'), who, name, b, kind, at: Cleo.now().getTime() }); },
+    // the same rules as the server (migration 008): the plan decides how many branches and staff
+    async addBranch({ name, city = '', address = '' } = {}) {
+      await latency(700);
+      const plan = Cleo.plans.current(), n = String(name || '').trim().replace(/\s+/g, ' ');
+      if (plan.branches !== Infinity && data().branches.length >= plan.branches) return { ok: false, code: 'forbidden', message: `The ${plan.name} plan is for one branch. Upgrade to Max in Plan and billing to add more.` };
+      if (!n || n.length > 120) return { ok: false, code: 'validation', message: 'Give the branch a name of up to 120 characters.' };
+      if (data().branches.some((b) => b.name.toLowerCase() === n.toLowerCase())) return { ok: false, code: 'conflict', message: 'You already have a branch with that name.' };
+      const b = { id: uid('b'), bcode: `B${data().branches.length + 1}`, name: n, short: n, area: String(city).trim(), city: String(city).trim(), addr: String(address).trim(), terminals: 0, online: 0, manager: '', w: 0.3 };
+      Cleo.db.put('branch-adds', b);
+      Cleo.data.load({ branches: [...data().branches, b] });
+      ownerModel = null;   // the sample analytics rebuild with the new branch in them
+      return { ok: true, branch: b };
+    },
+    async addStaff({ branch, name, role = 'cashier', pin, color = '#45454b' } = {}) {
+      await latency(650);
+      const plan = Cleo.plans.current(), n = String(name || '').trim().replace(/\s+/g, ' ');
+      const staff = Cleo.db.list('users').filter((u) => u.pin && u.status === 'active');
+      if (plan.price === 0 && staff.length >= 1) return { ok: false, code: 'forbidden', message: 'The Free plan is for one cashier. Upgrade to Basic in Plan and billing for any number of staff.' };
+      if (!n) return { ok: false, code: 'validation', message: 'Enter their name.' };
+      if (!/^\d{4}$/.test(String(pin || '')) || pin === '0000') return { ok: false, code: 'validation', message: 'Use a 4-digit PIN, but not 0000.' };
+      const label = { cashier: 'Cashier', kitchen: 'Server', manager: 'Branch Manager' }[role] || 'Cashier';
+      const user = Cleo.db.put('users', { id: `u-t${Date.now().toString(36)}`, name: n, initials: n.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase(), color, email: '', mobile: '', role: label, roles: { [branch]: role }, status: 'active', last: 'Added on this terminal', pin: true, twoFactor: false });
+      return { ok: true, user };
+    },
+    async setStaffPin({ id, pin } = {}) {
+      await latency(500);
+      if (!/^\d{4}$/.test(String(pin || '')) || pin === '0000') return { ok: false, code: 'validation', message: 'Use a 4-digit PIN, but not 0000.' };
+      Cleo.db.put('users', { id, pin: true, pinChangedAt: Date.now() });
+      return { ok: true };
+    },
+    async removeStaff(id) { await latency(500); Cleo.db.remove('users', id); return { ok: true }; },
 
     async uploadSale(sale) {
       await latency(450);
@@ -7599,7 +7707,7 @@ const Charts = (() => {
     async changePlan({ plan }) { await latency(1100); store.set('plan', plan); return { ok: true }; },
     // the plan ID (content/plans.md). NOTE: IDs saved before the rename (starter, growth) map to basic and pro.
     plan() {
-      const saved = store.get('plan', 'pro'); const id = { starter: 'basic', growth: 'pro' }[saved] || saved;
+      const saved = store.get('plan', 'max'); const id = { starter: 'basic', growth: 'pro' }[saved] || saved;
       return Cleo.plans.get(id) ? id : (Cleo.plans.get('pro') || Cleo.plans.list()[0]).id;
     },
     billingMethod() { return store.get('billing-method', { kind: 'card', label: 'Visa ending 4417', sub: 'Expires 08/28 · Maricel Dizon' }); },
@@ -7678,7 +7786,7 @@ const Charts = (() => {
     daily: (name) => DAILY.has(name),
     collections: Object.keys(SEEDS),
     // the sample business for Cleo.data (data.js)
-    snapshot: () => ({ biz: F.biz, branches: F.branches, cashiers: F.cashiers, people: F.people, categories: F.categories, products: F.products, modifiers: F.modifiers, ingredients: F.ingredients, peripherals: F.peripherals, STATIONS: F.STATIONS, EXP_CATS: F.EXP_CATS }),
+    snapshot: () => ({ biz: F.biz, branches: [...F.branches, ...(Cleo.db?.list('branch-adds') || [])], cashiers: F.cashiers, people: F.people, categories: F.categories, products: F.products, modifiers: F.modifiers, ingredients: F.ingredients, peripherals: F.peripherals, STATIONS: F.STATIONS, EXP_CATS: F.EXP_CATS }),
     // called once Cleo.db exists: stock item edits saved in this browser apply to the shared item objects
     started() { applyItemPatches(); },
     api, catalog, items, reports,
@@ -7816,6 +7924,7 @@ const Charts = (() => {
   function clearState() {
     state.session = null; state.snapshot = null; state.plan = null; state.subscription = null;
     state.billingMethod = null; state.invoices = []; state.transfers = []; state.audit = []; state.salesRequest = null;
+    state.businessId = null; state.entitlement = null;
     authState.account = null; authState.twoFactor = false; authState.recovery = false; authState.redirecting = false; authState.intent = null; authState.agreed = null;
     factorId = null; store.tab?.remove('auth-recovery'); store.remove('auth-keep');
   }
@@ -7835,6 +7944,16 @@ const Charts = (() => {
     });
     return sb;
   }
+  /* the Android app (apps/android): Google sign-in opens in the phone's browser and comes back through the
+     app's own link, which apps/android/configure-android.js registers. The app then opens its own page with
+     the one-time code, and the sign-in finishes as it does on the web (the PKCE key never left the app). */
+  const ANDROID_RETURN = 'online.cleopos.app://auth-callback';
+  const inAndroidApp = () => !!window.Capacitor?.isNativePlatform?.() && window.Capacitor.getPlatform?.() === 'android';
+  if (inAndroidApp()) window.Capacitor.Plugins?.App?.addListener?.('appUrlOpen', ({ url } = {}) => {
+    if (!String(url || '').startsWith(ANDROID_RETURN)) return;
+    const back = new URL(url);
+    location.replace(`${location.origin}/index.html${back.search}${back.hash}`);
+  });
   function redirectUrl(kind) {
     const url = new URL('index.html', location.href);
     url.search = kind === 'recovery' ? '?auth=recovery' : '';
@@ -8023,6 +8142,10 @@ const Charts = (() => {
       if (!snapshot?.data || typeof snapshot.data !== 'object') throw new CleoError('unavailable');
       state.snapshot = snapshot; state.plan = snapshot.plan || null; state.subscription = snapshot.subscription || null;
       state.billingMethod = snapshot.billingMethod || null; state.invoices = Array.isArray(snapshot.invoices) ? snapshot.invoices : [];
+      // the business this account works in: device-held records (the electronic journal, this terminal's
+      // registration) are kept per business, so two accounts on one device never see each other's
+      state.businessId = typeof snapshot.businessId === 'string' ? snapshot.businessId : null;
+      state.entitlement = snapshot.entitlement || null;
       return snapshot;
     },
     async signOut() {
@@ -8065,7 +8188,7 @@ const Charts = (() => {
       remember(keep); store.tab?.set('auth-intent', wanted);
       // Kept for a few minutes where another tab can read it: the provider may come back in a new one.
       store.set('auth-pending', { provider, intent: wanted, agreed: String(agreed || ''), route: location.hash, at: Date.now() });
-      const options = { redirectTo: redirectUrl() };
+      const options = { redirectTo: inAndroidApp() ? ANDROID_RETURN : redirectUrl() };
       const data = await request(c.auth.signInWithOAuth({ provider, options }), 'socialAuth');
       if (!data?.url) { store.remove('auth-pending'); throw new CleoError('unavailable', 'The sign-in page couldn’t be opened. Check your connection and try again.'); }
       authState.redirecting = true;
@@ -8078,6 +8201,12 @@ const Charts = (() => {
       if (!account.businessId || account.needsBusiness) throw new CleoError('unavailable');
       authState.account = account;
       return { ok: true, account, business: context.business };
+    },
+    async addBranch({ name, city = '', address = '' } = {}) {
+      await requireUser({ strong: true });
+      const branch = await request(client().rpc('cleo_add_branch', { p_name: String(name || ''), p_city: String(city || ''), p_address: String(address || '') }), 'addBranch');
+      Cleo.data.load({ branches: [...Cleo.data.branches, branch] });
+      return { ok: true, branch };
     },
     async acceptLegal({ version, method = 'email' } = {}) {
       await requireUser({ strong: true });
@@ -8135,18 +8264,68 @@ const Charts = (() => {
     },
     newBackupCodes: pending('newBackupCodes'),
     signOutDevice: pending('signOutDevice'),
-    /* terminals: registration is kept on the device after the server confirms it (Edge Function issues a device credential) */
-    // A browser-held terminal label is not a credential. Registration must be
-    // verified with its server-issued device credential before PIN-only entry.
-    device() { return null; },
-    registerTerminal: pending('registerTerminal'),
-    unregisterTerminal() { store.remove('t-device'); },
-    // Suggested: client().rpc('verify_pin', { p_terminal, p_user, p_pin }); the function counts failures and locks.
-    checkPin: pending('checkPin'),
-    clock: pending('clock'),
+    /* terminals: the server keeps which numbers are registered (cleo_terminals, migration 008), and the plan
+       decides how many. This device remembers which one it is, for the business signed in on it.
+       NOTE: the label held here is not a credential. The Terminal still needs the business's account signed
+       in (Cleo.session); a registration only skips choosing the branch and number again. */
+    device() {
+      const d = store.get('t-device', null);
+      return d && state.businessId && d.business === state.businessId && Cleo.data.branches.some((b) => b.id === d.branch) ? d : null;
+    },
+    async registerTerminal({ branch, term } = {}) {
+      await requireUser({ strong: true });
+      const r = await request(client().rpc('cleo_register_terminal', { p_branch: branch, p_number: term }), 'registerTerminal');
+      store.set('t-device', { branch, term, at: r?.at || Date.now(), business: state.businessId });
+      Cleo.db.put('terminals', { id: `${branch}-t${term}`, b: branch, t: term, at: r?.at || Date.now() });
+      const b = Cleo.data.branches.find((x) => x.id === branch);
+      if (b) Cleo.data.load({ branches: Cleo.data.branches.map((x) => (x.id === branch ? { ...x, terminals: Math.max(x.terminals || 0, term) } : x)) });
+      return { ok: true };
+    },
+    unregisterTerminal() {
+      const d = store.get('t-device', null);
+      store.remove('t-device');
+      if (d?.branch && d.business === state.businessId) client().rpc('cleo_unregister_terminal', { p_branch: d.branch, p_number: d.term }).then(() => {}, () => {});
+    },
+    /* staff PINs are checked by the server (salted hashes there, never here); three wrong PINs lock that
+       person for five minutes on every terminal: { ok } or { ok: false, code: wrong_pin | locked, left, until } */
+    async checkPin({ userId, pin } = {}) {
+      const r = await request(client().rpc('cleo_check_pin', { p_staff: String(userId || '').replace(/^u-/, ''), p_pin: String(pin || '') }), 'checkPin');
+      return r?.ok ? r : { ok: false, code: r?.code || 'wrong_pin', left: r?.left ?? null, until: r?.until || null, message: r?.message || '' };
+    },
+    async clock({ who, kind } = {}) {
+      const row = await request(client().rpc('cleo_clock', { p_staff: String(who || '').replace(/^u-/, ''), p_kind: kind }), 'clock');
+      return Cleo.db.put('attendance', row);
+    },
+    async addStaff({ branch, name, role = 'cashier', pin, color } = {}) {
+      await requireUser({ strong: true });
+      const user = await request(client().rpc('cleo_add_staff', { p_branch: branch, p_name: String(name || ''), p_role: role, p_pin: String(pin || ''), p_color: color || null }), 'addStaff');
+      Cleo.db.put('users', user);
+      Cleo.data.load({ cashiers: [...Cleo.data.cashiers, { id: user.staffId, name: user.name, initials: user.initials, role: user.role, branch, color: user.color }] });
+      return { ok: true, user };
+    },
+    async setStaffPin({ id, pin } = {}) {
+      await requireUser({ strong: true });
+      const user = await request(client().rpc('cleo_set_staff_pin', { p_staff: String(id || '').replace(/^u-/, ''), p_pin: String(pin || '') }), 'setStaffPin');
+      Cleo.db.put('users', user);
+      return { ok: true };
+    },
+    async removeStaff(id) {
+      await requireUser({ strong: true });
+      const staffId = String(id || '').replace(/^u-/, '');
+      await request(client().rpc('cleo_remove_staff', { p_staff: staffId }), 'removeStaff');
+      Cleo.db.remove('users', `u-${staffId}`);
+      Cleo.data.load({ cashiers: Cleo.data.cashiers.filter((c) => c.id !== staffId) });
+      return { ok: true };
+    },
 
-    /* sales: client().rpc('issue_document', { ... }) keyed by (terminal, series, number) so a retry is safe */
-    uploadSale: pending('uploadSale'),
+    /* sales: the summary of each issued sale, once per (branch, terminal, invoice), so a retry from the
+       Terminal's outbox is harmless. The full invoice stays in this device's electronic journal (BIR). */
+    async uploadSale(sale = {}) {
+      const body = { ...sale, inv: String(sale.inv ?? ''), items: Array.isArray(sale.items) ? sale.items.map((x) => String(x).slice(0, 120)) : [] };
+      await request(client().rpc('cleo_upload_sale', { p_sale: body }), 'uploadSale');
+      Cleo.bus.emit('sale.created', { b: sale.b, t: sale.t, who: sale.who, amt: sale.total, items: sale.items, method: sale.method, inv: sale.inv, type: 'sale' });
+      return { ok: true };
+    },
     createQrIntent: pending('createQrIntent'),
     createTickets: pending('createTickets'),
     updateTicket: pending('updateTicket'),
@@ -8165,8 +8344,11 @@ const Charts = (() => {
 
     /* shared records: generic writes; prefer a specific RPC where the server must validate */
     save: pending('save'),
-    // Suggested: client().rpc('update_business_setting', { p_path: path, p_value: value }); writes audit_log in the same transaction
-    saveSettings: pending('saveSettings'),
+    // one changed setting at a time (cleo_save_setting, migrations 003 and 008); the server writes the audit entry
+    async saveSettings({ path, value } = {}) {
+      const r = await request(client().rpc('cleo_save_setting', { p_path: String(path || ''), p_value: value === undefined ? null : value, p_expected_version: null }), 'saveSettings');
+      return { ok: true, version: r?.version };
+    },
     resendInvite: pending('resendInvite'),
     emailDocument: pending('emailDocument'),
     remove: pending('remove'),
@@ -8213,8 +8395,44 @@ const Charts = (() => {
 
   // the catalog and stock items come from bootstrap (Cleo.data) and stay current through realtime updates
   const onData = (fn) => { const h = () => fn({ remote: true }); document.addEventListener('cleo:data', h); return () => document.removeEventListener('cleo:data', h); };
-  const catalog = { list: () => Cleo.data.products.filter((p) => !p.archived), on: onData, save: pending('catalog.save'), add: pending('catalog.add'), saveMany: pending('catalog.saveMany'), remove: pending('catalog.remove'), apply: pending('catalog.apply') };
-  const items = { list: () => Cleo.data.ingredients.filter((x) => !x.archived), on: onData, apply: pending('items.apply') };
+  /* catalog and stock item edits go to the server in one batch (cleo_apply_records), which checks every field,
+     the plan (Free: up to 100 products; stock items from Basic) and each record's version, then answers with
+     the business's current records. Fields the server doesn't keep are left out. */
+  const FIELDS = {
+    products: ['name', 'sku', 'cat', 'price', 'cost', 'station', 'barcode', 'sizes', 'variants', 'branchPrice', 'branchOff', 'mods', 'recipe', 'taxType', 'available'],
+    ingredients: ['name', 'unit', 'grp', 'rp', 'supplier', 'exp'],
+    categories: ['name', 'icon'],
+  };
+  const newId = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  async function applyRecords(kind, list, { add = [], change = [], remove = [] } = {}) {
+    await requireUser({ strong: true });
+    const pick = (o) => Object.fromEntries(Object.entries(o || {}).filter(([k, v]) => FIELDS[kind].includes(k) && v !== undefined && v !== null));
+    const version = (id) => list.find((x) => x.id === id)?._version;
+    const upserts = [
+      ...add.map((o) => ({ id: String(o.id || newId(kind === 'products' ? 'p' : 'i')), ...pick(o) })),
+      ...change.map((o) => ({ id: String(o.id), _version: version(o.id), ...pick(o) })),
+    ];
+    const archive = remove.map((id) => ({ id: String(id), _version: version(id) }));
+    const rows = await request(client().rpc('cleo_apply_records', { p_kind: kind, p_upserts: upserts, p_archive: archive }), `${kind}.apply`);
+    // stock items keep their on-hand quantities and costs, which come from stock movements, not from this call
+    const merged = kind === 'ingredients' ? rows.map((r) => ({ oh: {}, cost: 0, ...(list.find((x) => x.id === r.id) || {}), ...r })) : rows;
+    Cleo.data.load({ [kind]: merged });
+    return { ok: true };
+  }
+  const catalog = {
+    list: () => Cleo.data.products.filter((p) => !p.archived), on: onData,
+    save: (id, fields) => applyRecords('products', Cleo.data.products, { change: [{ ...fields, id }] }),
+    add: (p) => applyRecords('products', Cleo.data.products, { add: [p] }),
+    saveMany: (list) => applyRecords('products', Cleo.data.products, { change: list }),
+    remove: (ids) => applyRecords('products', Cleo.data.products, { remove: ids }),
+    // a batch may bring new categories (made in the Terminal's item sheet): they are saved first
+    async apply(batch = {}) {
+      const cats = (batch.categories || []).filter((c) => c?.id && !Cleo.data.categories.some((x) => x.id === c.id));
+      if (cats.length) await applyRecords('categories', Cleo.data.categories, { add: cats });
+      return applyRecords('products', Cleo.data.products, batch);
+    },
+  };
+  const items = { list: () => Cleo.data.ingredients.filter((x) => !x.archived), on: onData, apply: (batch) => applyRecords('ingredients', Cleo.data.ingredients, batch) };
   /* reports: the Owner Dashboard's figures. Until report RPCs or views exist, owner() is null and the
      dashboard shows that reports are not connected. See the guide for the shapes each view needs. */
   const reports = { owner: () => null, prepare: pending('reports.prepare') };
@@ -8227,6 +8445,8 @@ const Charts = (() => {
       seed: () => [],
       client,
       state, authState,
+      // the business signed in on this device (device-held records are kept under it), or null before load
+      scope: () => state.businessId,
       api, catalog, items, reports,
     },
   });
@@ -8277,7 +8497,7 @@ const Charts = (() => {
 
   /* ---------- operations, checked against the contract ---------- */
   // operations whose screens read a { ok, message } result instead of catching an error
-  const RESULT_OPS = new Set(['ready', 'signIn', 'signUp', 'verifyEmail', 'resendVerification', 'socialAuth', 'createBusiness', 'acceptLegal', 'verifyCode', 'verifyBackupCode', 'requestPasswordReset', 'resetPassword', 'changePassword', 'signOutDevice', 'registerTerminal', 'changePlan', 'linkWallet', 'addCard', 'subscribe', 'requestSalesCall', 'connectPlatform', 'decideApproval']);
+  const RESULT_OPS = new Set(['ready', 'signIn', 'signUp', 'verifyEmail', 'resendVerification', 'socialAuth', 'createBusiness', 'acceptLegal', 'verifyCode', 'verifyBackupCode', 'requestPasswordReset', 'resetPassword', 'changePassword', 'signOutDevice', 'registerTerminal', 'changePlan', 'linkWallet', 'addCard', 'subscribe', 'requestSalesCall', 'connectPlatform', 'decideApproval', 'addBranch', 'addStaff', 'setStaffPin', 'removeStaff']);
   function bind(section, impl, prefix = '') {
     const out = {};
     for (const op of section) {
@@ -8319,19 +8539,22 @@ const Charts = (() => {
   const db = (() => {
     const cache = Object.create(null);
     const keep = (n) => adapter.persist || DEVICE_OWN.has(n);
+    // device-held records live under the business signed in here (real backend), so accounts sharing a device stay apart
+    const scope = () => (adapter.scope?.() ? `${adapter.scope()}:` : '');
+    const dbKey = (n) => `db:${scope()}${n}`;
     const assertName = (n) => { if (!COLLECTIONS.has(n)) throw new TypeError('Unknown record collection.'); };
     const emit = (name, remote) => document.dispatchEvent(new CustomEvent('cleo:db', { detail: { name, remote } }));
     function load(n) {
       assertName(n);
       if (cache[n]) return cache[n];
-      const saved = keep(n) ? store.get('db:' + n, null) : null;
+      const saved = keep(n) ? store.get(dbKey(n), null) : null;
       const fresh = !saved || !Array.isArray(saved.rows) || (adapter.daily?.(n) && saved.day !== today());
       cache[n] = fresh ? adapter.seed(n) : saved.rows;
-      if (fresh && keep(n)) store.set('db:' + n, { day: today(), rows: cache[n] });
+      if (fresh && keep(n)) store.set(dbKey(n), { day: today(), rows: cache[n] });
       return cache[n];
     }
     const commit = (n, rows, remote = false) => {
-      if (keep(n) && store.set('db:' + n, { day: today(), rows }) === false) throw new Cleo.errors.CleoError('unknown', 'Changes could not be saved on this device. Free storage and try again.');
+      if (keep(n) && store.set(dbKey(n), { day: today(), rows }) === false) throw new Cleo.errors.CleoError('unknown', 'Changes could not be saved on this device. Free storage and try again.');
       cache[n] = rows; emit(n, remote);
     };
     function putMany(n, records) {
@@ -8346,13 +8569,15 @@ const Charts = (() => {
       commit(n, rows); return saved;
     }
     const prefix = store.key('db:');
-    addEventListener('storage', (e) => { if (!e.key?.startsWith(prefix)) return; const n = e.key.slice(prefix.length); delete cache[n]; emit(n, true); });
+    addEventListener('storage', (e) => { if (!e.key?.startsWith(prefix + scope())) return; const n = e.key.slice((prefix + scope()).length); if (!COLLECTIONS.has(n)) return; delete cache[n]; emit(n, true); });
     return {
       list: (n) => load(n),
       get: (n, id) => load(n).find((r) => r.id === id),
       put: (n, rec) => putMany(n, [rec])[0],
       putMany,
       remove(n, id) { commit(n, load(n).filter((r) => r.id !== id)); },
+      /** after the business loads: device-held collections read again, from that business's own keys */
+      rescope() { Object.keys(cache).filter(keep).forEach((n) => delete cache[n]); },
       /** BACKEND: replace a collection with the server's rows (bootstrap, a refetch, or a realtime update) */
       hydrate(n, rows) { assertName(n); commit(n, clone(Array.isArray(rows) ? rows : []), true); },
       on(n, fn) { const h = (e) => { if (e.detail.name === n) fn(e.detail); }; document.addEventListener('cleo:db', h); return () => document.removeEventListener('cleo:db', h); },
@@ -8534,6 +8759,7 @@ const Charts = (() => {
     async load() {
       if (loaded) return { ok: true };
       const snapshot = await api.bootstrap();
+      db.rescope();
       if (snapshot?.data) Cleo.data.load(snapshot.data);
       if (snapshot?.config) Cleo.config.hydrate(snapshot.config);
       for (const [n, rows] of Object.entries(snapshot?.collections || {})) db.hydrate(n, rows);
@@ -9060,7 +9286,7 @@ Cleo.bir = (() => {
 
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: 'squares-four' },
-    { id: 'branches', label: 'Branches', icon: 'storefront' },
+    { id: 'branches', label: 'Branches', icon: 'storefront', plan: 'consolidation' },
     { id: 'live', label: 'Live monitor', icon: 'pulse', count: () => pending().length || null },
     { id: 'pnl', label: 'Profit and loss', icon: 'chart-line-up' },
     { id: 'alerts', label: 'Alerts', icon: 'bell-ringing', count: () => liveAlerts().filter((a) => !ack.has(a.id) && (a.sev === 'bad' || a.sev === 'serious')).length || null },
@@ -9120,7 +9346,7 @@ Cleo.bir = (() => {
 
   /* ---------------- shell ---------------- */
   function navHTML() {
-    return NAV.map((n) => n.sep ? `<p class="nav-label">${esc(n.sep)}</p>` : `<a href="#/owner/${n.id}" data-nav="${n.id}" ${state.view === n.id ? 'aria-current="page"' : ''}><i class="ph${state.view === n.id ? '-fill' : ''} ph-${n.icon}"></i><span>${esc(n.label)}</span>${n.soon ? `<span class="soon">${n.soon}</span>` : n.count && n.count() ? `<span class="count">${n.count()}</span>` : ''}</a>`).join('');
+    return NAV.map((n) => n.sep ? `<p class="nav-label">${esc(n.sep)}</p>` : `<a href="#/owner/${n.id}" data-nav="${n.id}" ${state.view === n.id ? 'aria-current="page"' : ''}><i class="ph${state.view === n.id ? '-fill' : ''} ph-${n.icon}"></i><span>${esc(n.label)}</span>${n.plan && !Cleo.plans.has(n.plan) ? `<i class="ph ph-lock-simple nav-lock" aria-hidden="true" title="On the ${Cleo.plans.from(n.plan)} plan"></i>` : ''}${n.soon ? `<span class="soon">${n.soon}</span>` : n.count && n.count() ? `<span class="count">${n.count()}</span>` : ''}</a>`).join('');
   }
   function buildShell() {
     const node = el(`
@@ -9192,9 +9418,11 @@ Cleo.bir = (() => {
     popover(btn, `
       <div style="padding:8px 10px 6px" class="t-cap">Show data for</div>
       ${[{ id: 'all', name: 'All branches', sub: `${B.length} branches combined` }, ...B.map((b) => ({ id: b.id, name: b.name, sub: b.area }))].map((o) => `
-        <button class="menu-item" role="menuitemradio" aria-checked="${state.scope === o.id}" data-sc="${o.id}"><i class="ph ph-${o.id === 'all' ? 'stack' : 'storefront'}"></i><span class="grow">${esc(o.name)}<small>${esc(o.sub)}</small></span><i class="ph-bold ph-check check-i"></i></button>`).join('')}`,
-    { width: 300, onOpen: (p, close) => $$('[data-sc]', p).forEach((b) => b.addEventListener('click', () => { close(); setScope(b.dataset.sc); })) });
+        <button class="menu-item" role="menuitemradio" aria-checked="${state.scope === o.id}" data-sc="${o.id}"><i class="ph ph-${o.id === 'all' ? 'stack' : 'storefront'}"></i><span class="grow">${esc(o.name)}<small>${esc(o.sub)}</small></span><i class="ph-bold ph-check check-i"></i></button>`).join('')}${Cleo.branchMenuItem()}`,
+    { width: 300, onOpen: (p, close) => { $('[data-add-branch]', p)?.addEventListener('click', close); $$('[data-sc]', p).forEach((b) => b.addEventListener('click', () => { close(); setScope(b.dataset.sc); })); } });
   }
+  // a branch added here (or in the Back Office, in another tab) shows at once
+  document.addEventListener('cleo:branch-added', () => { if (shellEl?.isConnected) renderView(false, true); });
   function setScope(id) {
     if (id !== 'all' && !B.some((b) => b.id === id)) return;
     if (state.scope === id) return;
@@ -9262,7 +9490,9 @@ Cleo.bir = (() => {
     refreshNav();
     Charts.hideTip();
     const v = state.view;
-    const build = !M && REPORT_VIEWS.has(v) ? () => el(`<div><div class="page-head"><div><h2 class="t-title">${esc(TITLES[v])}</h2><p>${esc(scopeName())}</p></div></div><section class="panel glass-thick">${reportsOff('Sales, profit and stock figures')}</section></div>`) : VIEWS[v] || VIEWS.dashboard;
+    // a view the plan doesn't include shows what it is and the way to the plans (the server refuses it anyway)
+    const feature = NAV.find((n) => n.id === v)?.plan;
+    const build = feature && !Cleo.plans.has(feature) ? () => el(`<div><div class="page-head"><div><h2 class="t-title">${esc(TITLES[v])}</h2><p>${esc(scopeName())}</p></div></div><section class="panel glass-thick">${Cleo.plans.locked(feature, 'Max compares every branch side by side and adds them up. Branches you add on Max appear here.')}</section></div>`) : !M && REPORT_VIEWS.has(v) ? () => el(`<div><div class="page-head"><div><h2 class="t-title">${esc(TITLES[v])}</h2><p>${esc(scopeName())}</p></div>${v === 'branches' && Cleo.canAddBranch() ? '<div class="filters"><button class="btn btn-primary" type="button" data-add-branch><i class="ph ph-plus"></i>Add branch</button></div>' : ''}</div><section class="panel glass-thick">${reportsOff('Sales, profit and stock figures')}</section></div>`) : VIEWS[v] || VIEWS.dashboard;
     if (refetch) {
       pageEl.replaceChildren(build()); Cleo.watchTitle($('.topbar', shellEl), pageEl); return;
     }
@@ -9525,7 +9755,7 @@ Cleo.bir = (() => {
       ['Terminals online', B.map((b) => b.online / b.terminals), (v, i) => `${B[i].online} of ${B[i].terminals}`, false],
     ];
     const node = el(`<div>
-      <div class="page-head"><div><h2 class="t-title">Compare branches</h2><p>Every branch side by side · ${periodName()}</p></div><div class="filters">${periodFilter()}</div></div>
+      <div class="page-head"><div><h2 class="t-title">Compare branches</h2><p>Every branch side by side · ${periodName()}</p></div><div class="filters">${periodFilter()}${Cleo.canAddBranch() ? '<button class="btn btn-primary" type="button" data-add-branch><i class="ph ph-plus"></i>Add branch</button>' : ''}</div></div>
       <div class="grid g-12">
         <section class="span-12 panel glass-thick">
           <div class="panel-head"><div><h2>Ranking</h2><p>Pick the figure to rank by</p></div>
@@ -10229,7 +10459,7 @@ Cleo.bir = (() => {
     { id: 'overview', label: 'Overview', icon: 'house-simple' },
     { id: 'catalog', label: 'Catalog', icon: 'book-open-text' },
     { id: 'inventory', label: 'Inventory', icon: 'package', count: () => INGR.filter((x) => scopeIds().some((b) => x.oh[b] < x.rp)).length },
-    { id: 'transfers', label: 'Stock transfers', icon: 'truck', count: () => TRANSFERS().filter((t) => t.step === 0 && !t.rejected).length || null, when: () => Cleo.config.get('features.transfers') },
+    { id: 'transfers', label: 'Stock transfers', icon: 'truck', plan: 'transfers', count: () => TRANSFERS().filter((t) => t.step === 0 && !t.rejected).length || null, when: () => Cleo.config.get('features.transfers') },
     { id: 'bir', label: 'BIR and reports', icon: 'receipt' },
     { id: 'audit', label: 'Audit trail', icon: 'clock-counter-clockwise' },
     { sep: 'More' },
@@ -10286,7 +10516,7 @@ Cleo.bir = (() => {
   /* ---------------- shell ---------------- */
   const roleLabel = () => (state.scope === 'all' ? (DEMO ? me().role : ROLE_LABEL[roleAt('all')] || me().role) : branchRole(state.scope));
   function navHTML() {
-    return NAV.filter((n) => n.sep || navOn(n.id)).map((n) => n.sep ? `<p class="nav-label">${esc(n.sep)}</p>` : `<a href="#/backoffice/${n.id}" data-nav="${n.id}" ${state.view === n.id ? 'aria-current="page"' : ''}><i class="ph${state.view === n.id ? '-fill' : ''} ph-${n.icon}"></i><span>${esc(n.label)}</span>${n.count && n.count() ? `<span class="count">${n.count()}</span>` : ''}</a>`).join('');
+    return NAV.filter((n) => n.sep || navOn(n.id)).map((n) => n.sep ? `<p class="nav-label">${esc(n.sep)}</p>` : `<a href="#/backoffice/${n.id}" data-nav="${n.id}" ${state.view === n.id ? 'aria-current="page"' : ''}><i class="ph${state.view === n.id ? '-fill' : ''} ph-${n.icon}"></i><span>${esc(n.label)}</span>${n.plan && !Cleo.plans.has(n.plan) ? `<i class="ph ph-lock-simple nav-lock" aria-hidden="true" title="On the ${Cleo.plans.from(n.plan)} plan"></i>` : ''}${n.count && n.count() ? `<span class="count">${n.count()}</span>` : ''}</a>`).join('');
   }
   // the plan tab, in the same place as in the Owner Dashboard; Plan and billing lives there, so it switches mode
   const planTabHTML = () => Cleo.planTab({ attrs: 'href="#/owner/billing" data-plan-go', hint: 'Plan and billing, in the Owner Dashboard' });
@@ -10368,8 +10598,8 @@ Cleo.bir = (() => {
     popover(btn, `
       <div style="padding:8px 10px 6px" class="t-cap">Work in</div>
       ${[{ id: 'all', name: 'HQ, all branches', sub: 'Central catalog and transfers', ic: 'buildings' }, ...B.map((b) => ({ id: b.id, name: b.name, sub: `Your role: ${branchRole(b.id)}`, ic: 'storefront' }))].map((o) => `
-        <button class="menu-item" role="menuitemradio" aria-checked="${state.scope === o.id}" data-sc="${o.id}"><i class="ph ph-${o.ic}"></i><span class="grow">${esc(o.name)}<small>${esc(o.sub)}</small></span><i class="ph-bold ph-check check-i"></i></button>`).join('')}`,
-    { width: 300, onOpen: (p, close) => $$('[data-sc]', p).forEach((b) => b.addEventListener('click', () => {
+        <button class="menu-item" role="menuitemradio" aria-checked="${state.scope === o.id}" data-sc="${o.id}"><i class="ph ph-${o.ic}"></i><span class="grow">${esc(o.name)}<small>${esc(o.sub)}</small></span><i class="ph-bold ph-check check-i"></i></button>`).join('')}${Cleo.branchMenuItem()}`,
+    { width: 300, onOpen: (p, close) => (($('[data-add-branch]', p)?.addEventListener('click', close)), $$('[data-sc]', p)).forEach((b) => b.addEventListener('click', () => {
       close(); if (state.scope === b.dataset.sc) return;
       state.scope = b.dataset.sc;
       $('[data-scope-name]', shellEl).textContent = state.scope === 'all' ? 'HQ, all branches' : bName(state.scope);
@@ -10377,6 +10607,7 @@ Cleo.bir = (() => {
       renderView(false, true);
     })) });
   }
+  document.addEventListener('cleo:branch-added', () => { if (shellEl?.isConnected) renderView(false, true); });
   function roleMenu(btn) {
     popover(btn, `
       ${DEMO ? `<div style="padding:8px 10px 6px" class="t-cap">Preview this screen as (demo)</div>
@@ -10406,7 +10637,10 @@ Cleo.bir = (() => {
   async function renderView(first = false, refetch = false) {
     if (!pageEl) return;
     refreshChrome(); Charts.hideTip();
-    const build = VIEWS[state.view] || VIEWS.overview;
+    const feature = NAV.find((n) => n.id === state.view)?.plan;
+    const build = feature && !Cleo.plans.has(feature)
+      ? () => el(`<div><div class="page-head"><div><h2 class="t-title">${esc(TITLES[state.view])}</h2></div></div><section class="panel glass-thick">${Cleo.plans.locked(feature)}</section></div>`)
+      : VIEWS[state.view] || VIEWS.overview;
     if (refetch) { pageEl.replaceChildren(build()); Cleo.watchTitle($('.topbar', shellEl), pageEl); return; }
     if (first) { pageEl.replaceChildren(skeleton()); await wait(600); }
     const node = build(); if (first) node.classList.add('screen-enter');
@@ -12188,7 +12422,7 @@ Cleo.bir = (() => {
     const all = Cleo.db.list('terminals').filter((t) => scopeIds().includes(t.b));
     const node = el(`<div>
       <div class="page-head"><div><h2 class="t-title">Devices</h2><p>Registered terminals and the printers, scanners and card terminals they report</p></div>
-        <div class="filters"><div class="seg" data-dtab><button data-value="terminals" aria-pressed="${devTab === 'terminals'}">Terminals</button><button data-value="peripherals" aria-pressed="${devTab === 'peripherals'}">Printers and more</button></div><button class="btn btn-primary" data-reg><i class="ph ph-plus"></i>Register a terminal</button></div></div>
+        <div class="filters"><div class="seg" data-dtab><button data-value="terminals" aria-pressed="${devTab === 'terminals'}">Terminals</button><button data-value="peripherals" aria-pressed="${devTab === 'peripherals'}">Printers and more</button></div>${Cleo.canAddBranch() ? '<button class="btn" type="button" data-add-branch><i class="ph ph-storefront"></i>Add branch</button>' : ''}<button class="btn btn-primary" data-reg><i class="ph ph-plus"></i>Register a terminal</button></div></div>
       ${devTab === 'terminals' ? `
       <div class="grid g-12">
         <section class="span-12 glass-thick kpis kpis-four">
@@ -12557,6 +12791,7 @@ Cleo.bir = (() => {
   const branch = () => B.find((b) => b.id === S.branch);
   async function start({ skipSignIn } = {}) {
     prepare();
+    if (!DEMO) loadMenus();
     refreshCatalog();
     if (skipSignIn) { const m = Cleo.manila(); S.user = Cleo.data.cashiers[0]; S.shiftOpen = true; S.shiftStart = new Date(Cleo.now().getTime() - ((m.hour * 60 + m.minute) - (6 * 60 + 58)) * 60000); mainScreen(true); if (BIR.pendingZ(S.branch, S.term)) toast({ title: 'An earlier day has no Z-reading', body: 'Print it from Shift, End of day.', tone: 'warn' }); return; }
     // a tablet registered before goes straight to the staff PIN screen
@@ -12607,6 +12842,12 @@ Cleo.bir = (() => {
     });
   }
 
+  // a feature this plan doesn't include: what it is, and the way to the plans
+  function planNote(feature) {
+    overlay({ label: Cleo.plans.featureName(feature), className: 'mid', html: `<div class="dialog-head"><div><h2 class="sheet-title">${esc(Cleo.plans.featureName(feature))}</h2><p>On the ${Cleo.plans.from(feature)} plan and up. You're on ${esc(Cleo.plans.current().name)}.</p></div><button class="icon-btn" data-close aria-label="Close"><i class="ph ph-x"></i></button></div>
+      <div class="sheet-foot"><span></span><button class="btn btn-primary btn-lg" type="button" data-see-plans>See plans</button></div>` });
+  }
+
   /* ---------------- PIN sign-in (USR-02) ---------------- */
   // Business settings changed on this terminal, in the Back Office or the Owner Portal: apply them live.
   Cleo.config.onChange(({ path, remote }) => {
@@ -12634,8 +12875,14 @@ Cleo.bir = (() => {
     const here = staffAt(S.branch);
     // the demo's HQ team (BGC) also covers its other branches
     const staff = (here.length ? here : Cleo.data.cashiers.filter((c) => c.branch === S.branch)).concat(DEMO && S.branch !== 'bgc' && !solo() ? staffAt('bgc').slice(0, 2) : []);
+    // Add clerk: the account signed in on this terminal (the owner or a manager) gives someone a PIN here
+    const addClerk = () => staffDialog(null, () => pinScreen(), { title: 'Add clerk' });
     if (!staff.length) {
-      show(() => el(`<section class="screen pin-screen" data-amb="login"><div class="pin-left"><div>${Cleo.lockup('Terminal')}</div><div style="align-self:center"><h1 class="t-display" style="font-size:34px">No staff can sign in here yet</h1><p class="ink-2" style="margin-top:8px;max-width:520px">Staff who sell on this terminal get a PIN when the owner or a manager adds them in Back Office › Users and roles for ${esc(branch()?.name || 'this branch')}.</p></div><span class="t-small ink-2">${esc(branch()?.name || '')} · T${S.term}</span></div></section>`));
+      show(() => {
+        const node = el(`<section class="screen pin-screen" data-amb="login"><div class="pin-left"><div>${Cleo.lockup('Terminal')}</div><div style="align-self:center"><h1 class="t-display" style="font-size:34px">No staff can sign in here yet</h1><p class="ink-2" style="margin-top:8px;max-width:520px">Add the first clerk for ${esc(branch()?.name || 'this branch')}. They sign in on this terminal with a 4-digit PIN.</p><button class="btn btn-primary btn-lg" data-add-clerk style="margin-top:22px"><i class="ph ph-user-plus"></i>Add clerk</button></div><span class="t-small ink-2">${esc(branch()?.name || '')} · T${S.term}</span></div></section>`);
+        $('[data-add-clerk]', node).addEventListener('click', addClerk);
+        return node;
+      });
       return;
     }
     let sel = staff[0], pin = '', mode = 'sell';
@@ -12650,7 +12897,7 @@ Cleo.bir = (() => {
               ${BIR.pendingZ(S.branch, S.term) ? `<div style="display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;background:var(--warn-soft);margin:-8px 0 18px;font-size:14px"><i class="ph-fill ph-warning" style="color:var(--warn);font-size:18px"></i><span style="flex:1">An earlier business day has no Z-reading. Print it before the first sale today.</span><button class="btn btn-sm" data-zr>Print Z-reading</button></div>` : ''}
               <div class="staff-grid stagger" role="radiogroup" aria-label="Staff">${staff.map((s, i) => `<button class="staff" role="radio" style="--i:${i}" data-s="${s.id}" aria-pressed="${i === 0}"><span class="avatar" style="--av:${esc(s.color)}">${esc(s.initials)}</span><b>${esc(s.name)}</b><span>${esc(s.role)}</span>${clockedIn(s.id) ? `<span class="clk-on"><i class="ph-fill ph-clock"></i>In since ${fmt.time(new Date(clockedIn(s.id).at))}</span>` : ''}</button>`).join('')}</div>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center"><span class="status ${S.online ? 'on' : 'off'}">${S.online ? 'Online · synced' : 'Offline · selling locally'}</span><span style="display:flex;gap:14px;align-items:center"><button class="link-btn" data-zr style="color:var(--ink-3);font-weight:400;display:inline-flex;align-items:center;gap:6px"><i class="ph ph-moon-stars"></i>End of day</button>${solo() ? '' : `<button class="link-btn" data-switch style="color:var(--ink-3);font-weight:400;display:inline-flex;align-items:center;gap:6px">${Cleo.actIcon('switchMode')}${Cleo.actLabel('switchMode')}</button>`}${Cleo.aeso()}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span class="status ${S.online ? 'on' : 'off'}">${S.online ? 'Online · synced' : 'Offline · selling locally'}</span><span style="display:flex;gap:14px;align-items:center"><button class="link-btn" data-add-clerk style="color:var(--ink-3);font-weight:400;display:inline-flex;align-items:center;gap:6px"><i class="ph ph-user-plus"></i>Add clerk</button><button class="link-btn" data-zr style="color:var(--ink-3);font-weight:400;display:inline-flex;align-items:center;gap:6px"><i class="ph ph-moon-stars"></i>End of day</button>${solo() ? '' : `<button class="link-btn" data-switch style="color:var(--ink-3);font-weight:400;display:inline-flex;align-items:center;gap:6px">${Cleo.actIcon('switchMode')}${Cleo.actLabel('switchMode')}</button>`}${Cleo.aeso()}</span></div>
           </div>
           <div class="pin-card" data-lg>
             <div class="seg pin-mode" data-pmode role="group" aria-label="What the PIN is for"><button data-value="sell" aria-pressed="true"><i class="ph ph-cash-register"></i>Sell</button><button data-value="clock" aria-pressed="false"><i class="ph ph-clock"></i>Clock in or out</button></div>
@@ -12672,6 +12919,7 @@ Cleo.bir = (() => {
       }));
       seg($('[data-pmode]', node), (v) => { mode = v; pin = ''; paint(); $('h1', node).textContent = `Who's ${v === 'sell' ? 'selling' : 'clocking'}?`; hint(); });
       $('[data-switch]', node)?.addEventListener('click', () => Cleo.route.switchTo(''));
+      $('[data-add-clerk]', node)?.addEventListener('click', addClerk);
       $$('[data-zr]', node).forEach((b) => b.addEventListener('click', () => zReading(() => pinScreen())));
       const press = async (k) => {
         if (pin.length === 4 && k !== 'clear') return;
@@ -12683,8 +12931,9 @@ Cleo.bir = (() => {
         if (locked) { beep('err'); msg.className = 'pin-msg bad'; msg.textContent = lockText(locked); pin = ''; paint(); return; }
         const r = await Cleo.api.checkPin({ userId: sel.id, pin });
         if (!r.ok) {
-          const tries = (pinLocks()[sel.id]?.fails || 0) + 1;
-          setLock(sel.id, tries >= LOCK_TRIES ? { fails: 0, until: Date.now() + LOCK_MS } : { fails: tries, until: 0 });
+          // the server counts too (real use): its lock, when it answers with one, is the one that holds
+          const tries = r.code === 'locked' ? LOCK_TRIES : (pinLocks()[sel.id]?.fails || 0) + 1;
+          setLock(sel.id, tries >= LOCK_TRIES ? { fails: 0, until: r.until || Date.now() + LOCK_MS } : { fails: tries, until: 0 });
           beep('err'); buzz(80);
           $('[data-dots]', node).classList.add('bad'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
           msg.className = 'pin-msg bad'; msg.textContent = tries >= LOCK_TRIES ? lockText(lockOf(sel.id)) : `Wrong PIN. ${LOCK_TRIES - tries} ${LOCK_TRIES - tries === 1 ? 'try' : 'tries'} left before a 5-minute lock.`;
@@ -12862,7 +13111,11 @@ Cleo.bir = (() => {
     show: { price: true, hint: true, stock: true, icon: true },
     added: [], edits: {}, removed: [], cats: [],
   });
-  const MENUS = (() => { const s = Cleo.store.get('t-menu', null); return s && typeof s === 'object' ? s : {}; })();
+  // real use keeps this per business (`cleo:t-menu:<business>`), so accounts sharing a device keep their own layout
+  const menuKey = () => (DEMO ? 't-menu' : `t-menu:${Cleo.backend?.supabase?.scope?.() || 'none'}`);
+  const MENUS = {};
+  const loadMenus = () => { const v = Cleo.store.get(menuKey(), null); Object.keys(MENUS).forEach((k) => delete MENUS[k]); Object.assign(MENUS, v && typeof v === 'object' ? v : {}); };
+  loadMenus();
   function menu(mod = S.module) {
     const m = MENUS[mod];
     if (!m || m.v !== 1) return (MENUS[mod] = menuDefault(mod));
@@ -12880,7 +13133,7 @@ Cleo.bir = (() => {
   /* BACKEND: layout fields (hidden, fav, sort, density, show...) are this device's preferences and can stay local.
      added, edits, removed and cats are catalog changes made at the counter: send each one to the server
      (the same calls as Cleo.catalog in api.js) so the Back Office catalog stays the source of truth. */
-  const saveMenu = (mod = S.module) => { Cleo.store.set('t-menu', MENUS); applyMenuItems(mod); };
+  const saveMenu = (mod = S.module) => { Cleo.store.set(menuKey(), MENUS); applyMenuItems(mod); };
   Object.keys(MODULES).forEach((k) => applyMenuItems(k));
   let editingMenu = false;
   // categories in the order this terminal shows them (Favorites and All excluded)
@@ -13012,12 +13265,12 @@ Cleo.bir = (() => {
     const mod = S.module, M = MODULES[mod], m = menu();
     const isNew = !p, isAdded = !!p && m.added.some((x) => x.id === p.id);
     const base = p && !isAdded ? M.base.find((x) => x.id === p.id) : null;
-    const firstCat = menuCats().some((c) => c[0] === cat) ? cat : (p?.cat || menuCats()[0][0]);
+    const firstCat = menuCats().some((c) => c[0] === cat) ? cat : (p?.cat || menuCats()[0]?.[0] || 'general');
     const d = {
       name: p?.name || '', price: p ? String(p.price) : '', cat: p?.cat || firstCat, barcode: String(p?.barcode || barcode || '').trim(), sku: p?.sku || '',
       track: p ? p.stock != null : mod === 'retail', stock: p?.stock != null ? String(p.stock) : '',
       sizes: p ? !!p.sizes : mod === 'fnb' && ['coffee', 'noncoffee', 'tea'].includes(firstCat),
-      per: !!p?.per, fav: p ? m.fav.includes(p.id) : S.cat === 'fav', sold: p ? m.soldout.includes(p.id) : false, newCat: null,
+      per: !!p?.per, fav: p ? m.fav.includes(p.id) : S.cat === 'fav', sold: p ? m.soldout.includes(p.id) : false, newCat: !p && !menuCats().length ? ['general', 'General', 'tag'] : null,
     };
     const tax = Cleo.config.get('tax') || {};
     const vatNote = tax.vat === false ? 'Non-VAT' : tax.inclusive === false ? 'before VAT' : 'VAT included';
@@ -13042,7 +13295,7 @@ Cleo.bir = (() => {
           </div>
           <div class="set-list if-opts">
             ${mod === 'fnb' ? setRow('Ask for size, sugar, ice and add-ons', 'Opens the options sheet when tapped', sw('sizes', 'Ask for size, sugar, ice and add-ons')) : ''}
-            ${mod === 'retail' && !p?.variants ? setRow('Track stock', 'Counts down with each sale and warns when low', `<span class="num-field" data-stockf ${d.track ? '' : 'hidden'}><input class="input num" data-stock inputmode="numeric" value="${esc(d.stock)}" placeholder="0" aria-label="Units in stock"><span>in stock</span></span>${sw('track', 'Track stock')}`) : ''}
+            ${mod === 'retail' && !p?.variants && Cleo.plans.has('stock') ? setRow('Track stock', 'Counts down with each sale and warns when low', `<span class="num-field" data-stockf ${d.track ? '' : 'hidden'}><input class="input num" data-stock inputmode="numeric" value="${esc(d.stock)}" placeholder="0" aria-label="Units in stock"><span>in stock</span></span>${sw('track', 'Track stock')}`) : ''}
             ${p?.variants ? setRow('Options', `${p.variants.map((v) => esc(v[0])).join(', ')}. Each option keeps its own barcode and stock${solo() ? '' : ' in the Back Office'}.`, '<i class="ph ph-lock-simple ink-3" style="font-size:18px" aria-hidden="true"></i>') : ''}
             ${mod === 'svc' ? setRow('Priced per kilo', 'Asks for the weight when tapped', sw('per', 'Priced per kilo')) : ''}
             ${setRow('Show in Favorites', 'Pinned to the first tab', sw('fav', 'Show in Favorites'))}
@@ -13177,7 +13430,7 @@ Cleo.bir = (() => {
         else toast({ title: 'Label printed', body: `${esc(d.name.trim() || 'Item')} · ${esc(d.barcode)} · ${P(parseFloat(d.price) || 0)} on ${esc(pr.name)}`, icon: 'printer', duration: 2400 });
       }
     });
-    $('[data-save]', P0).addEventListener('click', () => {
+    $('[data-save]', P0).addEventListener('click', async () => {
       tried = true;
       if (!validate()) {
         const pr = problems(); buzz(60);
@@ -13189,11 +13442,19 @@ Cleo.bir = (() => {
       if (mod === 'fnb') fields.sizes = d.sizes || null;
       if (mod === 'retail' && !p?.variants) fields.stock = d.track ? parseInt(d.stock, 10) || 0 : null;
       if (mod === 'svc') fields.per = d.per ? 'kg' : null;
-      if (d.newCat && d.cat === d.newCat[0]) m.cats.push(d.newCat);
       let id = p?.id;
-      if (isNew) {
-        id = 'c' + Date.now().toString(36);
-        if (!fields.sku && mod !== 'svc') fields.sku = `NEW-${String(m.added.length + 1).padStart(3, '0')}`;
+      if (isNew) { id = 'c' + Date.now().toString(36); if (!fields.sku && mod !== 'svc') fields.sku = `NEW-${String(m.added.length + 1).padStart(3, '0')}`; }
+      const newCat = d.newCat && d.cat === d.newCat[0] ? d.newCat : null;
+      if (!DEMO && !isAdded) {
+        // real use: the item, and a category made here, go to the business's own catalog on the server first
+        // (the plan's limits apply there: Free holds up to 100 products); the menu then refreshes from it
+        const sv = $('[data-save]', P0); if (sv.dataset.state) return;
+        btnState(sv, 'loading');
+        try { await Cleo.catalog.apply({ categories: newCat ? [{ id: newCat[0], name: newCat[1], icon: newCat[2] }] : [], ...(isNew ? { add: [{ id, ...fields }] } : { change: [{ id, ...fields }] }) }); }
+        catch (error) { btnState(sv, null); toast({ title: `${fields.name} wasn’t saved`, body: Cleo.errors.from(error).message, tone: 'bad' }); return; }
+        btnState(sv, null);
+      } else if (newCat) m.cats.push(newCat);
+      if (!DEMO && !isAdded) { /* saved above */ } else if (isNew) {
         m.added.push({ id, custom: true, ...fields });
       } else if (isAdded) {
         const i = m.added.findIndex((x) => x.id === id); m.added[i] = { ...m.added[i], ...fields };
@@ -13207,7 +13468,7 @@ Cleo.bir = (() => {
       saveMenu(mod);
       if (S.view === 'sell') { S.q = ''; if (isNew && !(S.cat === d.cat || S.cat === 'all' || (S.cat === 'fav' && d.fav))) S.cat = d.cat; }
       o.close();
-      toast({ title: `${isNew ? 'Added' : 'Saved'} ${fields.name}`, body: `${P(fields.price)} · ${esc(catName(d.cat))}${fields.barcode ? ` · barcode ${esc(fields.barcode)}` : ''}. ${solo() ? 'Saved on this terminal.' : S.online ? 'Synced to the Back Office.' : 'Syncs to the Back Office when this terminal is back online.'}`, icon: isNew ? 'plus-circle' : 'check-circle', duration: 3400 });
+      toast({ title: `${isNew ? 'Added' : 'Saved'} ${fields.name}`, body: `${P(fields.price)} · ${esc(catName(d.cat))}${fields.barcode ? ` · barcode ${esc(fields.barcode)}` : ''}. ${DEMO && solo() ? 'Saved on this terminal.' : !DEMO ? 'Saved to your business’s catalog.' : S.online ? 'Synced to the Back Office.' : 'Syncs to the Back Office when this terminal is back online.'}`, icon: isNew ? 'plus-circle' : 'check-circle', duration: 3400 });
       onSaved?.(id);
     });
     $('[data-remove]', P0)?.addEventListener('click', (e) => {
@@ -13481,7 +13742,7 @@ Cleo.bir = (() => {
       else if (e.target.closest('[data-dec]')) { l.qty--; buzz(6); if (l.qty <= 0) o.lines = o.lines.filter((x) => x !== l); renderCart(); }
       else if (e.target.closest('[data-edit]')) lineSheet(l);
     });
-    $('[data-cust]', cartEl).addEventListener('click', customerSheet);
+    $('[data-cust]', cartEl).addEventListener('click', () => (Cleo.plans.has('customers') ? customerSheet() : planNote('customers')));
     $('[data-due]', cartEl)?.addEventListener('click', dueSheet);
     $('[data-scchip]', cartEl)?.addEventListener('click', scSheet);
     $('[data-buyer]', cartEl)?.addEventListener('click', () => buyerSheet());
@@ -15162,15 +15423,16 @@ Cleo.bir = (() => {
      The demo keeps no PIN at all (Cleo.api.checkPin accepts any 4 digits except 0000). */
   const ROLE_OPTS = [['cashier', 'Cashier'], ['kitchen', 'Server'], ['manager', 'Branch Manager']];
   const STAFF_COLORS = ['#9b2335', '#2e5e8c', '#5b3d8a', '#1f7a63', '#8a5a12', '#7a2f5d', '#3d6b2a', '#2f6f8f'];
-  function staffDialog(rec, onSaved) {
+  function staffDialog(rec, onSaved, { title = 'Add staff' } = {}) {
     const isNew = !rec;
-    const o = overlay({ label: isNew ? 'Add staff' : `New PIN for ${rec.name}`, className: 'mid', html: `
-      <div class="dialog-head"><div><h2 class="sheet-title">${isNew ? 'Add staff' : `New PIN for ${esc(rec.name)}`}</h2><p>${isNew ? `They sign in on ${esc(branch().short)} terminals with a 4-digit PIN.` : 'The old PIN stops working right away.'}</p></div><button class="icon-btn" data-close aria-label="Close"><i class="ph ph-x"></i></button></div>
+    const o = overlay({ label: isNew ? title : `New PIN for ${rec.name}`, className: 'mid', html: `
+      <div class="dialog-head"><div><h2 class="sheet-title">${isNew ? esc(title) : `New PIN for ${esc(rec.name)}`}</h2><p>${isNew ? `They sign in on ${esc(branch().short)} terminals with a 4-digit PIN.` : 'The old PIN stops working right away.'}</p></div><button class="icon-btn" data-close aria-label="Close"><i class="ph ph-x"></i></button></div>
       <form novalidate data-staff-form style="display:grid;gap:18px">
         ${isNew ? `<div class="field" data-f="st-n"><label for="st-n">Name</label><input id="st-n" class="input" autocomplete="off" placeholder="Example: Liza Ramos" aria-describedby="st-n-err"><p class="err" id="st-n-err" role="alert"><i class="ph-fill ph-warning-circle"></i><span>Enter their name.</span></p></div>
         <div class="field"><span class="label" id="st-r-l">Role</span><div class="seg" data-role role="group" aria-labelledby="st-r-l">${ROLE_OPTS.map(([k, l], i) => `<button type="button" data-value="${k}" aria-pressed="${i === 0}">${l}</button>`).join('')}</div><p class="help">Branch managers approve voids, refunds, big discounts and the Z-reading.</p></div>` : ''}
         <div class="field" data-f="st-p"><label for="st-p">4-digit PIN</label><input id="st-p" class="input num" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-describedby="st-p-err" style="width:180px;letter-spacing:.4em"><p class="err" id="st-p-err" role="alert"><i class="ph-fill ph-warning-circle"></i><span>Use 4 digits, but not 0000.</span></p></div>
-        <div class="sheet-foot" style="margin-top:4px"><span></span><button class="btn btn-primary btn-lg" type="submit" data-save>${isNew ? 'Add staff' : 'Save PIN'}</button></div>
+        <p class="pin-msg bad" data-staff-err role="alert" hidden></p>
+        <div class="sheet-foot" style="margin-top:4px"><span></span><button class="btn btn-primary btn-lg" type="submit" data-save>${isNew ? esc(title) : 'Save PIN'}</button></div>
       </form>` });
     let role = 'cashier';
     if (isNew) seg($('[data-role]', o.panel), (v) => (role = v));
@@ -15184,10 +15446,12 @@ Cleo.bir = (() => {
       if (!/^\d{4}$/.test(pin) || pin === '0000') bad('st-p');
       const first = $('.field.invalid input', o.panel); if (first) { first.focus(); return; }
       btnState(b, 'loading');
-      const roleLabel = ROLE_OPTS.find(([k]) => k === role)[1];
-      await Cleo.api.save('users', isNew
-        ? { id: `u-t${Date.now().toString(36)}`, name, initials: name.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase(), color: STAFF_COLORS[Cleo.db.list('users').length % STAFF_COLORS.length], email: '', mobile: '', role: roleLabel, roles: { [S.branch]: role }, status: 'active', last: 'Added on this terminal', pin: true, twoFactor: false }
-        : { id: rec.uid, pin: true, pinChangedAt: Date.now() });
+      const errLine = $('[data-staff-err]', o.panel); errLine.hidden = true;
+      // the PIN goes to the server, which keeps only a salted hash of it
+      const r = isNew
+        ? await Cleo.api.addStaff({ branch: S.branch, name, role, pin, color: STAFF_COLORS[Cleo.db.list('users').length % STAFF_COLORS.length] })
+        : await Cleo.api.setStaffPin({ id: rec.uid, pin });
+      if (!r?.ok) { btnState(b, null); errLine.textContent = r?.message || 'That didn’t save. Try again.'; errLine.hidden = false; return; }
       btnState(b, 'done'); await wait(360); o.close();
       toast({ title: isNew ? `${name} added` : 'PIN changed', body: isNew ? `${esc(name.split(' ')[0])} can sign in on this terminal now.` : `${esc(rec.name.split(' ')[0])} signs in with the new PIN.`, icon: isNew ? 'user-plus' : 'key' });
       onSaved?.();
@@ -15215,7 +15479,8 @@ Cleo.bir = (() => {
         setTimeout(() => { if (rb.isConnected) { delete rb.dataset.armed; rb.classList.remove('armed'); rb.innerHTML = trash; rb.setAttribute('aria-label', `Remove ${s.name}`); } }, 3000);
         return;
       }
-      await Cleo.api.remove('users', s.uid);
+      const gone = await Cleo.api.removeStaff(s.uid);
+      if (!gone?.ok) { toast({ title: `${s.name} wasn’t removed`, body: gone?.message || 'Try again.', tone: 'bad' }); return; }
       toast({ title: `${s.name} removed`, body: 'Their PIN no longer works on this terminal.', tone: 'info', icon: 'user-minus' });
       changed();
     });
@@ -15283,10 +15548,10 @@ Cleo.bir = (() => {
     return node;
   }
   function paneSync(refresh) {
-    // the Free plan keeps everything on the device: there is nothing to back up to the cloud
+    // Free uploads its sales to the business's own account, with no backup and no second terminal to sync
     const local = Cleo.plans.current()?.price === 0;
     const node = el(`<div class="set-body">
-      <header class="set-head"><h2>Sync</h2><p>${local ? 'This terminal sells offline. On the Free plan, sales and settings stay on this terminal.' : 'This terminal sells offline and uploads sales in order when the connection returns.'}</p></header>
+      <header class="set-head"><h2>Sync</h2><p>${local ? 'This terminal uploads each sale to your own Cleo account. Free has no automated backup and no second terminal to keep in step.' : 'This terminal sells offline and uploads sales in order when the connection returns.'}</p></header>
       <div class="dev-hero glass-thin" style="grid-template-columns:auto 1fr">
         <span class="set-ic big ${S.online ? 'good' : 'bad'}"><i class="ph ph-cloud-${S.online ? 'check' : 'slash'}"></i></span>
         <div class="dev-info"><h3>${S.online ? (S.queue ? `Uploading ${S.queue} sales` : 'Everything is in sync') : 'Offline'}</h3><p>${S.online ? 'Catalog and prices last updated 2 minutes ago.' : `${S.queue} sales are saved on this terminal and wait for the connection.`}</p></div>
@@ -15881,7 +16146,7 @@ Cleo.bir = (() => {
         const r = await Cleo.api.subscribe({ plan: id, terminals: 1, cycle: 'monthly', branches: 1, expectedTotal: 0 });
         if (!r?.ok) { if (button) btnState(button, null); toast({ title: 'Free didn’t start', body: r?.message || 'Try again.', tone: 'bad' }); return; }
         if (button) btnState(button, 'done');
-        toast({ title: `You’re on ${Cleo.plans.name(id)}`, body: 'One terminal, with everything kept on this device. Upgrade any time in Settings, Plan and billing.', icon: 'plant' });
+        toast({ title: `You’re on ${Cleo.plans.name(id)}`, body: 'One terminal, signed in to your own account. Upgrade any time in Settings, Plan and billing.', icon: 'plant' });
         await wait(reduced() ? 200 : 700);
         resolve(true);
       };
@@ -16046,6 +16311,26 @@ Cleo.bir = (() => {
     store.tab.remove('idle-out');
     setTimeout(() => toast({ title: 'You were signed out', body: 'Cleo signs out after 30 minutes without activity. Tick “Keep me signed in” on a device only you use.', tone: 'info', icon: 'lock-simple', duration: 9000 }), 4600);
   }
+
+  /* the Android app looks for a newer release when it starts (the Windows app updates itself with its
+     installer, apps/desktop/main.js). Releases come from .github/workflows/release.yml. */
+  (async () => {
+    const cap = window.Capacitor;
+    if (!cap?.isNativePlatform?.() || cap.getPlatform?.() !== 'android') return;
+    try {
+      const info = await cap.Plugins?.App?.getInfo?.();
+      const res = await fetch('https://api.github.com/repos/aeso-pro/Cleo-v1.4/releases/latest', { headers: { Accept: 'application/vnd.github+json' } });
+      if (!res.ok) return;
+      const rel = await res.json();
+      const latest = String(rel?.tag_name || '').replace(/^v/, ''), mine = String(info?.version || '');
+      const apk = (rel?.assets || []).find((a) => a?.name === 'Cleo.apk')?.browser_download_url || '';
+      const parts = (v) => v.split('.').map((n) => parseInt(n, 10) || 0);
+      const newer = (a, b) => { const x = parts(a), y = parts(b); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
+      if (!latest || !mine || !apk.startsWith('https://github.com/aeso-pro/Cleo-v1.4/releases/download/') || !newer(latest, mine)) return;
+      setTimeout(() => toast({ title: `Cleo POS ${latest} is available`, body: `You have ${mine}. Download the update, then open it to install. Your data stays in your account.`, icon: 'download-simple', duration: 20000,
+        action: { label: 'Download', onClick: () => { location.href = apk; } } }), 4000);
+    } catch { /* offline: the next start checks again */ }
+  })();
 
   /* BACKEND: the service worker caches the app for offline use (see sw.js). It only runs over https or on localhost.
      NOTE: on a local preview (localhost) it is off, so a rebuild or a saved edit to content/plans.md always shows:

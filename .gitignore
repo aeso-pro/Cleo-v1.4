@@ -2,3 +2,11 @@
 .env
 .env.*
 !.env.example
+
+# Installed apps: dependencies and build output (the release workflow rebuilds them)
+apps/*/node_modules/
+apps/desktop/web/
+apps/desktop/dist/
+apps/android/www/
+apps/android/android/
+apps/android/*.apk

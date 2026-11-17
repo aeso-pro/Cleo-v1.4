@@ -21,6 +21,25 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-18 (night) · Claude Code (owner's laptop session), `main`
+
+**Plans enforced on the server, branches and clerks added from the app, Free kept per account, and Windows and Android installers.** Backend and frontend; migration 008 is new.
+
+- **Migration `202611180008_plans_branches_staff.sql`** (tests: `supabase/tests/plans.test.mjs`, 86 database checks pass):
+  - `cleo_features()` mirrors `Cleo.licensing`'s matrix; `cleo_entitlement(business)` is the plan in force (with the 3-day grace) and its limits. With no plan, a business reads but changes nothing.
+  - Triggers on `cleo_records`, `cleo_stock_movements` and `cleo_transfers` apply the plan to every signed-in write: Free holds 100 products and no stock or customers; stock items and receiving from Basic; adjustments, counts and customers from Pro; transfers on Max. Aeso's maintenance (no signed-in account) isn't stopped.
+  - `cleo_add_branch` (owner or head office): Free, Basic and Pro have one branch; Max as many as `cleo_subscriptions.branches` pays for.
+  - `cleo_staff` (PIN staff, salted SHA-256, no browser grants) with `cleo_add_staff`, `cleo_set_staff_pin`, `cleo_remove_staff`, `cleo_check_pin` (3 wrong PINs lock for 5 minutes, counted on the server) and `cleo_clock` (`cleo_attendance`). Free: one cashier.
+  - `cleo_terminals` with `cleo_register_terminal` / `cleo_unregister_terminal`: the subscription's terminal count (Free: one).
+  - `cleo_sales` with `cleo_upload_sale`, once per (branch, terminal, invoice), from a registered terminal only.
+  - `cleo_save_setting` now takes every Settings section (types and sizes checked; `roles` and unknown sections still refused); a NULL version saves without the version check.
+  - `cleo_bootstrap` adds `businessId`, `entitlement`, real terminal counts, PIN staff (`data.cashiers` and `users`), registered terminals and the last 36 hours of attendance.
+- **Real adapter** (`backend/supabase.js` section): `registerTerminal`, `device`, `checkPin`, `clock`, `uploadSale`, `saveSettings`, `catalog.*` and `items.apply` now call the server. New contract operations `addBranch`, `addStaff`, `setStaffPin`, `removeStaff` (both adapters). Still pending: customers and other `save`/`remove` collections, stock posting from the screens, reports.
+- **Free plan:** sign-in was already required; now its data is the account's own on the server (products, terminal, clerk, sales), and device-held records (electronic journal, the Terminal's menu layout, this terminal's registration) are kept per business, so accounts sharing a device stay apart. `content/plans.md`, the landing page and the Terminal's Sync pane no longer say "everything stays on the device".
+- **Buttons:** Add branch in the Owner Dashboard (Branches page and branch switcher) and the Back Office (branch switcher and Devices); Add clerk on the Terminal's PIN screen. Plan locks: Transfers (Max) in the Back Office, branch comparison (Max) in the Owner Dashboard, customer profiles (Pro) and stock counts (Basic) in the Terminal. The demo's sample business now runs on Max.
+- **Installers:** `apps/desktop` (Electron, `Cleo-Setup.exe`, updates itself), `apps/android` (Capacitor, `Cleo.apk`, offers updates), built and released by `.github/workflows/release.yml` from a `v*` tag. The landing page's download buttons point at the latest release. See `Docs/APP_RELEASES.md`. CSP `connect-src` adds `https://api.github.com` (the version line and the Android update check); `apps/` and `.github/` are never served.
+- [ ] **Android signing secrets** (`ANDROID_KEYSTORE_*`): until they are set, each APK has a temporary key. Owner's step, `Docs/APP_RELEASES.md`.
+
 ### 2026-11-18 (night) · Claude Code (UI/UX refresh session), `main`
 
 **Landing screen captures re-taken, and a tool to re-take them.** New `tools/capture-screens.js` (no packages): `serve` runs the app on port 5176 without a CSP and with the demo clock at 3:45 PM Manila, a console call in the page captures a screen, `write` rebuilds `#screen-data` in `landing.html`. The Terminal, Owner Dashboard and Back Office captures now show today's UI passes. The enlarged-screen dialog lost its own `backdrop-filter` (it kept the sandboxed screen from painting, so the enlarged view was empty); the blur moved to `::backdrop`. The captions under the screens are visually hidden (kept for screen readers). Front end only.
