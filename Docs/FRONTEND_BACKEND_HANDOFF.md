@@ -21,6 +21,10 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-18 (evening) · Claude Code (UI/UX refresh session), `main`
+
+**Landing page top section.** `landing.html`: the real-screen device frames and the enlarged-screen dialog no longer take the liquid-glass refraction map (in Chromium it smeared the Terminal capture in the hero and the workspace frames); the hero lede now says what Cleo is; the hero's actions are "Get started" and "Try the demo" (`index.html?demo#/`, replacing "See the plans", which stays in the nav); nav reads "Product" and its Get started has no outward arrow; "Explore the demo" is "Try the demo" throughout. The screen captures (`#screen-data`) were not re-taken and still show the app as it was before today's UI passes. Front end only.
+
 ### 2026-11-18 (later) · Claude Code (UI/UX refresh session), `main`
 
 **Second UI/UX pass: ease of use across iPadOS-, macOS- and iOS-like surfaces; front end only.** Terminal payment sheet: method buttons read "E-wallet" and "On account" (display only; tender keys such as `'Charge'` are unchanged). Back Office: Catalog's bulk edit is "Edit in table"; Inventory's toolbar gains "Receive delivery" (same `receiveDialog()` as the Overview) and says "Adjust stock" / "Edit in table"; a plainer Inventory subtitle; the global search placeholder fits its field. Owner and Back Office sidebar counts are grey (not red). Admin console (`assets/admin/admin.css` only): the current nav item is a quiet fill with a red icon, the overview's six stats fit one row, and "Suspend" in account rows is plain red text on one line (it still asks first). No routes, data shapes or `data-*` hooks changed beyond the new `data-rcv` button.

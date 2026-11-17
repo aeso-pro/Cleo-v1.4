@@ -561,23 +561,23 @@ html:has(dialog[open]){overflow:hidden}
 <header class="nav-wrap wrap">
  <nav class="nav glass" aria-label="Main navigation">
   <a href="#main" class="brand" aria-label="Cleo POS home"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 980.27 1330.77' width='980.27' height='1330.77'%3E%3Cpath fill='%23d40000' d='M697.19 488.06A179.45 179.45 0 1 0 697.19 842.72A245.48 245.48 0 1 1 489.31 1085.36A179.45 179.45 0 0 0 282.68 908.03A245.48 245.48 0 1 1 282.68 422.74A179.45 179.45 0 0 0 489.31 245.42A245.48 245.48 0 1 1 697.19 488.06Z'/%3E%3C/svg%3E" alt="" width="23" height="31"><span class="word"></span><span class="pos">POS</span></a>
-  <div class="nav-links"><a href="#product">The product</a><a href="#pricing">Pricing</a><a href="#download">Download</a><a href="#questions">Questions</a></div>
+  <div class="nav-links"><a href="#product">Product</a><a href="#pricing">Pricing</a><a href="#download">Download</a><a href="#questions">Questions</a></div>
   <div class="nav-actions">
    <a class="signin" href="index.html#/">Sign in</a>
-   <a class="btn red small" href="index.html#/setup">Get started<i class="ci ci-arrow-up-right" aria-hidden="true"></i></a>
+   <a class="btn red small" href="index.html#/setup">Get started</a>
    <button class="icon-btn menu-btn" id="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation"><i class="ci ci-list" aria-hidden="true"></i></button>
   </div>
  </nav>
  <nav class="mobile-nav glass" id="mobile-menu" aria-label="Mobile navigation" hidden>
-  <a href="#product">The product</a><a href="#pricing">Pricing</a><a href="#download">Download</a><a href="#questions">Questions</a><a href="index.html?demo#/">Explore the demo</a><a href="index.html#/">Sign in</a>
+  <a href="#product">Product</a><a href="#pricing">Pricing</a><a href="#download">Download</a><a href="#questions">Questions</a><a href="index.html?demo#/">Try the demo</a><a href="index.html#/">Sign in</a>
  </nav>
 </header>
 <main id="main">
  <section class="hero" aria-labelledby="hero-title">
   <div class="hero-copy wrap">
    <h1 id="hero-title"><span class="h-line">One Phase</span> <span class="h-line h-red">Ahead.</span></h1>
-   <p class="hero-lede">Meet the point of sale that brings your counter, your team and your next big idea together.</p>
-   <div class="hero-actions"><a class="btn red" href="index.html#/setup">Get started with Cleo<i class="ci ci-arrow-right" aria-hidden="true"></i></a><a class="btn ghost" href="#pricing">See the plans</a></div>
+   <p class="hero-lede">The point of sale for Philippine businesses. Sell at the counter, even offline, and see every sale, shift and branch in one place.</p>
+   <div class="hero-actions"><a class="btn red" href="index.html#/setup">Get started<i class="ci ci-arrow-right" aria-hidden="true"></i></a><a class="btn ghost" href="index.html?demo#/">Try the demo</a></div>
   </div>
   <div class="hero-stage wrap">
  <div class="device-rise">
@@ -715,7 +715,7 @@ html:has(dialog[open]){overflow:hidden}
     <details><summary>Can I use just the Terminal?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>Yes. Free and Basic open directly into a standalone Terminal, with no mode switcher. Its staff, business settings and billing live there too. Pro and Max add the Owner Dashboard and Back Office.</p></details>
     <details><summary>How do annual payments work?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>You pay the first-terminal annual price upfront, plus 12 monthly fees for each additional terminal. Each new branch starts at its own first-terminal rate. Use the calculator above to see the total for one branch.</p></details>
     <details><summary>Can Cleo work without internet?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>The Terminal is designed for offline selling, with synchronization when the connection returns. Online payment authorization and cloud services still depend on their providers and connectivity. The interactive preview uses sample data and simulated services.</p></details>
-    <details><summary>Can I try Cleo before creating an account?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>Yes. <a class="text-link" href="index.html?demo#/">Explore the demo</a> with a sample business. The demo keeps its data separate from your account and simulates sales and payments.</p></details>
+    <details><summary>Can I try Cleo before creating an account?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>Yes. <a class="text-link" href="index.html?demo#/">Try the demo</a> with a sample business. The demo keeps its data separate from your account and simulates sales and payments.</p></details>
     <details><summary>Is this a live payment service?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>Accounts use secure sign-in through Cleo’s cloud service. Payment checkout is still a preview: provider payments, server-side licensing and production sales services need to be connected before commercial use. No real payment is taken here.</p></details>
     <details><summary>Does Cleo claim BIR accreditation?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>No accreditation claim is made here. Cleo is designed to support Philippine invoicing workflows, but BIR functionality, applicable accreditation and your tax configuration must be validated before commercial use.</p></details>
    </div>
@@ -1466,7 +1466,9 @@ html:has(dialog[open]){overflow:hidden}
   const chromium = /Chromium|Google Chrome|Microsoft Edge|Opera/.test(brands) || (!!window.chrome && !/Firefox/.test(navigator.userAgent));
   const enabled = chromium && !matchMedia('(prefers-reduced-transparency: reduce)').matches;
   if (!enabled) return { enabled };
-  const NS = 'http://www.w3.org/2000/svg', SEL = '.glass, #screen-dialog';
+  // frames that hold a real screen (.device) and the enlarged-screen dialog keep plain glass: in Chromium a displacement
+  // map in backdrop-filter also smears the sandboxed screen inside the frame, and the screen is the evidence
+  const NS = 'http://www.w3.org/2000/svg', SEL = '.glass:not(.device)';
   const svg = document.createElementNS(NS, 'svg'), defs = document.createElementNS(NS, 'defs');
   svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.setAttribute('aria-hidden', 'true');
   svg.style.position = 'absolute'; svg.appendChild(defs); document.body.appendChild(svg);
