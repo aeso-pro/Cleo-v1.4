@@ -21,6 +21,10 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-18 · Claude Code (UI/UX refresh session), `main`
+
+**Calmer, clearer app chrome; front end only, nothing for the backend to do.** In `index.html`: the plan tab at the foot of every sidebar and the Terminal rail no longer runs a light round its edge, sheens or glows (plans are told apart by tint and edge); primary buttons lost their red glow; completed setup steps are grey checks so the current step leads; the sign-in mark has no "Hover, press or tap the mark" caption; the Terminal's browser-preview bar stays on one line on phones; plain cart items no longer say "No options". Copy: Back Office header buttons now match the quick actions ("Receive delivery", "Adjust stock"); Owner's "Exceptions" panel is "Flagged activity · Over your approval limits"; the revenue chart legend reads "Columns add up to net sales"; the sign-in fine print explains two-step sign-in plainly. No data shapes, routes, `data-*` hooks or element IDs changed. `DESIGN.md` has a new "Design philosophy" section (form follows function, nothing moves on its own, one emphasis per view, one name for one thing, say it once).
+
 ### 2026-11-17 (night) · Claude Code (owner's laptop session), `main`
 
 **Admin Google sign-in fixed for the addresses the owner actually uses.** The auth logs showed the owner works on VS Code Live Server (`http://127.0.0.1:5500`), whose `/admin/` was not on the Redirect URL list, so Supabase sent the Google return to the Site URL (the main app) and the admin sign-in could not finish. Added `http://127.0.0.1:5500/admin/**`, `http://localhost:5500/admin/**` and `http://127.0.0.1:5175/admin/**` (10 Redirect URLs now). `returnAddress()` in `assets/admin/admin.js` always asks for the folder's `/admin/` address, so `/admin` and `/admin/index.html` also match the `/admin/**` entries.

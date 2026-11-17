@@ -352,7 +352,7 @@ body::after {
 /* a filled button, as Apple draws one: flat colour, a fine top light, a small grounded shadow (no glow) */
 .btn-primary {
   color: var(--on-accent); background: var(--accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 2px rgb(0 0 0 / .14), 0 4px 12px -6px var(--accent-glow);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 2px rgb(0 0 0 / .16);
 }
 @media (hover: hover) and (pointer: fine) { .btn-primary:hover:not(:disabled) { background: var(--accent-hover); } }
 .btn-primary:active:not(:disabled) { background: var(--accent-press); }
@@ -644,7 +644,8 @@ button.chip:active { transform: scale(.96); }
 .art-grid.grabbing { cursor: grabbing; }
 /* where the mark sits, so the loading screen's mark can glide into it */
 .art-mark { position: absolute; pointer-events: none; view-transition-name: cleo-mark; }
-.art-hint { position: absolute; bottom: 28px; right: 32px; font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; pointer-events: none; }
+/* the mark answers to the pointer without a caption telling people to play with it */
+.art-hint { display: none !important; }
 /* the Cleo mark in 3D (emblem3d in core.js draws it with WebGL2; its pillars answer the pointer). Behind it,
    a soft accent glow in dark mode; in light mode a faint grid and the mark's own soft shadow (the art-ghost canvas). */
 .art-3d, .art-ghost { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -851,55 +852,34 @@ button.chip:active { transform: scale(.96); }
 /* ---------- Plan tab (Cleo.planTab): the plan's name and its own mark ----------
    At the foot of the Owner Dashboard and Back Office sidebars and the Terminal rail. It is built like the
    other cards there (glass-thin surface, rim, 18px corners, 15px name). Each plan is a step up from the one
-   before, so the tab says which plan this is at a glance ("Tab" in content/plans.md): quiet is drawn on the
-   page itself, a dashed outline and no glass (Free); plain stays still (Basic); animated adds a light that
-   runs around the edge and a sheen (Pro); premium is a step up from animated with a hint of gold: a second
-   light, in gold, and a gold-tinted edge (Max); elite is a dark panel with gold, two gold lights running
-   around a gold edge (Enterprise). Glows are dark mode only and light mode stays flat, except elite, which
-   is dark in both. compact is the Terminal version: the mark alone, centred (the name is its label). */
-.plan-tab { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 14px 0 16px; border-radius: 18px; color: var(--ink); text-decoration: none; background: var(--glass-thin); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim); transition: transform var(--t-press) var(--ease-out), box-shadow 260ms ease, background-color 200ms ease; -webkit-tap-highlight-color: transparent; }
+   before ("Tab" in content/plans.md), told apart by material and edge, never by motion: the sidebar is
+   working chrome and nothing in it moves on its own. quiet is drawn on the page itself, a dashed outline
+   and no glass (Free); plain is the glass alone (Basic); animated takes a faint brand tint and a red edge
+   (Pro); premium adds a gold edge over the same tint (Max); elite is a dark panel with a gold edge in both
+   themes (Enterprise). compact is the Terminal version: the mark alone, centred (the name is its label). */
+.plan-tab { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 14px 0 16px; border-radius: 18px; color: var(--ink); text-decoration: none; background: var(--glass-thin); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-rim); transition: transform var(--t-press) var(--ease-out), box-shadow 200ms ease, background-color 200ms ease; -webkit-tap-highlight-color: transparent; }
 a.plan-tab:active { transform: scale(.98); }
-@media (hover: hover) and (pointer: fine) { a.plan-tab.t-plain:hover { background: var(--wash-2); } }
 .plan-tab .pt-name { position: relative; font-size: 15px; font-weight: 500; letter-spacing: -.01em; }
 .plan-tab .plan-mark { position: relative; color: inherit; }
 .plan-tab.compact { width: 66px; height: 58px; min-height: 0; padding: 0; justify-content: center; }
-@property --pt-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-/* the edge: a hairline with light running around it (a ring cut out by a mask) */
-.plan-tab.t-animated::before, .plan-tab.t-premium::before, .plan-tab.t-elite::before {
-  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: pt-orbit 5s linear infinite;
-}
-/* a sheen crosses the tab every few seconds */
-.plan-tab.t-animated::after, .plan-tab.t-premium::after, .plan-tab.t-elite::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; transform: translateX(-120%); background: linear-gradient(100deg, transparent 30%, var(--pt-sheen) 50%, transparent 70%); animation: pt-sheen 5.6s var(--ease-in-out) 1.2s infinite; }
-@keyframes pt-orbit { to { --pt-a: 360deg; } }
-@keyframes pt-sheen { 0% { transform: translateX(-120%); } 40%, 100% { transform: translateX(120%); } }
+@media (hover: hover) and (pointer: fine) { a.plan-tab:hover { background: var(--wash-2); } }
 
 /* quiet (Free): no glass, a dashed outline and quieter ink */
 .plan-tab.t-quiet { background: none; box-shadow: none; outline: 1.5px dashed var(--line-2); outline-offset: -1.5px; color: var(--ink-2); }
 @media (hover: hover) and (pointer: fine) { a.plan-tab.t-quiet:hover { background: var(--wash); } }
-/* animated (Pro): one light in the brand colour */
-.plan-tab.t-animated { --pt-sheen: rgb(255 255 255 / .1); background: color-mix(in srgb, var(--accent) 7%, var(--glass-thin)); }
-.plan-tab.t-animated::before { background: conic-gradient(from var(--pt-a), transparent 0deg, var(--accent) 70deg, #ff9a52 110deg, transparent 170deg, transparent 360deg), linear-gradient(var(--line-2), var(--line-2)); }
-/* premium (Max): the same, a step up, with a hint of gold */
-.plan-tab.t-premium { --pt-gold: #d6ad57; --pt-sheen: rgb(255 236 190 / .14); background: color-mix(in srgb, var(--pt-gold) 8%, color-mix(in srgb, var(--accent) 6%, var(--glass-thin))); }
-.plan-tab.t-premium::before {
-  --pt-edge: color-mix(in srgb, var(--pt-gold) 42%, var(--line-2));
-  background: conic-gradient(from var(--pt-a), transparent 0deg, var(--accent) 60deg, #ff9a52 95deg, transparent 145deg, transparent 180deg, var(--pt-gold) 235deg, #f6dfa0 270deg, transparent 325deg), linear-gradient(var(--pt-edge), var(--pt-edge));
-}
-/* elite (Enterprise): a dark panel in both themes, with two gold lights around a gold edge */
-.plan-tab.t-elite { --pt-gold: #e2bd6b; --pt-sheen: rgb(255 236 190 / .16); color: #f6efe0; background: radial-gradient(140% 170% at 0% 0%, #2c2518, #121013 62%); box-shadow: inset 0 1px 0 rgb(255 236 190 / .2), 0 10px 26px -16px rgb(214 173 87 / .6); }
-.plan-tab.t-elite::before { background: conic-gradient(from var(--pt-a), transparent 0deg, var(--pt-gold) 60deg, #f6dfa0 95deg, transparent 145deg, transparent 180deg, var(--pt-gold) 235deg, #f6dfa0 270deg, transparent 325deg), linear-gradient(rgb(214 173 87 / .45), rgb(214 173 87 / .45)); }
-/* dark mode: soft glows under the tab */
-:root[data-theme="dark"] .plan-tab.t-animated { box-shadow: inset 0 1px 0 var(--glass-hi), 0 8px 22px -16px var(--accent-glow); }
-:root[data-theme="dark"] .plan-tab.t-premium { box-shadow: inset 0 1px 0 var(--glass-hi), 0 8px 24px -16px rgb(214 173 87 / .5); }
-/* light mode: flat, a fainter tint, a deeper gold that reads on white, a brighter sheen */
-:root[data-theme="light"] .plan-tab.t-animated { --pt-sheen: rgb(255 255 255 / .75); background: color-mix(in srgb, var(--accent) 4%, var(--glass-thin)); }
-:root[data-theme="light"] .plan-tab.t-premium { --pt-gold: #b5862c; --pt-sheen: rgb(255 248 228 / .85); background: color-mix(in srgb, var(--pt-gold) 7%, color-mix(in srgb, var(--accent) 3%, var(--glass-thin))); }
+/* animated (Pro): a faint brand tint and a red edge */
+.plan-tab.t-animated { --pt-edge: color-mix(in srgb, var(--accent-ink) 42%, var(--line-2)); background: color-mix(in srgb, var(--accent) 7%, var(--glass-thin)); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--pt-edge); }
+/* premium (Max): the same tint, with a gold edge */
+.plan-tab.t-premium { --pt-gold: #d6ad57; --pt-edge: color-mix(in srgb, var(--pt-gold) 55%, var(--line-2)); background: color-mix(in srgb, var(--pt-gold) 8%, color-mix(in srgb, var(--accent) 6%, var(--glass-thin))); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--pt-edge); }
+/* elite (Enterprise): a dark panel in both themes, with a gold edge */
+.plan-tab.t-elite { color: #f6efe0; background: linear-gradient(160deg, #2a2418, #121013 62%); box-shadow: inset 0 1px 0 rgb(255 236 190 / .2), inset 0 0 0 1px rgb(214 173 87 / .5), var(--shadow-sm); }
+/* light mode: a fainter tint and a deeper gold that reads on white */
+:root[data-theme="light"] .plan-tab.t-animated { background: color-mix(in srgb, var(--accent) 4%, var(--glass-thin)); }
+:root[data-theme="light"] .plan-tab.t-premium { --pt-gold: #b5862c; background: color-mix(in srgb, var(--pt-gold) 7%, color-mix(in srgb, var(--accent) 3%, var(--glass-thin))); }
 @media (hover: hover) and (pointer: fine) {
-  a.plan-tab.t-animated:hover::before, a.plan-tab.t-premium:hover::before, a.plan-tab.t-elite:hover::before { animation-duration: 2.4s; }
-  :root[data-theme="dark"] a.plan-tab.t-animated:hover { box-shadow: inset 0 1px 0 var(--glass-hi), 0 12px 28px -14px var(--accent-glow); }
-  :root[data-theme="dark"] a.plan-tab.t-premium:hover { box-shadow: inset 0 1px 0 var(--glass-hi), 0 12px 30px -14px rgb(214 173 87 / .6); }
+  a.plan-tab.t-animated:hover { background: color-mix(in srgb, var(--accent) 11%, var(--glass-thin)); }
+  a.plan-tab.t-premium:hover { background: color-mix(in srgb, var(--pt-gold) 12%, var(--glass-thin)); }
+  a.plan-tab.t-elite:hover { background: linear-gradient(160deg, #332b1c, #17141a 62%); }
 }
 
 /* ---------- Plan logo (Cleo.planLogo): the plan's tree as a plain line drawing in ink ---------- */
@@ -1075,7 +1055,7 @@ a.plan-tab:active { transform: scale(.98); }
 .setup-progress { list-style: none; padding: 0; margin: 32px 0; display: grid; gap: 26px; }
 .setup-progress li { position: relative; display: flex; align-items: center; gap: 14px; color: var(--ink-2); }
 .setup-progress li:not(:last-child)::after { content: ''; position: absolute; left: 17px; top: 42px; height: 20px; width: 1px; background: var(--line-2); transition: background-color 240ms ease; }
-.setup-progress li.complete::after { background: color-mix(in srgb, var(--accent-ink) 55%, var(--line-2)); }
+.setup-progress li.complete::after { background: var(--ink-4); }
 .setup-number { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-2); font-size: 14px; font-variant-numeric: tabular-nums; transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease; }
 /* the number turns into a check once the step is done */
 .setup-number > * { grid-area: 1 / 1; transition: opacity 160ms ease, transform 220ms var(--ease-out); }
@@ -1086,7 +1066,8 @@ a.plan-tab:active { transform: scale(.98); }
 .setup-progress small { display: block; margin-top: 4px; font-size: 13px; color: var(--ink-2); }
 .setup-progress [aria-current="step"] { color: var(--ink); }
 .setup-progress [aria-current="step"] .setup-number { background: var(--ink); color: var(--bg); border-color: transparent; }
-.setup-progress .complete .setup-number { background: var(--accent-soft); border-color: var(--accent-ink); color: var(--accent-ink); }
+/* done steps step back (a quiet check); the current step is the one filled shape on the list */
+.setup-progress .complete .setup-number { background: var(--wash-2); border-color: transparent; color: var(--ink-2); }
 .setup-guide .setup-later { max-width: 24ch; padding-top: 24px; border-top: 1px solid var(--line); }
 .is-setup .login-card { max-width: none; width: 100%; margin: 0; padding: 36px; align-self: start; overflow: clip; }
 .is-setup .login-card h1 { font-weight: 400; font-size: 30px; line-height: 1.15; }
@@ -2473,8 +2454,10 @@ body.is-terminal { overflow: hidden; background: #050506; }
 
 
 /* device chrome toggle (browser preview only) */
-.preview-bar { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 100; display: flex; gap: 6px; align-items: center; padding: 6px 6px 6px 14px; border-radius: 99px; font-size: 12px; color: rgb(243 241 238 / .7); background: rgb(20 20 22 / .72); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .1); font-family: var(--font); }
+.preview-bar { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 100; display: flex; width: max-content; max-width: calc(100vw - 24px); white-space: nowrap; gap: 6px; align-items: center; padding: 6px 6px 6px 14px; border-radius: 99px; font-size: 12px; color: rgb(243 241 238 / .7); background: rgb(20 20 22 / .72); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .1); font-family: var(--font); }
 .preview-bar button { height: 28px; padding: 0 12px; border-radius: 99px; color: #f3f1ee; background: rgb(255 255 255 / .08); font-size: 12px; }
+.preview-bar [data-pscale] { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.preview-bar button { flex: none; min-height: 0 !important; }
 .preview-bar[hidden] { display: none; }
 :root[data-theme="light"] .preview-bar { color: var(--ink-2); background: rgb(255 255 255 / .92); box-shadow: inset 0 0 0 1px var(--line-2), var(--shadow-sm); }
 :root[data-theme="light"] .preview-bar button { color: var(--ink); background: var(--wash-2); }
@@ -2485,7 +2468,6 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .dp .login { grid-template-columns: minmax(420px, 500px) 1fr; }
 .dp .login-left { padding: 26px 36px; }
 .dp .login-art { position: relative; inset: auto; z-index: auto; opacity: 1; pointer-events: auto; }
-.dp .art-hint { display: flex; }
 .dp .login-card { padding: 32px 30px 28px; }
 .dp .branches { padding: 26px 36px 40px; }
 .dp .branches-top { margin-bottom: 34px; }
@@ -5122,7 +5104,7 @@ const Cleo = (() => {
   const SOCIAL = {
     google: { name: 'Google', svg: '<svg class="soc-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>' },
   };
-  function loginScreen({ app, demoEmail = '', sub, onDone, initialStep = 1, resumeAccount = null, recovery = false, twoFactor = false, authError = null, agreedVersion = '', fine = 'Use your email or a connected sign-in provider. Accounts with two-step sign-in also need an authenticator code.', fineIcon = 'shield-check' }) {
+  function loginScreen({ app, demoEmail = '', sub, onDone, initialStep = 1, resumeAccount = null, recovery = false, twoFactor = false, authError = null, agreedVersion = '', fine = 'If your account uses two-step sign-in, you will also enter a code from your authenticator app.', fineIcon = 'shield-check' }) {
     // The connected Supabase project issues eight-digit email codes. Its TOTP
     // authenticator codes remain six digits; the separate demo uses six for both.
     const emailCodeLength = CleoEnv.demo ? 6 : 8;
@@ -9329,7 +9311,7 @@ Cleo.bir = (() => {
   const WIDGETS = {
     kpis: ['Key figures', 'number-square-one'], trend: ['Revenue and profit', 'chart-bar'], mix: ['Payment mix', 'chart-donut'], activity: ['Activity', 'calendar-dots'],
     rank: ['Branch ranking', 'ranking'], feed: ['Live sales', 'pulse'], heat: ['Busiest hours', 'grid-four'],
-    products: ['Products', 'coffee'], exceptions: ['Exceptions', 'warning'], terminals: ['Terminals', 'device-tablet'],
+    products: ['Products', 'coffee'], exceptions: ['Flagged activity', 'warning'], terminals: ['Terminals', 'device-tablet'],
   };
   const SIZES = [['s', 'S', 4], ['m', 'M', 6], ['l', 'L', 8], ['full', 'Full', 12]];
   const DASH_DEFAULT = { v: 1, order: Object.keys(WIDGETS), hidden: [], size: { trend: 'l', mix: 's', activity: 'm', rank: 'm', feed: 'm', heat: 'm', products: 'm', exceptions: 'l', terminals: 's' }, kpis: ['net', 'gross', 'gp', 'margin', 'tx', 'avg'], period: 'today' };
@@ -9402,7 +9384,7 @@ Cleo.bir = (() => {
           <div class="panel-head"><div><h2>Revenue and profit</h2><p data-trend-sub></p></div>
             <div class="tools"><div class="seg" data-gran role="group" aria-label="Granularity"><button data-value="day" aria-pressed="${state.gran === 'day'}">Day</button><button data-value="week" aria-pressed="${state.gran === 'week'}">Week</button><button data-value="month" aria-pressed="${state.gran === 'month'}">Month</button></div>
             <button class="icon-btn" data-tbl="trend" aria-pressed="false" aria-label="Show as table" title="Show as table"><i class="ph ph-table"></i></button></div></div>
-          <div class="legend" style="margin-bottom:12px">${TREND_PARTS.map(([n, c]) => `<span>${Charts.swatch(c)}${n}</span>`).join('')}<span class="muted">Column height is net sales</span></div>
+          <div class="legend" style="margin-bottom:12px">${TREND_PARTS.map(([n, c]) => `<span>${Charts.swatch(c)}${n}</span>`).join('')}<span class="muted">Columns add up to net sales</span></div>
           <div data-chart="trend" data-fill></div></section>`,
       mix: () => `<section class="panel glass-thick">
           <div class="panel-head"><div><h2>Payment mix</h2><p>${periodName()} · share of net sales</p></div><button class="icon-btn" data-tbl="mix" aria-pressed="false" aria-label="Show as table" title="Show as table"><i class="ph ph-table"></i></button></div>
@@ -9416,7 +9398,7 @@ Cleo.bir = (() => {
       feed: () => `<section class="panel glass-thick"><div class="panel-head"><div><h2>Live sales</h2><p>Sales, voids and refunds as terminals sync</p></div><span class="status live">Live</span></div><div class="rows feed" data-feed>${feed.filter((e) => inScope(e)).slice(0, 6).map((e) => feedRow(e)).join('')}</div></section>`,
       heat: () => `<section class="panel glass-thick"><div class="panel-head"><div><h2>Busiest hours</h2><p>Average net sales by hour, last 4 weeks</p></div></div><div data-chart="heat"></div></section>`,
       products: () => `<section class="panel glass-thick"><div class="panel-head"><div><h2>Products</h2><p>${periodName()}</p></div><div class="seg" data-prod role="group" aria-label="Product list"><button data-value="top" aria-pressed="true">Top sellers</button><button data-value="slow" aria-pressed="false">Slow movers</button></div></div><div data-products></div></section>`,
-      exceptions: () => `<section class="panel glass-thick"><div class="panel-head"><div><h2>Exceptions</h2><p>Above your approval limits</p></div><a class="btn btn-sm btn-ghost" href="#/owner/alerts" data-nav="alerts">All alerts<i class="ph ph-arrow-right"></i></a></div><div class="rows">${liveAlerts().filter((a) => ['void', 'drawer', 'discount', 'price', 'terminal'].includes(a.type) && inScope({ b: { id: a.b } })).slice(0, 4).map(alertRow).join('') || emptyRow('No exceptions above your limits')}</div></section>`,
+      exceptions: () => `<section class="panel glass-thick"><div class="panel-head"><div><h2>Flagged activity</h2><p>Over your approval limits</p></div><a class="btn btn-sm btn-ghost" href="#/owner/alerts" data-nav="alerts">All alerts<i class="ph ph-arrow-right"></i></a></div><div class="rows">${liveAlerts().filter((a) => ['void', 'drawer', 'discount', 'price', 'terminal'].includes(a.type) && inScope({ b: { id: a.b } })).slice(0, 4).map(alertRow).join('') || emptyRow('No exceptions above your limits')}</div></section>`,
       terminals: () => `<section class="panel glass-thick"><div class="panel-head"><div><h2>Terminals</h2><p>Connection and sync status</p></div><a class="btn btn-sm btn-ghost" href="#/owner/live" data-nav="live">Monitor<i class="ph ph-arrow-right"></i></a></div><div class="rows">${TERMS.filter((t) => inScope(t)).slice(0, 5).map(termRow).join('')}</div></section>`,
     };
     const shown = dash.order.filter((id) => !dash.hidden.includes(id));
@@ -10451,7 +10433,7 @@ Cleo.bir = (() => {
     ].filter(Boolean);
     const node = el(`<div>
       <div class="page-head"><div><h2 class="t-title">Operations at ${esc(where)}</h2><p>${fmt.date(Cleo.now(), { weekday: 'long', month: 'long', day: 'numeric' })} · what needs you today</p></div>
-        <div class="filters">${lockedBtn('stock', '<i class="ph ph-package"></i>Receive stock', 'class="btn" data-q="receive"')}${lockedBtn('stock', '<i class="ph ph-plus"></i>Add adjustment', 'class="btn btn-primary" data-q="adjust"')}</div></div>
+        <div class="filters">${lockedBtn('stock', '<i class="ph ph-package"></i>Receive delivery', 'class="btn" data-q="receive"')}${lockedBtn('stock', '<i class="ph ph-sliders"></i>Adjust stock', 'class="btn btn-primary" data-q="adjust"')}</div></div>
       <div class="grid g-12">
         <section class="span-12 glass-thick kpis kpis-four" aria-label="Today">
           ${DEMO ? `<div class="kpi"><span class="k-l">Net sales so far</span><span class="k-v num">${fmt.peso(net, 0)}</span><span class="k-d">Daily sales summary updates as terminals sync</span></div>
@@ -10466,7 +10448,7 @@ Cleo.bir = (() => {
         <section class="span-5 panel glass-thick">
           <div class="panel-head"><div><h2>Quick actions</h2><p>The work you do most</p></div></div>
           <div class="quick">
-            ${[['receive', 'package', 'Receive a delivery', 'Quantity, cost and supplier', 'stock'], ['adjust', 'sliders', 'Adjust stock', 'Spoilage, damage, own use', 'stock'], ['count', 'list-checks', 'Start a count', 'Full or cycle count', 'stock'], ['transfer', 'truck', 'Request a transfer', 'Between branches', 'stock'], ['product', 'plus-circle', 'Add a product', 'Pushes to every branch', 'edit'], ['export', 'file-csv', 'Export sales journal', 'For your accountant', 'export']].filter(([k]) => k !== 'transfer' || navOn('transfers')).map(([k, ic, t, s, need]) => `<button class="qa glass-thin sheen" data-q="${k}" ${can(need) ? '' : 'disabled title="Your role can\'t do this"'}><i class="ph ph-${ic}"></i><b>${t}</b><span>${s}</span></button>`).join('')}
+            ${[['receive', 'package', 'Receive delivery', 'Quantity, cost and supplier', 'stock'], ['adjust', 'sliders', 'Adjust stock', 'Spoilage, damage, own use', 'stock'], ['count', 'list-checks', 'Start a count', 'Full or cycle count', 'stock'], ['transfer', 'truck', 'Request a transfer', 'Between branches', 'stock'], ['product', 'plus-circle', 'Add a product', 'Pushes to every branch', 'edit'], ['export', 'file-csv', 'Export sales journal', 'For your accountant', 'export']].filter(([k]) => k !== 'transfer' || navOn('transfers')).map(([k, ic, t, s, need]) => `<button class="qa glass-thin sheen" data-q="${k}" ${can(need) ? '' : 'disabled title="Your role can\'t do this"'}><i class="ph ph-${ic}"></i><b>${t}</b><span>${s}</span></button>`).join('')}
           </div>
         </section>
         <section class="span-7 panel glass-thick">
@@ -13449,7 +13431,7 @@ Cleo.bir = (() => {
       </div>`;
     const lines = o.lines.length ? o.lines.map((l) => `
       <div class="line cart-line ${l.uid === flashUid ? 'flash' : ''}" data-l="${l.uid}">
-        <button class="ln" data-edit><b>${esc(l.name)}</b><span>${l.mods.map((m) => esc(m.n)).join(', ') || 'No options'}${l.note ? ` · "${esc(l.note)}"` : ''}${l.sc ? ` · <span class="disc">${statTag(o)}</span>` : l.disc ? ` · <span class="disc">${l.disc}% off</span>` : ''}</span></button>
+        <button class="ln" data-edit><b>${esc(l.name)}</b>${((d) => d ? `<span>${d}</span>` : '')([l.mods.map((m) => esc(m.n)).join(', '), l.note ? `"${esc(l.note)}"` : '', l.sc ? `<span class="disc">${statTag(o)}</span>` : l.disc ? `<span class="disc">${l.disc}% off</span>` : ''].filter(Boolean).join(' · '))}</button>
         <div class="qty"><button data-dec aria-label="Remove one ${esc(l.name)}"><i class="ph ph-minus"></i></button><b>${l.qty}</b><button data-inc aria-label="Add one ${esc(l.name)}"><i class="ph ph-plus"></i></button></div>
         <span class="lp">${P(l.unit * l.qty * (l.disc ? 1 - l.disc / 100 : 1))}${l.disc ? `<s>${P(l.unit * l.qty)}</s>` : ''}</span>
       </div>`).join('') : `<div class="cart-empty"><i class="ph ph-shopping-cart-simple"></i><b class="ink-2">No items yet</b><span>Tap an item to add it. Scan barcodes any time.</span></div>`;
