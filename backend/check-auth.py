@@ -49,7 +49,9 @@ def main():
     results['public_auth_http'] = code
     if code == 200:
         settings = json.loads(body)
-        results['facebook_enabled'] = settings.get('external', {}).get('facebook') is True
+        # Facebook sign-in was removed at the owner's request: the hosted provider must stay off.
+        results['facebook_disabled'] = settings.get('external', {}).get('facebook') is not True
+        results['google_enabled'] = settings.get('external', {}).get('google') is True
         results['email_enabled'] = settings.get('external', {}).get('email') is True
         results['signups_allowed'] = settings.get('disable_signup') is False
         results['email_confirmation_required'] = settings.get('mailer_autoconfirm') is False
@@ -81,7 +83,7 @@ def main():
             digest = 'sha384-' + base64.b64encode(hashlib.sha384(sdk).digest()).decode()
             results['deployed_sdk_integrity'] = bool(match and digest == match[1].decode())
     print(json.dumps(results, indent=2))
-    required = ('facebook_enabled', 'email_enabled', 'signups_allowed', 'email_confirmation_required',
+    required = ('facebook_disabled', 'google_enabled', 'email_enabled', 'signups_allowed', 'email_confirmation_required',
                 'site_url_matches', 'app_redirect_present', 'deployed_app_is_cleo', 'deployed_sdk_javascript', 'deployed_sdk_integrity')
     return 0 if all(results.get(name) is True for name in required) else 2
 

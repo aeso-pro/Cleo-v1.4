@@ -5,8 +5,8 @@ These changes are implemented and tested locally on `codex/backend-auth-operatio
 ## Confirmed live findings
 
 - The supplied production domain, `https://cleopos.online`, currently serves a Hostinger parked-domain document. Both `/index.html` and the expected SDK URL return that HTML. A successful HTTP status does not establish that Cleo is deployed.
-- Supabase public Auth settings enable email, Facebook and Google; signup is allowed and email confirmation is required.
-- Facebook authorization redirects to Facebook with email scope and the correct Supabase callback (`https://ntbkbvlsgymupjdpuvob.supabase.co/auth/v1/callback`). A complete user consent/signup round trip has not been performed.
+- Supabase public Auth settings enable email and Google; signup is allowed and email confirmation is required.
+- Facebook sign-in was removed at the owner's request (November 2026). `check-auth.py` now fails while the hosted Facebook provider is still switched on; turn it off in Authentication › Sign In / Providers. Accounts already made with Facebook remain valid data (`'facebook'` stays an accepted method in the migrations) and sign in with email via password reset.
 - Anonymous profile reads and context calls return permission denied as intended. Do not grant anonymous access to resolve a signup UI issue.
 - This cloud session has no access to the user's Chrome tabs. A management token is required to inspect private Supabase configuration or run migrations through the management API. Store `SUPABASE_ACCESS_TOKEN` securely in environment settings, never in source or chat.
 

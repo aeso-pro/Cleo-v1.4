@@ -1,4 +1,4 @@
-# Admin console, Facebook sign-in and security: setup
+# Admin console, sign-in and security: setup
 
 What was added in November 2026, and the steps only the owner can do. Nothing here needs a secret key in a file, and none should ever be put in one.
 
@@ -38,21 +38,17 @@ It should say `INSERT 0 1`. `INSERT 0 0` means no account has that email yet: si
 
 Go to `https://your-domain/admin.html` (locally: `http://localhost:5175/admin.html`). The first time, it walks you through adding Cleo Admin to an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password). After that every sign-in asks for the 6-digit code. This is enforced by the database, not the page: no admin function answers a session that has not passed the second step.
 
-### 1.4 Check the Facebook app (Meta for Developers)
+### 1.4 Turn off Facebook sign-in, and check the sign-in addresses
 
-The code was not the only problem. The handoff log recorded that the Facebook provider in Supabase had an **email address as its Client ID**; it now shows a 16-digit app ID, which is the right shape. Confirm the rest:
+Facebook sign-in was removed from Cleo at the owner's request (November 2026): the button is gone and the app refuses to start a Facebook sign-in. The provider is still switched on in the hosted project, so turn it off there too:
 
 | Where | Setting | Value |
 | --- | --- | --- |
-| Supabase › Authentication › Sign In / Providers › Facebook | Client ID, Client Secret | The Meta app's **App ID** and **App Secret** |
-| Meta › Facebook Login › Settings | Valid OAuth Redirect URIs | Only `https://ntbkbvlsgymupjdpuvob.supabase.co/auth/v1/callback` |
-| Meta › App settings › Basic | Privacy Policy URL | `https://your-domain/legal/privacy.html` |
-| Meta › App settings › Basic | App mode | **Live**. In Development mode only people listed under App roles can sign in |
-| Meta › App Review › Permissions | `email` | **Advanced Access**. Without it, people outside your team sign in with no email and Cleo has to turn them away |
+| Supabase › Authentication › Sign In / Providers › Facebook | Enable Sign in with Facebook | **Off**, then Save |
 | Supabase › Authentication › URL Configuration | Site URL | `https://your-domain` |
 | Supabase › Authentication › URL Configuration | Redirect URLs | `https://your-domain/index.html**` (remove the `localhost` entries at launch) |
 
-A sign-in made by someone who is not in the app's roles is the only real test of the last two Meta rows.
+Accounts already made with Facebook keep their data. They sign in with email instead: **Forgot password?** on Cleo's sign-in page sets a password for the same email address. The CleoPos app in Meta for Developers can be deleted once no one depends on it.
 
 ### 1.5 Still blocking real customers
 
@@ -62,7 +58,7 @@ A sign-in made by someone who is not in the app's roles is the only real test of
 
 ## 2. What changed
 
-### Facebook and Google sign-in (`index.html`)
+### Facebook and Google sign-in (`index.html`; Facebook was removed later, see 1.4)
 
 - Facebook ends its return address with `#_=_`. It is removed, and a sign-in started from a mode's address (`#/backoffice/…`) goes back to it.
 - A refused sign-in says why on the sign-in card: no email shared, cancelled, expired, opened in another browser, provider turned off. Before, every case said "cancelled or could not finish."

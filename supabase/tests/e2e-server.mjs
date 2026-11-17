@@ -7,8 +7,9 @@
 // All five migrations run in a disposable in-memory PostgreSQL (PGlite), and each RPC is
 // executed as the signed-in role with that session's claims, exactly as PostgREST would.
 // What is imitated: Supabase Auth (password sign-in, the PKCE code exchange, TOTP) and the
-// provider itself. "Continue with Facebook" comes straight back with whatever outcome was
-// chosen at POST /__test/scenario, including Facebook's "#_=_" on the return address.
+// provider itself. "Continue with Google" comes straight back with whatever outcome was
+// chosen at POST /__test/scenario. Facebook sign-in was removed at the owner's request: as on the
+// hosted project with the provider turned off, asking for it is refused.
 // Plan payments run the real Edge Function logic (supabase/functions/_shared/billing-core.js)
 // against a stand-in PayMongo at /__paymongo: its checkout page has a "Pay" and a "Cancel"
 // link, and paying sends the signed webhook (scenario { webhook: 'lost' } drops it).
@@ -192,11 +193,12 @@ const server = http.createServer(async (req, res) => {
       return authError(res, 400, 'validation_failed', 'unsupported grant type');
     }
     if (route === '/auth/v1/authorize') {
-      // The provider's whole sign-in, collapsed into one redirect. Facebook's "#_=_" rides along,
-      // as it does when a browser carries the fragment through Supabase's redirect.
+      // The provider's whole sign-in, collapsed into one redirect. Only Google is enabled, as on the
+      // hosted project: any other provider gets Supabase's own refusal.
       const back = new URL(url.searchParams.get('redirect_to') || `${ORIGIN}/index.html`);
       if (back.origin !== ORIGIN) return authError(res, 400, 'validation_failed', 'redirect_to is not allowed');
-      const provider = url.searchParams.get('provider') || 'facebook';
+      const provider = url.searchParams.get('provider') || '';
+      if (provider !== 'google') return authError(res, 400, 'validation_failed', 'Unsupported provider: provider is not enabled');
       // what the app asked the provider for, kept so a test can read it back (never the PKCE challenge)
       scenario.lastAuthorize = Object.fromEntries([...url.searchParams].filter(([k]) => !k.startsWith('code_challenge')));
       const refuse = (error, code, description) => {
@@ -212,7 +214,7 @@ const server = http.createServer(async (req, res) => {
       if (!person) { await addUser(scenario.email, scenario.name || 'New Person', { provider }); person = people.get(scenario.email); }
       const code = randomUUID(); flows.set(code, { userId: person.id });
       back.searchParams.set('code', code);
-      res.writeHead(302, { Location: `${back.href.replace(/#.*$/, '')}${provider === 'facebook' ? '#_=_' : ''}` });
+      res.writeHead(302, { Location: back.href.replace(/#.*$/, '') });
       return res.end();
     }
     if (route === '/auth/v1/user' && req.method === 'GET') {

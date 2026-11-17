@@ -39,7 +39,7 @@ Built for Philippine rules and payments: BIR invoicing (RR 7-2024), X- and Z-rea
 
 - Name: Cleo, by Aeso Technologies Inc. Original Cleo emblem and Aeso artwork (`assets/brand/`), Helvetica Neue (licensed font files), Phosphor icons, Cleo red accent, which a business can replace with its own brand colour.
 - Voice: plain, short, direct English for Philippine business owners and staff.
-- Google and Facebook sign-in keep their official marks and the wording "Continue with Google" and "Continue with Facebook".
+- Google sign-in keeps its official mark and the wording "Continue with Google". (Facebook sign-in was removed at the owner's request.)
 
 ## Evidence on Hand
 

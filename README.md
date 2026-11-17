@@ -4,7 +4,7 @@ One web app with three modes: **Terminal**, **Owner Dashboard** and **Back Offic
 
 Supabase authentication and account/business onboarding are implemented. The app runs on one of two data sources (`source/env.js`):
 
-- **The real backend** (Supabase), the default. Email/password, email confirmation, Google/Facebook redirects, session restoration, enrolled TOTP verification, password recovery/change, business creation, legal acceptance, and a safe empty business bootstrap use real server operations. The current build targets `https://ntbkbvlsgymupjdpuvob.supabase.co` with its public publishable key. Provider availability still depends on that project's provider configuration.
+- **The real backend** (Supabase), the default. Email/password, email confirmation, Google redirects, session restoration, enrolled TOTP verification, password recovery/change, business creation, legal acceptance, and a safe empty business bootstrap use real server operations. The current build targets `https://ntbkbvlsgymupjdpuvob.supabase.co` with its public publishable key. Provider availability still depends on that project's provider configuration.
 - **The demo**, a sample business (Kapé Lumen) that runs only when switched on with `?demo`. Its records are stored apart from real ones.
 
 The auth/onboarding migration has been applied to the target project. Its guard deliberately rejects a second application; use a new reviewed migration for future changes. See [`../supabase/README.md`](../supabase/README.md) for the schema and [`../Docs/AUTH_INTEGRATION.md`](../Docs/AUTH_INTEGRATION.md) for deployment, redirects, email templates, and tests. [`../Docs/BACKEND_INTEGRATION_GUIDE.md`](../Docs/BACKEND_INTEGRATION_GUIDE.md) maps the remaining integration work.
@@ -60,7 +60,7 @@ Run `node source/build.js` to rebuild the app, landing, legal pages and offline 
 - Demo sign-in (open with `?demo`; every way in needs the Terms and Privacy Policy box ticked):
   - Any email and password work. The demo team's owner and HQ manager emails, such as `maricel@kapelumen.ph`, ask for a 6-digit code. Any code passes except `000000`, which shows the error.
   - Backup code `AAAAA-AAAAA` shows the "already used" error.
-  - **Continue with Google** and **Continue with Facebook** are simulated: sign-in returns the demo owner, and sign-up goes on to the business details.
+  - **Continue with Google** is simulated: sign-in returns the demo owner, and sign-up goes on to the business details. (Facebook sign-in was removed.)
   - **Create an account** takes a name, email and password, then a 6-digit email code (again, `000000` is the error example), then the business, then **Choose your plan** and the payment page. Signing up with one of the demo team's emails shows the "already has an account" error.
   - **Plans and payment** (simulated): Basic, Pro or Max goes to a payment page with terminal count, branch count (Max), monthly or annual billing and a card (the provider's page, simulated) or GCash, Maya or GoTyme Bank (any 11-digit 09 number; approval is simulated). After paying, Basic opens the Terminal straight away with no mode picker; Pro and Max open the picker with all three modes. Enterprise has **Talk to sales**: it sends a call request and stays on the plan page.
   - Terminal PINs accept any 4 digits except `0000`. Three wrong PINs in a row lock that person out for 5 minutes on this device, even after a reload.

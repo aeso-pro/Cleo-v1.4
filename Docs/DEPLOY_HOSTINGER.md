@@ -40,7 +40,7 @@ In the Supabase dashboard → Authentication → URL Configuration:
 - **Site URL:** `https://<your domain>`
 - **Redirect URLs:** add `https://<your domain>/index.html**`
 
-Without these, Google, Facebook and email links send people to the wrong address after signing in.
+Without these, Google and email links send people to the wrong address after signing in.
 
 Also set up a custom SMTP sender (Authentication → Emails → SMTP Settings). The built-in mailer sends only a few emails an hour, so sign-up confirmations stop arriving.
 

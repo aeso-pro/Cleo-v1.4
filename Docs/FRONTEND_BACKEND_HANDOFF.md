@@ -21,6 +21,17 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-17 · Claude Code (cloud session), `main`
+
+**Facebook sign-in removed.** The owner asked for it to be taken out of the app and the backend.
+
+- [ ] **Hosted project: Facebook is still switched on.** `/auth/v1/settings` reports `facebook: true`. The owner turns it off in Authentication › Sign In / Providers › Facebook. Until then, `backend/check-auth.py` fails (it now requires `facebook_disabled` and `google_enabled`).
+- **`index.html`**: the "Continue with Facebook" button is gone from sign-in and sign-up. `socialAuth` in `backend/supabase.js` accepts only `google`; the Facebook-only email re-request (`auth_type=rerequest`, `auth-rerequest`) is removed; a pending provider sign-in can only be Google. Kept on purpose: the `#_=_` cleanup (old bookmarks), the no-email guard, and `'facebook'` as a recognised provider of an existing account.
+- **Migrations unchanged.** `'facebook'` stays an accepted legal-acceptance method and an admin console filter: accounts already made with Facebook are real records. They sign in with email via **Forgot password?**.
+- **`supabase/tests/e2e-server.mjs`**: the stand-in Auth refuses any provider but Google, as the hosted project will. All 19 + 52 backend tests pass.
+- [ ] **Legal text still names Facebook.** The Privacy Policy and Terms (embedded `cleo-legal`, `legal/*.html`, `Docs/Cleo Privacy Policy.md`) describe Facebook sign-in. Removing it is a legal-text change for the owner, and needs a new document version (the auth tests read it).
+- `node tools/update-security.js` re-fingerprinted the inline scripts and bumped the cache name.
+
 ### 2026-11-15 (later) · Claude Code (owner's session on his laptop), `main`
 
 **Plan payments through PayMongo.** The owner asked for the payment methods to work. Setup and limits are in [PAYMENTS.md](PAYMENTS.md). Nothing is deployed: the migration, the two Edge Functions and their secrets are the owner's to apply.
