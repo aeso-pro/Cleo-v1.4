@@ -2,53 +2,48 @@
 
 What was added in November 2026, and the steps only the owner can do. Nothing here needs a secret key in a file, and none should ever be put in one.
 
-## 1. What you have to do (in order)
+## 1. Where things stand, and what is left for you
 
-Until these are done, the fixes are in the code but the live project behaves as before.
+### 1.1 Database: done on 2026-11-17
 
-### 1.1 Apply the database migrations
-
-The hosted project (`ntbkbvlsgymupjdpuvob`) has only migration 001. In **Supabase › SQL Editor**, run these files from `supabase/migrations/`, one at a time, in this order. Each is a single transaction: it applies completely or not at all.
+Migrations 002 to 007 are applied to the hosted project (`ntbkbvlsgymupjdpuvob`), each checked byte for byte against the repository before it ran:
 
 1. `202610170002_verified_profiles.sql`
 2. `202610170003_operations.sql`
 3. `202610170004_transfers.sql`
 4. `202611140005_platform_admin.sql`
 5. `202611150006_billing.sql` (plan payments; see [PAYMENTS.md](PAYMENTS.md))
+6. `202611170007_admin_controls.sql` (the console's controls over accounts, businesses, plans and admins)
 
-Do not run 001 again; it refuses. 005 and 006 also refuse a second run.
+A read-only check afterwards found row-level security on all 19 Cleo tables, nothing open to visitors, nothing writable from a browser, and the existing 3 accounts, 2 businesses and memberships unchanged. Do not run any of them again: each refuses a second run. A future change is a new migration file.
 
 ### 1.2 Make yourself the first admin
 
-Admins are never created from a browser. In the SQL Editor, with your own sign-in email:
+Only the first admin is made in SQL; after that, superadmins add, change and remove admins on the console's **Admins** page. The account must exist and have a confirmed email first. Sign up in Cleo, or add the user in **Supabase › Authentication › Users** (you choose the password there; never put it in a file or a chat). Then, in the SQL Editor:
 
 ```sql
 INSERT INTO public.cleo_platform_admins(user_id, role, note)
 SELECT id, 'superadmin', 'First administrator' FROM auth.users
- WHERE lower(email) = lower('YOUR-EMAIL@example.com');
+ WHERE lower(email) = lower('YOUR-EMAIL@example.com') AND email_confirmed_at IS NOT NULL;
 ```
 
-It should say `INSERT 0 1`. `INSERT 0 0` means no account has that email yet: sign up in Cleo first, or add the user in **Authentication › Users**.
+It should say `INSERT 0 1`. `INSERT 0 0` means no confirmed account has that email yet.
 
-- `superadmin` can suspend accounts and revoke access. `support` can only read.
-- The admin page signs in with **email and password**. An account made with Facebook or Google has no password: use **Forgot password?** on Cleo's sign-in page once to set one.
-- To remove an admin: `UPDATE public.cleo_platform_admins SET revoked_at = now() WHERE user_id = '…';`
+- `superadmin` can change anything. `support` can only look.
+- The admin page signs in with **email and password**. An account made with Google has no password: use **Forgot password?** on Cleo's sign-in page once to set one.
+- Nobody can change their own admin access, and Cleo always keeps at least one superadmin with two-step verification.
 
 ### 1.3 Open the admin console
 
-Go to `https://your-domain/admin.html` (locally: `http://localhost:5175/admin.html`). The first time, it walks you through adding Cleo Admin to an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password). After that every sign-in asks for the 6-digit code. This is enforced by the database, not the page: no admin function answers a session that has not passed the second step.
+Go to `https://your-domain/admin` (locally: `http://localhost:5175/admin`). The old `admin.html` address forwards there. The first time, it walks you through adding Cleo Admin to an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password). After that every sign-in asks for the 6-digit code. The database enforces this, not the page: no admin function answers a session that has not passed the second step.
 
-### 1.4 Turn off Facebook sign-in, and check the sign-in addresses
+### 1.4 Sign-in settings (changed on 2026-11-17)
 
-Facebook sign-in was removed from Cleo at the owner's request (November 2026): the button is gone and the app refuses to start a Facebook sign-in. The provider is still switched on in the hosted project, so turn it off there too:
-
-| Where | Setting | Value |
-| --- | --- | --- |
-| Supabase › Authentication › Sign In / Providers › Facebook | Enable Sign in with Facebook | **Off**, then Save |
-| Supabase › Authentication › URL Configuration | Site URL | `https://your-domain` |
-| Supabase › Authentication › URL Configuration | Redirect URLs | `https://your-domain/index.html**` (remove the `localhost` entries at launch) |
-
-Accounts already made with Facebook keep their data. They sign in with email instead: **Forgot password?** on Cleo's sign-in page sets a password for the same email address. The CleoPos app in Meta for Developers can be deleted once no one depends on it.
+- **Facebook sign-in is removed**, at your request. The button and the code that started a Facebook sign-in are gone from the app (commit 1b519f5), and the provider is **switched off** in the hosted project (it now answers "provider is not enabled"). Its App ID and secret are still saved in Supabase.
+- Accounts already made with Facebook keep their data. They sign in with email instead: **Forgot password?** on Cleo's sign-in page sets a password for the same email address. The admin console can also send that reset email.
+- **Redirect URLs** now include `https://cleopos.online/index.html**` next to the four local test addresses. Remove the local ones at launch.
+- **Site URL** is still the local test address `http://127.0.0.1:5500`. Change it to `https://cleopos.online` when the site goes live; email links fall back to it.
+- Google and email sign-in are unchanged.
 
 ### 1.5 Still blocking real customers
 
@@ -79,13 +74,13 @@ Accounts already made with Facebook keep their data. They sign in with email ins
 ### Site hardening
 
 - **No inline scripts by permission.** `.htaccess` used to allow any inline script (`'unsafe-inline'`). It now lists the SHA-256 of each inline script the pages contain. Injected markup (`<img onerror>`, `javascript:` links) does not run; this was tested in a browser.
-- `admin.html` carries its own stricter policy: no inline script or style at all, connections only to the Supabase project.
+- The admin console (`admin/index.html`, served at `/admin`) carries its own stricter policy: no inline script or style at all, connections only to the Supabase project.
 - Both entry pages and the admin page refuse to run inside another site's frame, also on a host that drops the headers.
 - `tools/`, the stray nested `Cleo-v1.4-main/` folder and the admin page's caching are covered in `.htaccess`; the service worker never caches the admin console.
 
 ## 3. The one rule to remember
 
-**After any edit to `index.html`, `landing.html` or `admin.html`, and before every upload, run:**
+**After any edit to `index.html`, `landing.html` or `admin/index.html`, and before every upload, run:**
 
 ```bash
 node tools/update-security.js
@@ -121,11 +116,17 @@ The real pages at `http://localhost:5180/` in front of a stand-in Supabase that 
 
 | Section | Shows | Changes (superadmin only) |
 | --- | --- | --- |
-| Overview | Accounts, businesses, sign-ups per day, how people sign in | — |
-| Accounts | Everyone who signed up; search and filters | Suspend, restore (a reason is required and kept) |
-| Businesses | Every business; open one for its people, branches and recent changes | Revoke or restore one person's access |
+| Overview | Accounts, businesses, sign-ups per day, how people sign in, paid plans, businesses with no plan, money this month | — |
+| Accounts | Everyone who signed up; search and filters. **Open** shows one person: businesses, role, terms accepted, recent changes, past suspensions | Rename; confirm an email that never arrived; send a password reset email; change role or add to a business; suspend or restore; make admin |
+| Businesses | Every business with its plan; **Open** shows people, branches, plan, payments and recent changes | Rename; give, change, extend or end a plan without payment (trials, deals, after a refund); change a person's role and branch; revoke or restore access |
+| Payments | Every PayMongo payment with its status, money paid this month and in all, plans running, plans ending soon | — |
+| Admins | Everyone who can open the console (superadmins only) | Add an admin by email, change superadmin/support, remove |
 | Security | Eight rules checked live in the database, who the admins are, settings to review by hand | — |
-| Admin history | Every console sign-in and every change. It cannot be edited | — |
+| Admin history | Every console sign-in and every change, with its reason. It cannot be edited | — |
+
+Every change asks for a reason, which is kept in the admin history. A change to a business also appears in that business's own audit trail as made by "Cleo support". You never see or set anyone's password: a reset email lets them choose it.
+
+Still in code, not on the console: **plan prices** (`content/plans.md` for what the app shows, and the `cleo_plan_prices` table for what PayMongo charges; change both together).
 
 The session lives in the tab only, ends after 15 idle minutes, and nothing an admin sees is written to browser storage. Passwords, tokens and authenticator secrets are never returned by any admin function.
 

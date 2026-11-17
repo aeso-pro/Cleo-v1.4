@@ -184,7 +184,7 @@
   }
 
   /* ---------- session: start, two-step, leave ---------- */
-  const lockup = () => h('div', { class: 'lockup' }, h('img', { src: 'assets/brand/cleo-emblem.svg', alt: '', width: '22', height: '30' }), h('b', { text: 'Cleo' }), h('span', { class: 'badge', text: 'Admin' }));
+  const lockup = () => h('div', { class: 'lockup' }, h('img', { src: '../assets/brand/cleo-emblem.svg', alt: '', width: '22', height: '30' }), h('b', { text: 'Cleo' }), h('span', { class: 'badge', text: 'Admin' }));
   const loadingPage = (label) => h('div', { class: 'spinner-page', role: 'status' }, h('span', { class: 'spin', 'aria-hidden': 'true' }), h('span', { text: label }));
   function gateCard({ title, lede, wide = false, body = [], foot = [] }) {
     const heading = h('h1', { text: title, tabindex: '-1' });
@@ -193,7 +193,7 @@
     mount(card);
     return { card, heading };
   }
-  const appLink = () => h('a', { href: 'index.html', text: 'Back to Cleo' });
+  const appLink = () => h('a', { href: '../index.html', text: 'Back to Cleo' });
   const signOutButton = (label = 'Sign out') => h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: () => leave() }, icon('sign-out'), label);
 
   async function forget() {
@@ -388,13 +388,17 @@
     ['overview', 'Overview', 'squares-four'],
     ['accounts', 'Accounts', 'users'],
     ['businesses', 'Businesses', 'storefront'],
+    ['payments', 'Payments', 'receipt'],
+    ['admins', 'Admins', 'user-gear'],
     ['security', 'Security', 'shield-check'],
     ['activity', 'Admin history', 'clock-counter-clockwise'],
   ];
+  // Admins is for superadmins only: the server refuses everyone else anyway
+  const visibleViews = () => VIEWS.filter(([id]) => id !== 'admins' || state.admin?.role === 'superadmin');
   let main = null, nav = null;
   function shell() {
     const admin = state.admin || {};
-    nav = h('nav', { class: 'nav', 'aria-label': 'Admin sections' }, VIEWS.map(([id, label, glyph]) =>
+    nav = h('nav', { class: 'nav', 'aria-label': 'Admin sections' }, visibleViews().map(([id, label, glyph]) =>
       h('button', { type: 'button', dataset: { view: id }, onclick: () => { location.hash = `#${id}`; } }, icon(glyph), label)));
     main = h('main', { class: 'main', id: 'view', tabindex: '-1' });
     mount(h('div', { class: 'shell' },
@@ -409,12 +413,12 @@
   function route() {
     if (state.stage !== 'console' || !main) return;
     const wanted = location.hash.replace(/^#/, '');
-    const id = VIEWS.some(([v]) => v === wanted) ? wanted : 'overview';
+    const id = visibleViews().some(([v]) => v === wanted) ? wanted : 'overview';
     state.view = id;
     nav.querySelectorAll('button').forEach((b) => { if (b.dataset.view === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     const host = h('div', { class: 'view' });
     main.replaceChildren(host);
-    ({ overview: overviewView, accounts: accountsView, businesses: businessesView, security: securityView, activity: activityView })[id](host);
+    ({ overview: overviewView, accounts: accountsView, businesses: businessesView, payments: paymentsView, admins: adminsView, security: securityView, activity: activityView })[id](host);
     document.title = `${VIEWS.find(([v]) => v === id)[1]} · Cleo Admin`;
     main.scrollTo?.(0, 0); window.scrollTo(0, 0);
   }
@@ -513,8 +517,8 @@
 
   /* ---------- Overview ---------- */
   function overviewView(host) {
-    const load = () => fill(host, () => rpc('cleo_admin_overview'), (o) => {
-      const a = o.accounts || {}, b = o.businesses || {}, p = o.providers || {}, days = Array.isArray(o.signups) ? o.signups : [];
+    const load = () => fill(host, () => Promise.all([rpc('cleo_admin_overview'), rpc('cleo_admin_billing_overview')]).then(([o, money]) => ({ ...o, money })), (o) => {
+      const a = o.accounts || {}, b = o.businesses || {}, p = o.providers || {}, days = Array.isArray(o.signups) ? o.signups : [], m = o.money || {};
       host.replaceChildren(
         head('Overview', `Updated ${when(o.generatedAt, DATETIME)}, Manila time`, h('button', { class: 'btn btn-sm', type: 'button', onclick: load }, icon('arrow-clockwise'), 'Refresh')),
         h('section', { class: 'tiles', 'aria-label': 'Key figures' },
@@ -524,12 +528,17 @@
           tile('Waiting to set up', n(a.pendingSetup), 'Confirmed, no business yet'),
           tile('Two-step sign-in on', n(a.twoStep), `${share(a.twoStep, a.total)} of accounts`),
           tile('Suspended', n(a.suspended), Number(a.suspended) > 0 ? 'See Accounts, filter Suspended' : 'None', Number(a.suspended) > 0)),
+        h('section', { class: 'tiles', 'aria-label': 'Plans and money' },
+          tile('Paid plans running', n(m.activePaid), `${n(m.activeFree)} on Free`),
+          tile('Businesses with no plan', n(m.noPlan), 'They stop at the plan page', Number(m.noPlan) > 0),
+          tile('Ending within 7 days', n(m.endingSoon), 'Owners pay again to continue', Number(m.endingSoon) > 0),
+          tile('Paid this month', peso(m.paidThisMonth), `${plural(m.pendingPayments, 'payment', 'payments')} waiting`)),
         days.length ? h('div', { class: 'grid-2' },
           columnChart({ title: 'New accounts', unit: ['account', 'accounts'], days, field: 'accounts' }),
           columnChart({ title: 'New businesses', unit: ['business', 'businesses'], days, field: 'businesses' })) : null,
         h('div', { class: 'grid-2' },
           meterCard({ title: 'How people sign in', note: 'An account can use more than one', whole: a.total,
-            rows: [['envelope-simple', 'Email', p.email], ['google-logo', 'Google', p.google], ['facebook-logo', 'Facebook', p.facebook]] }),
+            rows: [['envelope-simple', 'Email', p.email], ['google-logo', 'Google', p.google], ...(Number(p.facebook) > 0 ? [['facebook-logo', 'Facebook (switched off)', p.facebook]] : [])] }),
           meterCard({ title: 'What businesses sell', note: `${plural(b.branches, 'branch', 'branches')} in all`, whole: b.total,
             rows: [['coffee', 'Food and drinks', b.fnb], ['bag', 'Retail goods', b.retail], ['scissors', 'Services', b.svc]] })));
     });
@@ -594,7 +603,7 @@
         cell('Business', row.business ? [h('span', { class: 'clip', text: row.business }), h('span', { class: 'sub', text: `${ROLES[row.role] || row.role || ''}${row.membershipRevoked ? ' · access revoked' : ''}` })] : h('span', { class: 'muted', text: 'None yet' })),
         cell('Joined', h('span', { class: 'num', text: when(row.createdAt) }), h('span', { class: 'sub num', text: row.lastSignInAt ? `Last sign-in ${ago(row.lastSignInAt).toLowerCase()}` : 'Never signed in' })),
         cell('Status', h('span', { class: 'badges' }, status, onOff(row.twoStep, 'Two-step on', 'No two-step'), row.adminRole ? h('span', { class: 'badge info' }, icon('shield-check'), row.adminRole === 'superadmin' ? 'Superadmin' : 'Support') : null, mine ? h('span', { class: 'badge', text: 'You' }) : null)),
-        h('td', { class: 'actions' }, action));
+        h('td', { class: 'actions' }, h('div', { class: 'row-actions' }, smallButton('Open', null, () => accountSheet(row.id, load)), action)));
     }
     host.replaceChildren(head('Accounts', 'Everyone who has signed up, newest first.'),
       h('div', { class: 'filters' }, searchBox('Search name, email or business', (text) => { query.search = text; query.offset = 0; load(); }), filter), list);
@@ -642,16 +651,20 @@
     let turn = 0;
     const load = () => {
       const mine = ++turn;
-      return fill(list, () => rpc('cleo_admin_list_businesses', { p_search: query.search, p_limit: PAGE, p_offset: query.offset }), (result) => {
+      return fill(list, () => Promise.all([rpc('cleo_admin_list_businesses', { p_search: query.search, p_limit: PAGE, p_offset: query.offset }), rpc('cleo_admin_business_plans')])
+        .then(([page, plans]) => ({ ...page, plans: plans || {} })), (result) => {
         if (mine !== turn) return;
         if (!result.rows.length) { list.replaceChildren(empty('storefront', 'No businesses match', query.search ? 'Try another search.' : 'No business has been set up yet.')); return; }
         list.replaceChildren(h('div', { class: 'table-wrap' }, h('table', { class: 'stack' },
-          h('thead', null, h('tr', null, h('th', { scope: 'col', text: 'Business' }), h('th', { scope: 'col', text: 'Owner' }), h('th', { scope: 'col', class: 'r', text: 'People' }),
+          h('thead', null, h('tr', null, h('th', { scope: 'col', text: 'Business' }), h('th', { scope: 'col', text: 'Owner' }), h('th', { scope: 'col', text: 'Plan' }), h('th', { scope: 'col', class: 'r', text: 'People' }),
             h('th', { scope: 'col', class: 'r', text: 'Branches' }), h('th', { scope: 'col', class: 'r', text: 'Products' }), h('th', { scope: 'col', text: 'Created' }),
             h('th', { scope: 'col' }, h('span', { class: 'sr-only', text: 'Actions' })))),
           h('tbody', null, result.rows.map((row) => h('tr', null,
             cell('Business', h('span', { class: 'strong clip', text: row.name }), h('span', { class: 'sub', text: (row.modules || []).map((m) => MODULES[m] || m).join(' · ') })),
             cell('Owner', row.hasOwner ? [h('span', { class: 'clip', text: row.ownerName || '—' }), h('span', { class: 'sub clip', text: row.ownerEmail })] : h('span', { class: 'badge warn' }, icon('warning'), 'No active owner')),
+            cell('Plan', (() => { const p = result.plans[row.id]; return !p ? h('span', { class: 'badge warn', text: 'No plan' })
+              : h('span', { class: `badge ${p.active ? (p.plan === 'free' ? '' : 'info') : 'warn'}`, text: `${PLAN_NAMES[p.plan] || p.plan}${p.active ? '' : ' · ended'}` }); })(),
+              result.plans[row.id]?.periodEnd ? h('span', { class: 'sub num', text: `to ${when(result.plans[row.id].periodEnd)}` }) : null),
             h('td', { class: 'r num', 'data-label': 'People' }, h('div', { text: n(row.members) })),
             h('td', { class: 'r num', 'data-label': 'Branches' }, h('div', { text: n(row.branches) })),
             h('td', { class: 'r num', 'data-label': 'Products' }, h('div', { text: n(row.products) })),
@@ -671,6 +684,8 @@
     'stock.receive': 'Delivery received', 'stock.adjust': 'Stock adjusted', 'stock.count': 'Stock counted',
     'transfer.request': 'Transfer requested', 'transfer.approve': 'Transfer approved', 'transfer.dispatch': 'Transfer dispatched', 'transfer.receive': 'Transfer received', 'transfer.reject': 'Transfer rejected',
     'admin.membership.revoke': 'Access revoked by Cleo support', 'admin.membership.restore': 'Access restored by Cleo support',
+    'admin.membership.role': 'Role changed by Cleo support', 'admin.membership.add': 'Added by Cleo support', 'admin.business.rename': 'Renamed by Cleo support',
+    'admin.plan.set': 'Plan set by Cleo support', 'admin.plan.end': 'Plan ended by Cleo support', 'billing.paid': 'Plan paid', 'billing.plan': 'Plan started',
   };
   function businessSheet(id, changed) {
     const content = h('div', null);
@@ -685,6 +700,9 @@
       content.replaceChildren(h('div', { class: 'sheet-body' },
         h('div', { class: 'chips' }, (d.business.modules || []).map((m) => h('span', { class: 'badge', text: MODULES[m] || m })), h('span', { class: 'badge', text: `Created ${when(d.business.createdAt)}` })),
         h('div', { class: 'tiles' }, tile('Products', n(c.products)), tile('Stock items', n(c.stockItems)), tile('Customers', n(c.customers)), tile('Stock movements', n(c.stockMovements)), tile('Transfers', n(c.transfers))),
+        state.admin?.canWrite ? actionsBar(smallButton('Rename business', 'pencil-simple', () => formDialog({ title: `Rename ${d.business.name}`, fields: [{ id: 'name', label: 'Business name', value: d.business.name }],
+          run: (v) => rpc('cleo_admin_rename_business', { p_business_id: id, p_name: v.name, p_reason: v.reason }), done: () => { toast('Business renamed'); businessChoices = null; load(); changed(); } }))) : null,
+        planSection(id, changed),
         h('section', null, h('h3', { text: `People (${n(d.members.length)})` }), h('div', { class: 'card' }, h('div', { class: 'table-wrap' }, h('table', { class: 'stack' },
           h('thead', null, h('tr', null, ['Person', 'Role', 'Last sign-in', 'Access'].map((t) => h('th', { scope: 'col', text: t })), h('th', { scope: 'col' }, h('span', { class: 'sr-only', text: 'Actions' })))),
           h('tbody', null, d.members.map((m) => h('tr', null,
@@ -693,8 +711,14 @@
             cell('Last sign-in', h('span', { class: 'num', text: ago(m.lastSignInAt) })),
             cell('Access', h('span', { class: 'badges' }, m.revoked ? h('span', { class: 'badge warn' }, icon('prohibit'), 'Revoked') : h('span', { class: 'badge good' }, icon('check-circle'), 'Active'), onOff(m.twoStep, 'Two-step on', 'No two-step'),
               m.suspended ? h('span', { class: 'badge bad' }, icon('prohibit'), 'Account suspended') : null)),
-            h('td', { class: 'actions' }, state.admin?.canWrite ? h('button', { class: `btn btn-sm${m.revoked ? '' : ' btn-danger'}`, type: 'button',
-              onclick: () => membership(d.business, m, () => { load(); changed(); }) }, m.revoked ? 'Restore' : 'Revoke') : null)))))))),
+            h('td', { class: 'actions' }, h('div', { class: 'row-actions' }, smallButton('Open', null, () => accountSheet(m.userId, () => { load(); changed(); })),
+              state.admin?.canWrite && !m.revoked ? smallButton('Role', null, () => formDialog({ title: `Change ${m.email}’s role`, lede: `Now: ${ROLES[m.role] || m.role}${m.branch ? ` at ${m.branch}` : ''}.`,
+                fields: [{ id: 'role', label: 'Role', type: 'select', value: m.role, options: Object.entries(ROLES) },
+                  { id: 'branch', label: 'Branch', type: 'select', value: d.branches.find((b) => b.name === m.branch)?.id || d.branches[0]?.id, options: d.branches.map((b) => [b.id, b.name]), showIf: (v) => !['owner', 'hq'].includes(v.role) }],
+                run: (v) => rpc('cleo_admin_set_member', { p_user_id: m.userId, p_business_id: id, p_role: v.role, p_branch_id: ['owner', 'hq'].includes(v.role) ? null : v.branch, p_reason: v.reason }),
+                done: () => { toast('Role changed'); load(); changed(); } })) : null,
+              state.admin?.canWrite ? h('button', { class: `btn btn-sm${m.revoked ? '' : ' btn-danger'}`, type: 'button',
+              onclick: () => membership(d.business, m, () => { load(); changed(); }) }, m.revoked ? 'Restore' : 'Revoke') : null))))))))),
         h('section', null, h('h3', { text: `Branches (${n(d.branches.length)})` }), h('div', { class: 'chips' }, d.branches.map((b) => h('span', { class: 'badge', text: `${b.name}${b.city ? `, ${b.city}` : ''} · ${b.code}` })))),
         h('section', null, h('h3', { text: 'Recent changes' }), d.activity.length
           ? h('div', { class: 'card' }, h('ul', { class: 'activity' }, d.activity.map((a) => h('li', null, h('b', { text: ACTIONS[a.action] || a.action }), h('time', { text: when(a.at, DATETIME) }), h('span', { text: `${a.actor || 'Unknown'} · ${known.get(a.entity) || a.entity}` })))))
@@ -774,7 +798,9 @@
   }
 
   /* ---------- Admin history ---------- */
-  const DEEDS = { 'session.start': 'Opened the admin console', 'account.suspend': 'Suspended an account', 'account.restore': 'Restored an account', 'membership.revoke': 'Revoked business access', 'membership.restore': 'Restored business access' };
+  const DEEDS = { 'session.start': 'Opened the admin console', 'account.suspend': 'Suspended an account', 'account.restore': 'Restored an account', 'membership.revoke': 'Revoked business access', 'membership.restore': 'Restored business access',
+    'account.confirm_email': 'Confirmed an email', 'account.rename': 'Renamed an account', 'membership.role': 'Changed a role', 'membership.add': 'Added someone to a business',
+    'business.rename': 'Renamed a business', 'plan.set': 'Set a plan', 'plan.end': 'Ended a plan', 'admin.add': 'Added an admin', 'admin.change': 'Changed admin access', 'admin.remove': 'Removed an admin' };
   function activityView(host) {
     const list = h('div', { class: 'card flush' });
     let offset = 0;
@@ -785,12 +811,248 @@
         h('tbody', null, result.rows.map((row) => {
           const d = row.detail || {};
           const details = row.action === 'session.start' ? [d.ip, d.userAgent].filter(Boolean).join(' · ') || 'No device details'
-            : [d.email, d.business, d.role ? ROLES[d.role] || d.role : '', d.reason ? `Reason: ${d.reason}` : ''].filter(Boolean).join(' · ') || row.targetId;
+            : [d.email, d.business, d.plan ? `${PLAN_NAMES[d.plan] || d.plan}${d.until ? ` until ${d.until}` : ''}` : '', d.after ? `“${d.before || ''}” → “${d.after}”` : '',
+              d.role ? ROLES[d.role] || ({ superadmin: 'Superadmin', support: 'Support', none: 'Removed' })[d.role] || d.role : '', d.reason ? `Reason: ${d.reason}` : ''].filter(Boolean).join(' · ') || row.targetId;
           return h('tr', null, cell('When', h('span', { class: 'num', text: when(row.at, DATETIME) })), cell('Admin', h('span', { class: 'clip', text: row.admin })),
             cell('What', h('span', { class: 'strong', text: DEEDS[row.action] || row.action })), cell('Details', h('span', { class: 'sub', text: details })));
         })))), pager(result, (next) => { offset = next; load(); }));
     });
     host.replaceChildren(head('Admin history', 'Sign-ins to this console and every change made from it. It cannot be edited or deleted.'), list);
+    load();
+  }
+
+  /* ---------- controls (migration 007): every change asks for a reason, which is kept ---------- */
+  const PESO = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
+  const peso = (v) => PESO.format(Number(v) || 0);
+  const PLAN_NAMES = { free: 'Free', basic: 'Basic', pro: 'Pro', max: 'Max' };
+  const METHOD_NAMES = { card: 'Card', gcash: 'GCash', maya: 'Maya', gotyme: 'GoTyme Bank', '': 'Set by an admin' };
+  const STATUS_TONE = { paid: 'good', pending: 'warn', failed: 'bad', expired: '' };
+  const isoDay = (date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+
+  /** a form in a dialog: fields, an optional reason, and one action that runs on the server */
+  function formDialog({ title, lede, fields = [], reason = true, confirm = 'Save', danger = false, run, done }) {
+    const inputs = {};
+    const row = (f) => {
+      const id = `ad-f-${f.id}`;
+      let control;
+      if (f.type === 'select') control = h('select', { class: 'select', id }, f.options.map(([value, label]) => h('option', { value, text: label, selected: String(value) === String(f.value ?? '') || null })));
+      else if (f.type === 'textarea') control = h('textarea', { class: 'textarea', id, maxlength: f.max || 500, placeholder: f.placeholder || '' });
+      else control = h('input', { class: 'input', id, type: f.type || 'text', value: f.value ?? '', min: f.min ?? null, max: f.max ?? null, placeholder: f.placeholder || '', autocomplete: 'off', spellcheck: 'false' });
+      if (f.type === 'textarea' && f.value) control.value = f.value;
+      inputs[f.id] = control;
+      const field = h('div', { class: 'field', dataset: { field: f.id } }, h('label', { for: id, text: f.label }), control, f.help ? h('p', { class: 'help', text: f.help }) : null);
+      if (f.showIf) { field.hidden = !f.showIf(values()); }
+      return field;
+    };
+    const values = () => Object.fromEntries(Object.entries(inputs).map(([k, el]) => [k, el.value.trim()]));
+    const all = [...fields, ...(reason ? [{ id: 'reason', label: 'Reason (kept in the admin history)', type: 'textarea', placeholder: 'Example: the owner asked by email' }] : [])];
+    const rows = all.map(row);
+    const refresh = () => all.forEach((f, i) => { if (f.showIf) rows[i].hidden = !f.showIf(values()); });
+    const error = h('p', { class: 'note bad', role: 'alert', hidden: true });
+    const go = h('button', { class: `btn ${danger ? 'btn-danger' : 'btn-primary'}`, type: 'button', text: confirm });
+    const box = dialog({ title, lede, body: [h('div', { class: 'form-stack' }, rows), error], foot: [h('button', { class: 'btn', type: 'button', text: 'Cancel', onclick: () => box.close() }), go] });
+    Object.values(inputs).forEach((el) => el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', refresh));
+    go.addEventListener('click', async () => {
+      const v = values();
+      if (reason && v.reason.length < 3) { error.replaceChildren(icon('warning-circle', true), 'Give a reason of at least 3 characters.'); error.hidden = false; inputs.reason.focus(); return; }
+      busy(go, true); error.hidden = true;
+      try {
+        const result = await run(v);
+        box.close();
+        done?.(result, v);
+      } catch (failure) {
+        const refusal = explain(failure);
+        if (reroute(refusal)) { box.close(); return; }
+        busy(go, false); error.replaceChildren(icon('warning-circle', true), refusal.message); error.hidden = false;
+      }
+    });
+    (Object.values(inputs)[0] || go).focus();
+    return box;
+  }
+  const actionsBar = (...buttons) => h('div', { class: 'action-bar' }, buttons.filter(Boolean));
+  const smallButton = (label, glyph, onclick, tone = '') => h('button', { class: `btn btn-sm${tone ? ` btn-${tone}` : ''}`, type: 'button', onclick }, glyph ? icon(glyph) : null, label);
+  let businessChoices = null;
+  async function businessOptions() {
+    if (!businessChoices) businessChoices = (await rpc('cleo_admin_list_businesses', { p_search: '', p_limit: 100, p_offset: 0 })).rows;
+    return businessChoices.map((b) => [b.id, `${b.name}${b.ownerEmail ? ` · ${b.ownerEmail}` : ''}`]);
+  }
+
+  /** one person: who they are, where they work, and everything an admin can do for them */
+  function accountSheet(id, changed = () => {}) {
+    const content = h('div', null);
+    const box = dialog({ title: 'Account', sheet: true, body: [content] });
+    const heading = box.el.querySelector('h2');
+    const write = !!state.admin?.canWrite;
+    const after = (message) => () => { toast(message); load(); changed(); };
+    const load = () => fill(content, () => rpc('cleo_admin_account', { p_user_id: id }), (a) => {
+      heading.textContent = a.name || a.email || 'Account';
+      const mine = a.id === state.userId;
+      const row = { id: a.id, email: a.email, name: a.name, suspendedReason: a.suspension?.reason || '' };
+      const methods = [...new Set([a.provider, ...(Array.isArray(a.providers) ? a.providers : [])])].filter((m) => PROVIDERS[m]);
+      content.replaceChildren(h('div', { class: 'sheet-body' },
+        h('div', { class: 'chips' },
+          h('span', { class: 'badge', text: a.email || 'No email address' }),
+          methods.map((m) => h('span', { class: 'badge' }, icon(PROVIDERS[m][0]), PROVIDERS[m][1])),
+          a.suspension ? h('span', { class: 'badge bad' }, icon('prohibit'), 'Suspended') : a.banned ? h('span', { class: 'badge bad' }, icon('prohibit'), 'Banned in Auth') : h('span', { class: 'badge good' }, icon('check-circle'), 'Active'),
+          a.confirmed ? h('span', { class: 'badge good' }, icon('envelope-simple'), 'Email confirmed') : h('span', { class: 'badge warn' }, icon('envelope-simple'), 'Email not confirmed'),
+          onOff(a.twoStep, 'Two-step on', 'No two-step'),
+          a.adminRole ? h('span', { class: 'badge info' }, icon('shield-check'), a.adminRole === 'superadmin' ? 'Superadmin' : 'Support admin') : null),
+        a.suspension ? h('p', { class: 'note bad' }, icon('prohibit'), `Suspended ${when(a.suspension.at, DATETIME)}: ${a.suspension.reason}`) : null,
+        h('div', { class: 'tiles' }, tile('Joined', when(a.createdAt)), tile('Last sign-in', ago(a.lastSignInAt)),
+          tile('Agreed to terms', a.legal ? when(a.legal.at) : 'Not yet', a.legal ? `via ${a.legal.method}` : '')),
+        write && !mine ? actionsBar(
+          smallButton('Rename', 'pencil-simple', () => formDialog({ title: `Rename ${a.email || 'this account'}`, fields: [{ id: 'name', label: 'Name', value: a.name }],
+            run: (v) => rpc('cleo_admin_set_name', { p_user_id: a.id, p_name: v.name, p_reason: v.reason }), done: after('Name changed') })),
+          !a.confirmed && a.email ? smallButton('Confirm email', 'envelope-simple-open', () => formDialog({ title: `Confirm ${a.email}?`,
+            lede: 'Do this only when you are sure the address belongs to this person, for example after they wrote to you from it.', confirm: 'Confirm email',
+            run: (v) => rpc('cleo_admin_confirm_email', { p_user_id: a.id, p_reason: v.reason }), done: after('Email confirmed') })) : null,
+          a.email ? smallButton('Send password reset', 'key', () => resetPassword(a.email)) : null,
+          smallButton(a.memberships.some((m) => !m.revoked) ? 'Change role' : 'Add to a business', 'briefcase', async () => {
+            const current = a.memberships.find((m) => !m.revoked);
+            let options;
+            try { options = await businessOptions(); } catch (failure) { toast('Businesses couldn’t be loaded', explain(failure).message, 'bad'); return; }
+            formDialog({ title: current ? `Change ${a.email}’s role` : `Add ${a.email} to a business`,
+              lede: current ? `Now: ${ROLES[current.role] || current.role} at ${current.business}.` : 'An account belongs to one business at a time.',
+              fields: [
+                { id: 'business', label: 'Business', type: 'select', options: current ? [[current.businessId, current.business]] : options, value: current?.businessId },
+                { id: 'role', label: 'Role', type: 'select', options: Object.entries(ROLES), value: current?.role || 'cashier', help: 'Owner and HQ see every branch. Other roles work in the business’s first branch unless changed in the app.' }],
+              run: (v) => rpc('cleo_admin_set_member', { p_user_id: a.id, p_business_id: v.business, p_role: v.role, p_branch_id: null, p_reason: v.reason }),
+              done: after(current ? 'Role changed' : 'Added to the business') });
+          }),
+          a.adminRole ? null : (a.suspension
+            ? smallButton('Restore account', 'arrow-counter-clockwise', () => suspension(row, false, () => { load(); changed(); }))
+            : smallButton('Suspend account', 'prohibit', () => suspension(row, true, () => { load(); changed(); }), 'danger')),
+          state.admin?.role === 'superadmin' && a.email && a.confirmed && !a.suspension ? smallButton(a.adminRole ? 'Change admin access' : 'Make admin', 'shield-check', () => adminDialog(a.email, a.adminRole, () => { load(); changed(); })) : null)
+          : mine ? h('p', { class: 'help', text: 'This is your own account. Another superadmin changes it.' }) : null,
+        h('section', null, h('h3', { text: 'Businesses' }), a.memberships.length
+          ? h('div', { class: 'card' }, h('ul', { class: 'activity' }, a.memberships.map((m) => h('li', null,
+            h('b', { text: m.business }), h('time', { text: m.revoked ? 'Access revoked' : `Since ${when(m.since)}` }),
+            h('span', { text: `${ROLES[m.role] || m.role}${m.branch ? ` · ${m.branch}` : ''}` })))))
+          : h('p', { class: 'muted', text: 'Not part of any business yet.' })),
+        h('section', null, h('h3', { text: 'What they changed recently' }), a.activity.length
+          ? h('div', { class: 'card' }, h('ul', { class: 'activity' }, a.activity.map((x) => h('li', null, h('b', { text: ACTIONS[x.action] || x.action }), h('time', { text: when(x.at, DATETIME) }), h('span', { text: `${x.business} · ${x.entity}` })))))
+          : h('p', { class: 'muted', text: 'Nothing yet.' })),
+        a.suspensions.length > 1 || (a.suspensions.length === 1 && !a.suspension) ? h('section', null, h('h3', { text: 'Past suspensions' }),
+          h('div', { class: 'card' }, h('ul', { class: 'activity' }, a.suspensions.filter((s) => s.liftedAt).map((s) => h('li', null, h('b', { text: s.reason }), h('time', { text: when(s.at) }), h('span', { text: `Lifted ${when(s.liftedAt)}` })))))) : null));
+    });
+    load();
+  }
+
+  /** the person receives Supabase's own reset email and chooses a new password themselves */
+  function resetPassword(email) {
+    formDialog({ title: `Send a password reset to ${email}?`, reason: false, confirm: 'Send email',
+      lede: 'They get an email with a link to choose a new password. You never see or set it. Supabase limits how many emails it sends an hour.',
+      run: async () => {
+        const result = await client().auth.resetPasswordForEmail(email, { redirectTo: new URL('../index.html?auth=recovery', location.href).href });
+        if (result?.error) throw result.error;
+        return { ok: true };
+      },
+      done: () => toast('Password reset sent', email) });
+  }
+
+  /** add, change or remove one admin */
+  function adminDialog(email = '', current = null, done = () => {}) {
+    formDialog({ title: current ? `Admin access for ${email}` : email ? `Make ${email} an admin?` : 'Add an admin',
+      lede: 'Superadmins can change anything here. Support admins can look but not change. Every admin must set up an authenticator app the first time.',
+      fields: [
+        ...(email ? [] : [{ id: 'email', label: 'Email of their Cleo account', type: 'email', placeholder: 'name@example.com', help: 'The person signs up for Cleo and confirms their email first.' }]),
+        { id: 'role', label: 'Access', type: 'select', value: current || 'support', options: [['support', 'Support: read only'], ['superadmin', 'Superadmin: can change anything'], ...(current ? [['none', 'Remove admin access']] : [])] }],
+      confirm: 'Save',
+      run: (v) => rpc('cleo_admin_set_admin', { p_email: email || v.email, p_role: v.role, p_reason: v.reason }),
+      done: (r) => { toast(r.role === 'none' ? 'Admin access removed' : 'Admin access saved', r.email); done(); } });
+  }
+
+  /** the plan section of a business sheet */
+  function planSection(businessId, changed) {
+    const host = h('section', null, h('h3', { text: 'Plan and payments' }));
+    const body = h('div', null);
+    host.append(body);
+    const load = () => fill(body, () => rpc('cleo_admin_business_billing', { p_business_id: businessId }), (b) => {
+      const s = b.subscription;
+      const write = !!state.admin?.canWrite;
+      const summary = s ? `${PLAN_NAMES[s.plan] || s.plan} · ${plural(s.terminals, 'terminal', 'terminals')}${s.branches > 1 ? ` in ${s.branches} branches` : ''}` : 'No plan';
+      const period = !s ? 'The business can’t open Cleo until it has a plan.' : s.periodEnd ? `${s.active ? 'Runs until' : 'Ended'} ${when(s.periodEnd)} · ${s.cycle === 'annual' ? 'yearly' : 'monthly'} · ${METHOD_NAMES[s.method] ?? s.method}` : 'Free: no end date';
+      body.replaceChildren(
+        h('div', { class: 'tiles' }, tile('Plan', summary, period, !s || !s.active), tile('Price per period', s ? peso(s.total) : '—', s?.method === '' ? 'Set by an admin, no payment' : '')),
+        write ? actionsBar(
+          smallButton(s ? 'Change plan' : 'Give a plan', 'seal-check', () => {
+            const today = new Date(), next = new Date(today.getTime() + 30 * 86400000);
+            formDialog({ title: s ? 'Change the plan' : 'Give a plan',
+              lede: 'No payment is taken. Use this for a trial, a correction, a plan agreed with sales, or after a refund in PayMongo.',
+              fields: [
+                { id: 'plan', label: 'Plan', type: 'select', value: s?.plan || 'pro', options: [['free', 'Free'], ['basic', 'Basic'], ['pro', 'Pro'], ['max', 'Max'], ...(s ? [['none', 'End the plan now']] : [])] },
+                { id: 'terminals', label: 'Terminals', type: 'number', min: 1, max: 9999, value: s?.terminals || 1, showIf: (v) => v.plan && v.plan !== 'none' && v.plan !== 'free' },
+                { id: 'branches', label: 'Branches', type: 'number', min: 1, max: 9999, value: s?.branches || 1, showIf: (v) => v.plan === 'max', help: 'Only Max covers more than one branch.' },
+                { id: 'cycle', label: 'Billing cycle', type: 'select', value: s?.cycle || 'monthly', options: [['monthly', 'Monthly'], ['annual', 'Annual']], showIf: (v) => v.plan && v.plan !== 'none' && v.plan !== 'free' },
+                { id: 'until', label: 'Last day of the plan', type: 'date', min: isoDay(today), value: s?.periodEnd && s.active ? isoDay(new Date(new Date(s.periodEnd).getTime() - 1000)) : isoDay(next), showIf: (v) => v.plan && v.plan !== 'none' && v.plan !== 'free' }],
+              danger: false, confirm: 'Save plan',
+              run: (v) => {
+                const paid = !['free', 'none'].includes(v.plan);
+                return rpc('cleo_admin_set_plan', { p_business_id: businessId, p_plan: v.plan, p_terminals: v.plan === 'none' ? null : paid ? Number(v.terminals) : 1,
+                  p_branches: v.plan === 'none' ? null : v.plan === 'max' ? Number(v.branches) : 1, p_cycle: paid ? v.cycle : v.plan === 'none' ? null : 'monthly',
+                  p_until: paid ? v.until : null, p_reason: v.reason });
+              },
+              done: () => { toast('Plan saved'); load(); changed(); } });
+          })) : null,
+        b.payments.length ? h('div', { class: 'card' }, h('div', { class: 'table-wrap' }, h('table', { class: 'stack' },
+          h('thead', null, h('tr', null, ['When', 'Plan', 'Amount', 'Paid with', 'Status'].map((t) => h('th', { scope: 'col', text: t })))),
+          h('tbody', null, b.payments.map((p) => h('tr', null,
+            cell('When', h('span', { class: 'num', text: when(p.createdAt, DATETIME) }), h('span', { class: 'sub', text: p.reference })),
+            cell('Plan', h('span', { text: `${PLAN_NAMES[p.plan] || p.plan} · ${p.cycle === 'annual' ? 'year' : 'month'}` }), h('span', { class: 'sub', text: plural(p.terminals, 'terminal', 'terminals') })),
+            cell('Amount', h('span', { class: 'num', text: peso(p.amount) }), p.live === false ? h('span', { class: 'sub', text: 'Test payment' }) : null),
+            cell('Paid with', h('span', { text: METHOD_NAMES[p.method] ?? p.method })),
+            cell('Status', h('span', { class: `badge ${STATUS_TONE[p.status] ?? ''}`, text: p.status[0].toUpperCase() + p.status.slice(1) }))))))))
+          : h('p', { class: 'muted', text: 'No payments yet.' }));
+    });
+    load();
+    return host;
+  }
+
+  /* ---------- Payments ---------- */
+  function paymentsView(host) {
+    const query = { status: 'all', offset: 0 };
+    const top = h('div', null), list = h('div', { class: 'card flush' });
+    const filter = h('select', { class: 'select', 'aria-label': 'Show' }, [['all', 'All payments'], ['paid', 'Paid'], ['pending', 'Waiting'], ['failed', 'Failed'], ['expired', 'Abandoned']].map(([value, label]) => h('option', { value, text: label })));
+    filter.addEventListener('change', () => { query.status = filter.value; query.offset = 0; load(); });
+    const load = () => fill(list, () => rpc('cleo_admin_payments', { p_status: query.status, p_limit: PAGE, p_offset: query.offset }), (r) => {
+      const s = r.summary || {}, plans = s.activePlans || {};
+      top.replaceChildren(h('section', { class: 'tiles', 'aria-label': 'Money' },
+        tile('Paid this month', peso(s.paidThisMonth), 'Live payments, Manila time'),
+        tile('Paid in all', peso(s.paidTotal), s.testPaid ? `${plural(s.testPaid, 'test payment', 'test payments')} not counted` : 'Live payments'),
+        tile('Plans running', n(Object.values(plans).reduce((a, b) => a + Number(b), 0)), Object.entries(plans).map(([p, c]) => `${PLAN_NAMES[p] || p} ${c}`).join(' · ') || 'None'),
+        tile('Ending within 7 days', n(s.endingSoon), 'Owners pay again to continue', Number(s.endingSoon) > 0)));
+      if (!r.rows.length) { list.replaceChildren(empty('receipt', 'No payments', query.status === 'all' ? 'Payments appear here once owners start paying for plans.' : 'None with that status.')); return; }
+      list.replaceChildren(h('div', { class: 'table-wrap' }, h('table', { class: 'stack' },
+        h('thead', null, h('tr', null, ['When', 'Business', 'Plan', 'Amount', 'Paid with', 'Status'].map((t) => h('th', { scope: 'col', text: t })), h('th', { scope: 'col' }, h('span', { class: 'sr-only', text: 'Actions' })))),
+        h('tbody', null, r.rows.map((p) => h('tr', null,
+          cell('When', h('span', { class: 'num', text: when(p.createdAt, DATETIME) }), h('span', { class: 'sub', text: p.reference })),
+          cell('Business', h('span', { class: 'strong clip', text: p.business }), h('span', { class: 'sub clip', text: p.by })),
+          cell('Plan', h('span', { text: `${PLAN_NAMES[p.plan] || p.plan} · ${p.cycle === 'annual' ? 'year' : 'month'}` }), h('span', { class: 'sub', text: plural(p.terminals, 'terminal', 'terminals') })),
+          cell('Amount', h('span', { class: 'num strong', text: peso(p.amount) }), p.live === false ? h('span', { class: 'sub', text: 'Test payment' }) : null),
+          cell('Paid with', h('span', { text: METHOD_NAMES[p.method] ?? p.method })),
+          cell('Status', h('span', { class: `badge ${STATUS_TONE[p.status] ?? ''}`, text: p.status[0].toUpperCase() + p.status.slice(1) }), p.paidAt ? h('span', { class: 'sub', text: `Runs to ${when(p.periodEnd)}` }) : null),
+          h('td', { class: 'actions' }, smallButton('Business', null, () => businessSheet(p.businessId, load))))))),
+        pager(r, (offset) => { query.offset = offset; load(); })));
+    });
+    host.replaceChildren(head('Payments', 'Plan payments through PayMongo, newest first.'), top, h('div', { class: 'filters' }, filter), list);
+    load();
+  }
+
+  /* ---------- Admins ---------- */
+  function adminsView(host) {
+    const list = h('div', { class: 'card flush' });
+    const load = () => fill(list, () => rpc('cleo_admin_admins'), (rows) => {
+      list.replaceChildren(h('div', { class: 'table-wrap' }, h('table', { class: 'stack' },
+        h('thead', null, h('tr', null, ['Admin', 'Access', 'Two-step', 'Last sign-in'].map((t) => h('th', { scope: 'col', text: t })), h('th', { scope: 'col' }, h('span', { class: 'sr-only', text: 'Actions' })))),
+        h('tbody', null, rows.map((a) => h('tr', null,
+          cell('Admin', h('span', { class: 'strong clip', text: a.name || a.email }), h('span', { class: 'sub clip', text: a.email })),
+          cell('Access', a.revoked ? h('span', { class: 'badge', text: `Removed ${when(a.revokedAt)}` }) : h('span', { class: `badge ${a.role === 'superadmin' ? 'info' : ''}`, text: a.role === 'superadmin' ? 'Superadmin' : 'Support, read only' }), a.you ? h('span', { class: 'badge', text: 'You' }) : null),
+          cell('Two-step', onOff(a.twoStep, 'On', 'Not set up')),
+          cell('Last sign-in', h('span', { class: 'num', text: ago(a.lastSignInAt) })),
+          h('td', { class: 'actions' }, a.you ? null : smallButton(a.revoked ? 'Restore' : 'Change', null, () => adminDialog(a.email, a.revoked ? null : a.role, load)))))))));
+    });
+    host.replaceChildren(head('Admins', 'Who can open this console. Only superadmins see this page.', h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: () => adminDialog('', null, load) }, icon('plus'), 'Add an admin')), list,
+      h('p', { class: 'help', text: 'Nobody can change their own access, and Cleo always keeps at least one superadmin with two-step verification.' }));
     load();
   }
 

@@ -24,7 +24,7 @@ export async function database() {
    name==='unconfirmed'?null:new Date().toISOString(),{name:name==='facebook'?'   ':name,full_name:name==='facebook'?'Facebook Owner':name,role:'owner'}]);
  }
  await db.query("UPDATE auth.users SET raw_app_meta_data='{\"provider\":\"facebook\",\"providers\":[\"facebook\"]}' WHERE id=$1",[ids.facebook]);
- const files=['202610170001_auth_onboarding.sql','202610170002_verified_profiles.sql','202610170003_operations.sql','202610170004_transfers.sql','202611140005_platform_admin.sql','202611150006_billing.sql'];
+ const files=['202610170001_auth_onboarding.sql','202610170002_verified_profiles.sql','202610170003_operations.sql','202610170004_transfers.sql','202611140005_platform_admin.sql','202611150006_billing.sql','202611170007_admin_controls.sql'];
  for (const f of files) await db.exec(await fs.readFile(new URL('../migrations/'+f,import.meta.url),'utf8'));
  const rpc=async(name,args=[])=> (await db.query(`SELECT public.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) AS result`,args.map((x,i)=>name==='cleo_save_setting'&&i===1?JSON.stringify(x):x))).rows[0].result;
  const asRole=async(id,fn,role='authenticated',aal='aal1')=>{

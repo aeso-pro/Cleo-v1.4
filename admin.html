@@ -1,37 +1,13 @@
 <!doctype html>
-<!--
-  Cleo Admin · the platform console: accounts, businesses, security checks and admin history.
-  Markup only. Styles and scripts are separate files (assets/admin/), so this page's
-  Content-Security-Policy can refuse every inline script and inline style.
-  Who may use it is decided by the database (supabase/migrations/202611140005_platform_admin.sql),
-  never by this page: every figure and action comes from an RPC that checks the caller is an
-  active platform admin with a completed second factor.
-  Setup and the first admin: Docs/ADMIN_AND_SECURITY.md
--->
-<html lang="en" data-theme="dark" data-page="admin">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<!-- Stricter than the site-wide header in .htaccess, and in force on any host. If the Supabase
-     project changes, update connect-src here and #cleo-env below (node tools/update-security.js checks both). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://ntbkbvlsgymupjdpuvob.supabase.co; base-uri 'none'; form-action 'none'">
-<meta name="referrer" content="no-referrer">
-<meta name="robots" content="noindex, nofollow, noarchive">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cleo Admin</title>
-<meta name="theme-color" content="#0d0d0e">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/brand/cleo-icon-32.png">
-<link rel="stylesheet" href="assets/icons/phosphor/regular/style.css">
-<link rel="stylesheet" href="assets/icons/phosphor/fill/style.css">
-<link rel="stylesheet" href="assets/admin/admin.css">
-<script src="assets/admin/boot.js"></script>
-<!-- Public settings only: the project address and its publishable key. Never a secret or service-role key. -->
-<script type="application/json" id="cleo-env">{"supabaseUrl":"https://ntbkbvlsgymupjdpuvob.supabase.co","supabasePublishableKey":"sb_publishable_bo3snF8yJO9bsW_Yfwf_Vg_YMGKW8tC"}</script>
-<!-- Official @supabase/supabase-js 2.118.0, the same pinned local copy the app uses. -->
-<script src="assets/vendor/supabase-js-2.118.0.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" defer></script>
-<script src="assets/admin/admin.js" defer></script>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="0; url=admin/">
+<title>Cleo Admin has moved</title>
 </head>
 <body>
-<div id="admin"></div>
-<noscript><p class="noscript">Cleo Admin needs JavaScript. Turn it on for this site and reload.</p></noscript>
+<p>Cleo Admin is now at <a href="admin/">/admin</a>.</p>
 </body>
 </html>

@@ -21,11 +21,22 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-17 · Claude Code (owner's session on his laptop), `main`
+
+**Live project changed, admin console at `/admin`, Facebook sign-in off.** All on the owner's instruction.
+
+- **Hosted database**: migrations 002 to 007 applied through the SQL Editor (each verified against the repository first). Read-only checks before and after: existing accounts, businesses and memberships unchanged; RLS on all 19 Cleo tables; nothing open to `anon` or writable by `authenticated`.
+- **Supabase Auth settings**: the Facebook provider is **disabled** (its credentials are kept). `https://cleopos.online/index.html**` added to Redirect URLs. Site URL left at `http://127.0.0.1:5500` until the site is live.
+- **Frontend**: Facebook was removed from the code by the cloud session's entry below (commit 1b519f5); this session's one-flag hide was dropped in favour of it when merging.
+- **Migration `202611170007_admin_controls.sql`**: `cleo_admin_account`, `_confirm_email` (writes `auth.users.email_confirmed_at`), `_set_name`, `_set_member` (role, branch, or add to a business; keeps one owner), `_rename_business` (also updates `cleo_settings`), `_business_billing`, `_set_plan` (a subscription without payment, `method = ''`), `_payments`, `_admins`, `_set_admin`, `_billing_overview`, `_business_plans`. **Admins can now be added from the console** by a superadmin (no self-change; one superadmin with two-step always remains). 19 new checks in `supabase/tests/admin-controls.test.mjs`; 79 in all pass.
+- **The console moved** to `admin/index.html` (served at `/admin`, with `admin/.htaccess` for no-store and noindex). `admin.html` is a meta-refresh to it. `tools/serve.js` serves folders and redirects `/admin` to `/admin/`; `tools/update-security.js` checks `admin/index.html`; `sw.js` never caches `/admin`.
+- [ ] **No admin exists yet.** The owner creates the admin account (password chosen by them, not in any file), then the INSERT in ADMIN_AND_SECURITY.md §1.2.
+
 ### 2026-11-17 · Claude Code (cloud session), `main`
 
 **Facebook sign-in removed.** The owner asked for it to be taken out of the app and the backend.
 
-- [ ] **Hosted project: Facebook is still switched on.** `/auth/v1/settings` reports `facebook: true`. The owner turns it off in Authentication › Sign In / Providers › Facebook. Until then, `backend/check-auth.py` fails (it now requires `facebook_disabled` and `google_enabled`).
+- [x] *Done 2026-11-17 by the owner's laptop session (entry above): the provider is off.* **Hosted project: Facebook is still switched on.** `/auth/v1/settings` reports `facebook: true`. The owner turns it off in Authentication › Sign In / Providers › Facebook. Until then, `backend/check-auth.py` fails (it now requires `facebook_disabled` and `google_enabled`).
 - **`index.html`**: the "Continue with Facebook" button is gone from sign-in and sign-up. `socialAuth` in `backend/supabase.js` accepts only `google`; the Facebook-only email re-request (`auth_type=rerequest`, `auth-rerequest`) is removed; a pending provider sign-in can only be Google. Kept on purpose: the `#_=_` cleanup (old bookmarks), the no-email guard, and `'facebook'` as a recognised provider of an existing account.
 - **Migrations unchanged.** `'facebook'` stays an accepted legal-acceptance method and an admin console filter: accounts already made with Facebook are real records. They sign in with email via **Forgot password?**.
 - **`supabase/tests/e2e-server.mjs`**: the stand-in Auth refuses any provider but Google, as the hosted project will. All 19 + 52 backend tests pass.

@@ -1,0 +1,6 @@
+# Cleo Admin (this folder is served at /admin). Never stored by a browser or a proxy, never indexed.
+DirectoryIndex index.html
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store"
+  Header set X-Robots-Tag "noindex, nofollow, noarchive"
+</IfModule>

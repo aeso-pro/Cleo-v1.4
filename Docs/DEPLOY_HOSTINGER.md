@@ -6,9 +6,9 @@ Cleo is a static site: two pages, a service worker and an `assets` folder. Sign-
 
 Upload only these, into `public_html` (the site's root folder):
 
-- `landing.html`, `index.html`, `admin.html`, `sw.js`, `manifest.webmanifest`
+- `landing.html`, `index.html`, `admin.html` (forwards to `/admin`), `sw.js`, `manifest.webmanifest`
 - `.htaccess` (a hidden file: turn on "show hidden files" in the file manager)
-- the folders `assets`, `content` and `legal`
+- the folders `admin` (with its own hidden `.htaccess`), `assets`, `content` and `legal`
 
 Leave everything else off the server: `Docs`, `backend`, `supabase`, `tools`, the root `.md` files and any `.env` file. `.htaccess` refuses them anyway if they are uploaded by mistake.
 
@@ -56,6 +56,6 @@ If the Supabase project ever changes, update its two addresses in the `Content-S
 ## Checking a deploy
 
 - `https://<your domain>/Docs/`, `https://<your domain>/tools/` and `https://<your domain>/.env` answer 403.
-- `https://<your domain>/admin.html` shows the admin sign-in, and its response has `Cache-Control: no-store`.
+- `https://<your domain>/admin` shows the admin sign-in, and its response has `Cache-Control: no-store`.
 - The browser console on `index.html` shows no "Content Security Policy" errors.
 - A header check (for example securityheaders.com) lists HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy and Permissions-Policy.

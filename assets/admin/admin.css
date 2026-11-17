@@ -277,6 +277,13 @@ dialog[open] { animation: rise 240ms var(--ease-out) both; }
 .activity time { color: var(--ink-3); font-size: 13px; white-space: nowrap; }
 .activity span { grid-column: 1 / -1; font-size: 13px; color: var(--ink-3); overflow-wrap: anywhere; }
 
+/* ---------- controls ---------- */
+.action-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.row-actions { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.form-stack { display: grid; gap: 14px; }
+.form-stack .field + .field { margin-top: 0; }
+.input[type="date"] { color-scheme: inherit; }
+
 /* ---------- toasts ---------- */
 .toasts { position: fixed; z-index: 50; right: 20px; bottom: 20px; display: grid; gap: 8px; width: min(100% - 40px, 380px); }
 .toast { display: flex; gap: 10px; align-items: flex-start; padding: 13px 16px; border-radius: 16px; background: var(--card-2); border: 1px solid var(--line-2); box-shadow: var(--shadow); font-size: 14px; animation: rise 240ms var(--ease-out) both; }

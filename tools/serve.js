@@ -71,7 +71,13 @@ function serveStatic(req, res, { rewrite = null, headers: extra = {} } = {}) {
   if (pathname.includes('\0') || pathname.includes('\\')) return send(res, 400, 'Bad request');
   if (refused(pathname)) return send(res, 403, 'Forbidden');
   // The public landing answers the bare address; index.html is the app itself.
-  if (pathname.endsWith('/')) pathname += 'landing.html';
+  // A folder answers with its own index.html (/admin/), the root with the public landing.
+  // A folder named without its slash is sent to it, as Apache does, so relative links resolve.
+  if (!pathname.endsWith('/') && !path.extname(pathname)) {
+    try { if (fs.statSync(path.resolve(ROOT, '.' + pathname)).isDirectory()) { res.writeHead(301, { ...securityHeaders(), Location: pathname + '/' + (req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '') }); return res.end(); } } catch { /* not a folder */ }
+  }
+  if (pathname === '/') pathname = '/landing.html';
+  else if (pathname.endsWith('/')) pathname += 'index.html';
   const file = path.resolve(ROOT, '.' + pathname);
   if (file !== ROOT && !file.startsWith(ROOT + path.sep)) return send(res, 403, 'Forbidden');
   fs.stat(file, (error, stat) => {

@@ -5,7 +5,7 @@
      node tools/update-security.js           bring .htaccess and sw.js up to date
      node tools/update-security.js --check   change nothing; exit 1 if anything is out of date
 
-   Run it after ANY edit to index.html, landing.html or admin.html, and before
+   Run it after ANY edit to index.html, landing.html or admin/index.html, and before
    every upload. It keeps three things true:
 
    1. The Content-Security-Policy in .htaccess lists the SHA-256 of every inline
@@ -16,7 +16,7 @@
    2. The service worker's cache name follows the files it caches, so a change
       reaches devices that already installed the app.
    3. The pinned Supabase SDK still matches its recorded integrity value, and
-      admin.html points at the same Supabase project as the app.
+      admin/index.html points at the same Supabase project as the app.
 
    A page whose scripts do not match the policy shows blank in the browser, with
    "Content Security Policy" errors in the console. That is the policy working:
@@ -60,7 +60,7 @@ function inlineScripts(html) {
 const fingerprint = (script) => `'sha256-${crypto.createHash('sha256').update(script, 'utf8').digest('base64')}'`;
 
 /* ---------- 1. the Content-Security-Policy ---------- */
-const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith('.html')).sort();
+const pages = [...fs.readdirSync(ROOT).filter((f) => f.endsWith('.html')), ...(fs.existsSync(path.join(ROOT, 'admin', 'index.html')) ? ['admin/index.html'] : [])].sort();
 const hashes = new Set();
 for (const page of pages) {
   const html = read(page);
@@ -107,7 +107,7 @@ if (!app?.supabaseUrl) problems.push('index.html: no Supabase address in #cleo-e
 for (const page of pages) {
   const html = read(page);
   for (const [, src, integrity] of html.matchAll(/<script[^>]*\bsrc="([^"]+)"[^>]*\bintegrity="([^"]+)"/g)) {
-    const file = path.join(ROOT, src);
+    const file = path.join(ROOT, path.dirname(page), src);   // relative to the page (admin/ sits one folder down)
     if (!fs.existsSync(file)) { problems.push(`${page}: ${src} is missing.`); continue; }
     const actual = `sha384-${crypto.createHash('sha384').update(fs.readFileSync(file)).digest('base64')}`;
     if (actual !== integrity) problems.push(`${page}: ${src} does not match its integrity value. Was the file changed? The browser will refuse to load it.`);
@@ -118,11 +118,11 @@ for (const page of pages) {
     if (/^sb_secret_/i.test(String(key || '')) || role === 'service_role') problems.push(`${page}: a SECRET Supabase key is embedded. Remove it and rotate it in Supabase now.`);
   }
 }
-if (fs.existsSync(path.join(ROOT, 'admin.html')) && app?.supabaseUrl) {
-  const admin = read('admin.html'), adminEnv = envOf('admin.html');
-  if (adminEnv?.supabaseUrl !== app.supabaseUrl || adminEnv?.supabasePublishableKey !== app.supabasePublishableKey) problems.push('admin.html: #cleo-env differs from index.html. Both must name the same Supabase project and publishable key.');
-  if (!admin.includes(`connect-src ${app.supabaseUrl}`)) problems.push(`admin.html: its Content-Security-Policy does not allow ${app.supabaseUrl}. Sign-in would be blocked.`);
-  if (inlineScripts(admin).length) problems.push('admin.html: it has an inline script. Its own policy refuses every one; move it to assets/admin/.');
+if (fs.existsSync(path.join(ROOT, 'admin', 'index.html')) && app?.supabaseUrl) {
+  const admin = read('admin/index.html'), adminEnv = envOf('admin/index.html');
+  if (adminEnv?.supabaseUrl !== app.supabaseUrl || adminEnv?.supabasePublishableKey !== app.supabasePublishableKey) problems.push('admin/index.html: #cleo-env differs from index.html. Both must name the same Supabase project and publishable key.');
+  if (!admin.includes(`connect-src ${app.supabaseUrl}`)) problems.push(`admin/index.html: its Content-Security-Policy does not allow ${app.supabaseUrl}. Sign-in would be blocked.`);
+  if (inlineScripts(admin).length) problems.push('admin/index.html: it has an inline script. Its own policy refuses every one; move it to assets/admin/.');
 }
 if (app?.supabaseUrl && policyLine && !policyLine[2].includes(app.supabaseUrl)) problems.push(`.htaccess: connect-src does not allow ${app.supabaseUrl}. Sign-in would be blocked.`);
 
