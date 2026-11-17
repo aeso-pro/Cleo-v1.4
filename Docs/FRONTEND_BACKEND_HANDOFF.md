@@ -21,6 +21,10 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-17 (night) · Claude Code (owner's laptop session), `main`
+
+**Admin Google sign-in fixed for the addresses the owner actually uses.** The auth logs showed the owner works on VS Code Live Server (`http://127.0.0.1:5500`), whose `/admin/` was not on the Redirect URL list, so Supabase sent the Google return to the Site URL (the main app) and the admin sign-in could not finish. Added `http://127.0.0.1:5500/admin/**`, `http://localhost:5500/admin/**` and `http://127.0.0.1:5175/admin/**` (10 Redirect URLs now). `returnAddress()` in `assets/admin/admin.js` always asks for the folder's `/admin/` address, so `/admin` and `/admin/index.html` also match the `/admin/**` entries.
+
 ### 2026-11-17 (later) · Claude Code (owner's laptop session), `main`
 
 **Google sign-in on the admin console.** `assets/admin/admin.js`: a **Continue with Google** button (PKCE, `prompt=select_account`, returns to `/admin/`); the return is consumed before the stored session is read and the code is taken out of the address. Admin standing and the `aal2` requirement are unchanged: the database still decides. Supabase Redirect URLs now also allow `https://cleopos.online/admin/**` and `http://localhost:5175/admin/**`. Tested against the stand-in server: admin via Google reaches the code step then the console; a non-admin Google account is refused and signed out; a cancelled sign-in says so.

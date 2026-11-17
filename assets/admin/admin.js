@@ -221,8 +221,16 @@
      and every admin still needs the authenticator code afterwards (aal2), exactly as with a password.
      A Google account with the same email as a Cleo account signs in as that account. */
   const GOOGLE_MARK = `data:image/svg+xml;charset=utf-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>')}`;
-  /** this page's own address, with nothing after it: where Google sends the admin back to */
-  const returnAddress = () => `${location.origin}${location.pathname}`;
+  /** Where Google sends the admin back to: always this folder's exact address, ending in /admin/, whether the
+      page was opened as /admin, /admin/ or /admin/index.html. Supabase only returns to addresses on its allow
+      list (Authentication › URL Configuration), and each entry there is written as https://host/admin/**.
+      An address that isn't listed makes Supabase send the admin to the Site URL instead: the main app. */
+  const returnAddress = () => {
+    const url = new URL(location.href);
+    url.search = ''; url.hash = '';
+    url.pathname = url.pathname.replace(/\/index\.html$/, '/').replace(/([^/])$/, '$1/');
+    return url.href;
+  };
   async function continueWithGoogle(button, error) {
     if (button.disabled) return;
     busy(button, true); error.hidden = true;
