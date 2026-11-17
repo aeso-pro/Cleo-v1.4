@@ -21,6 +21,10 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-18 (late night) · Claude Code (owner's laptop session), `main`
+
+**Admin Google sign-in fixed (Supabase settings).** Supabase's request log showed the cause: the admin page on GitHub Pages asked Google to return to `https://aeso-pro.github.io/Cleo-v1.4/admin/`, which wasn't an allowed redirect, so Supabase sent the result to the Site URL (`http://127.0.0.1:5500`). Live Server opened from the Downloads folder had the same problem. Redirect URLs now include `https://aeso-pro.github.io/Cleo-v1.4/**`, `http://127.0.0.1:5500/**` and `http://localhost:5500/**`; the Site URL is the GitHub Pages site. `assets/admin/admin.js` and the app's `socialAuth` refuse Google sign-in from a page opened as a file, with a message that says why. Details: `Docs/ADMIN_AND_SECURITY.md` 1.4.
+
 ### 2026-11-18 (night) · Claude Code (owner's laptop session), `main`
 
 **Plans enforced on the server, branches and clerks added from the app, Free kept per account, and Windows and Android installers.** Backend and frontend; migration 008 is new.

@@ -45,8 +45,9 @@ Go to `https://your-domain/admin` (locally: `http://localhost:5175/admin`). The 
 
 - **Facebook sign-in is removed**, at your request. The button and the code that started a Facebook sign-in are gone from the app (commit 1b519f5), and the provider is **switched off** in the hosted project (it now answers "provider is not enabled"). Its App ID and secret are still saved in Supabase.
 - Accounts already made with Facebook keep their data. They sign in with email instead: **Forgot password?** on Cleo's sign-in page sets a password for the same email address. The admin console can also send that reset email.
-- **Redirect URLs** now include `https://cleopos.online/index.html**` next to the four local test addresses. Remove the local ones at launch.
-- **Site URL** is still the local test address `http://127.0.0.1:5500`. Change it to `https://cleopos.online` when the site goes live; email links fall back to it.
+- **Redirect URLs** (changed 2026-11-18): the live site on GitHub Pages, `https://aeso-pro.github.io/Cleo-v1.4/**` (the app and `/admin/`); cleopos.online's app and admin, for when that domain serves Cleo; and the local servers, `http://127.0.0.1:5500/**` and `http://localhost:5500/**` (Live Server, from any folder) plus port 5175 (`tools/serve.js`). Remove the local ones at launch.
+- **Site URL** is `https://aeso-pro.github.io/Cleo-v1.4/` (was `http://127.0.0.1:5500`). Supabase sends a sign-in here whenever the page's own address isn't on the list above, and email links fall back to it. Change it to `https://cleopos.online/` when that domain serves Cleo.
+- **Why admin Google sign-in failed (2026-11-18):** the admin page on GitHub Pages asked to come back to `https://aeso-pro.github.io/Cleo-v1.4/admin/`, which wasn't on the list, so Supabase sent the finished sign-in to the old Site URL on the owner's laptop. The same happened on Live Server opened from the Downloads folder (`/Cleo-v1.4-main/admin/`). Opening the page as a file can't work at all; both Google buttons now say so.
 - Google and email sign-in are unchanged.
 
 ### 1.5 Still blocking real customers

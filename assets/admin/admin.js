@@ -235,6 +235,11 @@
     if (button.disabled) return;
     busy(button, true); error.hidden = true;
     try {
+      // Google can only come back to a web address. Opened as a file (double-clicked, or a code editor's
+      // preview), the page has nowhere to return to, and Supabase would send the sign-in to its Site URL.
+      if (!/^https?:$/.test(location.protocol)) {
+        throw new Refusal('unavailable', 'Google sign-in needs this page opened from a web address, not as a file. Use the live site (https://aeso-pro.github.io/Cleo-v1.4/admin/) or a local server such as Live Server.');
+      }
       const data = await ask(client().auth.signInWithOAuth({ provider: 'google',
         options: { redirectTo: returnAddress(), skipBrowserRedirect: true, queryParams: { prompt: 'select_account' } } }));
       let target = null;

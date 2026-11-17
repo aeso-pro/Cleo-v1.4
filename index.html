@@ -8182,6 +8182,8 @@ const Charts = (() => {
       const c = client(); await initialize();
       // Google is the only sign-in provider (Facebook sign-in was removed at the owner's request)
       if (provider !== 'google') throw new CleoError('validation', 'Continue with Google, or use your email and password.');
+      // Google can only come back to a web address (or the Android app's own link), never to a file on this computer
+      if (!/^https?:$/.test(location.protocol) && !inAndroidApp()) throw new CleoError('validation', 'Google sign-in needs Cleo opened from a web address, not as a file. Open the live site, or serve this folder with a local server such as Live Server.');
       authState.recovery = false; store.tab?.remove('auth-recovery');
       authState.callbackError = null;
       const wanted = intent === 'signup' ? 'signup' : 'signin';
