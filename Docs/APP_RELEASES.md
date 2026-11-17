@@ -12,6 +12,8 @@ Both carry the same app as the website (`index.html` and its files, copied by `t
 The landing page's download buttons always point at the newest release:
 `https://github.com/aeso-pro/Cleo-v1.4/releases/latest/download/Cleo-Setup.exe` and `…/Cleo.apk`. The line under them shows the version, read from GitHub.
 
+The first release is **v1.4.1** (the tag v1.4.0 was used for a build that failed and has no release).
+
 ## Make a release
 
 1. Commit and push the changes to `main`.

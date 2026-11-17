@@ -26,7 +26,7 @@ If the owner cancels, nothing is charged and they are back on the payment page. 
 Start in **test mode**. PayMongo's test keys move no money, and you can go live later by repeating steps 3 and 5 with the live keys.
 
 1. **Open a PayMongo account** at paymongo.com. Test keys are available at once; live keys need PayMongo to verify your business.
-2. **Database: done.** Migration 006 was applied to the hosted project on 2026-11-17, with 002 to 005 and 007. **008 (plan limits, branches, staff, terminals, sales) still has to be run** in Supabase › SQL Editor: until it is, terminal registration, staff PINs and sales upload answer "not available on the server yet".
+2. **Database: done.** Migration 006 was applied to the hosted project on 2026-11-17, with 002 to 005 and 007. 008 (plan limits, branches, staff, terminals, sales) on 2026-11-18.
 3. **Add three secrets** in Supabase › Edge Functions › Secrets. Paste them there yourself; never into a file, a chat or the app.
 
    | Name | Value |
