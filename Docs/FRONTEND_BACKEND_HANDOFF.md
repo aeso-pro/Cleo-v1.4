@@ -21,6 +21,10 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-18 (night) · Claude Code (UI/UX refresh session), `main`
+
+**Landing screen captures re-taken, and a tool to re-take them.** New `tools/capture-screens.js` (no packages): `serve` runs the app on port 5176 without a CSP and with the demo clock at 3:45 PM Manila, a console call in the page captures a screen, `write` rebuilds `#screen-data` in `landing.html`. The Terminal, Owner Dashboard and Back Office captures now show today's UI passes. The enlarged-screen dialog lost its own `backdrop-filter` (it kept the sandboxed screen from painting, so the enlarged view was empty); the blur moved to `::backdrop`. The captions under the screens are visually hidden (kept for screen readers). Front end only.
+
 ### 2026-11-18 (evening) · Claude Code (UI/UX refresh session), `main`
 
 **Landing page top section.** `landing.html`: the real-screen device frames and the enlarged-screen dialog no longer take the liquid-glass refraction map (in Chromium it smeared the Terminal capture in the hero and the workspace frames); the hero lede now says what Cleo is; the hero's actions are "Get started" and "Try the demo" (`index.html?demo#/`, replacing "See the plans", which stays in the nav); nav reads "Product" and its Get started has no outward arrow; "Explore the demo" is "Try the demo" throughout. The screen captures (`#screen-data`) were not re-taken and still show the app as it was before today's UI passes. Front end only.
