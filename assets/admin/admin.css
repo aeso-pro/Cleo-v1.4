@@ -145,7 +145,9 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
 .nav button { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 40px; padding: 0 12px; border: 0; border-radius: 12px; background: transparent; color: var(--ink-2); font-weight: 500; font-size: 14px; text-align: left; transition: background 140ms ease, color 140ms ease; }
 .nav button i { font-size: 19px; }
 .nav button:hover { background: var(--wash-2); color: var(--ink); }
-.nav button[aria-current="page"] { background: var(--accent-soft); color: var(--accent-ink); }
+/* the current section reads like the app's sidebars: a quiet fill, full ink, and only the icon in red */
+.nav button[aria-current="page"] { background: var(--wash-2); color: var(--ink); }
+.nav button[aria-current="page"] i { color: var(--accent-ink); }
 .side-foot { margin-top: auto; display: grid; gap: 10px; padding: 14px 12px; border-radius: 18px; background: var(--wash); }
 .who { display: grid; gap: 2px; min-width: 0; }
 .who b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -169,7 +171,7 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
 .empty b { display: block; color: var(--ink-2); font-weight: 500; }
 
 /* ---------- figures ---------- */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 12px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 .tile { padding: 18px 20px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); }
 .tile .label { display: block; }
 .tile .value { display: block; margin-top: 6px; font-size: 34px; font-weight: 300; letter-spacing: -.03em; line-height: 1.1; }
@@ -288,7 +290,10 @@ dialog[open] { animation: rise 240ms var(--ease-out) both; }
 
 /* ---------- controls ---------- */
 .action-bar { display: flex; flex-wrap: wrap; gap: 8px; }
-.row-actions { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.row-actions { display: inline-flex; flex-wrap: nowrap; justify-content: flex-end; gap: 6px; }
+/* a destructive action in a list row is plain red text: it is there when needed (and still asks first), without shouting from every row */
+.row-actions .btn-danger { background: transparent; }
+.row-actions .btn-danger:hover { background: var(--bad-soft); filter: none; }
 .form-stack { display: grid; gap: 14px; }
 .form-stack .field + .field { margin-top: 0; }
 .input[type="date"] { color-scheme: inherit; }

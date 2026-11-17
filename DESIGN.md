@@ -4,15 +4,21 @@ The system lives in the one `<style>` block of `index.html` (tokens on `:root`, 
 
 ## Design philosophy
 
-Cleo follows the way Apple designs for iOS: the interface is a calm, precise tool, and the content (the order, the numbers, the next task) is what people look at. Five rules decide every change:
+Cleo follows the way Apple designs across iOS, iPadOS and macOS, and everything revolves around ease of use: the interface is a calm, precise tool, and the content (the order, the numbers, the next task) is what people look at. Each surface takes the platform it resembles:
+
+- **Terminal = iPadOS.** A landscape touch device at a counter. Big targets (44px and up), the one primary action per screen in Cleo red (Charge, Complete payment, New sale), choices in sheets that rise over the work, and labels a cashier reads in one glance ("On account", not "Charge", for a charge-account payment, so it never collides with the Charge button).
+- **Owner Dashboard, Back Office and the admin console = macOS.** A sidebar, a toolbar of named actions, dense tables with clear column heads, keyboard focus everywhere. Sidebar counts are grey like a Mac sidebar's; the current section is a quiet fill with only its icon in red. Destructive actions in a list row are plain red text and always confirm first.
+- **Phone widths = iOS.** One column, navigation behind the menu button, sheets from the bottom, toolbars that wrap rather than shrink.
+
+Five rules decide every change:
 
 1. **Form follows function.** Every element answers a question someone at the counter or in the office actually has. If it only decorates, it goes. Glass is a material with a job (a floating layer that holds controls over content), not an effect.
 2. **Nothing moves on its own.** Motion answers a touch, a change of screen or a change of state, and then it stops. Working chrome (sidebars, rails, top bars, the plan tab) never animates in a loop. Loading screens and the sign-in mark are the only places where things move without being asked, and they are not where work happens.
 3. **One emphasis per view.** Cleo red marks the one primary action, the current selection and the recommended plan. Finished steps, past states and secondary actions step back to grey. Primary buttons are flat red with a grounded shadow, never a red glow.
-4. **One name for one thing.** The same action carries the same label everywhere it appears (Back Office's header buttons and its quick actions both say "Receive delivery" and "Adjust stock"). Labels name what happens, in plain words: "Flagged activity", not "Exceptions".
-5. **Say it once, say it plainly.** No captions that tell people how to play with decoration, no filler such as "No options" under a plain item, and help text only where a person would otherwise get stuck. Copy is short, direct English for Philippine owners and staff.
+4. **One name for one thing, one place to find it.** The same action carries the same label everywhere it appears ("Receive delivery" and "Adjust stock" on the Back Office Overview, its quick actions and the Inventory toolbar). A toolbar button that does something different from a row's button says how it differs ("Edit in table" beside each row's "Edit"). An action lives where its subject lives: receiving stock is on the Inventory page, not only on the Overview. Labels name what happens, in plain words: "Flagged activity", not "Exceptions".
+5. **Say it once, say it plainly.** No captions that tell people how to play with decoration, no filler such as "No options" under a plain item, placeholders that fit their field, and help text only where a person would otherwise get stuck. Copy is short, direct English for Philippine owners and staff. Domain terms people already use stay (BIR's "backend reports", "Z-reading").
 
-What stays fixed: the glass materials, Cleo Sans (Helvetica Neue), the placement of every screen and control, Phosphor icons, and the Cleo red.
+What stays fixed: the glass materials, Cleo Sans (Helvetica Neue), the placement of every screen and control, Phosphor icons, and the Cleo red. The admin console (`assets/admin/admin.css`) uses the same tokens on solid cards: it sits on a plain background with nothing behind it to refract, so glass would add nothing there.
 
 ## Character
 

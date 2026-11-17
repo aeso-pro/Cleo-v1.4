@@ -21,6 +21,10 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-18 (later) · Claude Code (UI/UX refresh session), `main`
+
+**Second UI/UX pass: ease of use across iPadOS-, macOS- and iOS-like surfaces; front end only.** Terminal payment sheet: method buttons read "E-wallet" and "On account" (display only; tender keys such as `'Charge'` are unchanged). Back Office: Catalog's bulk edit is "Edit in table"; Inventory's toolbar gains "Receive delivery" (same `receiveDialog()` as the Overview) and says "Adjust stock" / "Edit in table"; a plainer Inventory subtitle; the global search placeholder fits its field. Owner and Back Office sidebar counts are grey (not red). Admin console (`assets/admin/admin.css` only): the current nav item is a quiet fill with a red icon, the overview's six stats fit one row, and "Suspend" in account rows is plain red text on one line (it still asks first). No routes, data shapes or `data-*` hooks changed beyond the new `data-rcv` button.
+
 ### 2026-11-18 · Claude Code (UI/UX refresh session), `main`
 
 **Calmer, clearer app chrome; front end only, nothing for the backend to do.** In `index.html`: the plan tab at the foot of every sidebar and the Terminal rail no longer runs a light round its edge, sheens or glows (plans are told apart by tint and edge); primary buttons lost their red glow; completed setup steps are grey checks so the current step leads; the sign-in mark has no "Hover, press or tap the mark" caption; the Terminal's browser-preview bar stays on one line on phones; plain cart items no longer say "No options". Copy: Back Office header buttons now match the quick actions ("Receive delivery", "Adjust stock"); Owner's "Exceptions" panel is "Flagged activity · Over your approval limits"; the revenue chart legend reads "Columns add up to net sales"; the sign-in fine print explains two-step sign-in plainly. No data shapes, routes, `data-*` hooks or element IDs changed. `DESIGN.md` has a new "Design philosophy" section (form follows function, nothing moves on its own, one emphasis per view, one name for one thing, say it once).

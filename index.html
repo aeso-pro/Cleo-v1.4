@@ -1347,7 +1347,8 @@ a.plan-tab:active { transform: scale(.98); }
   -webkit-tap-highlight-color: transparent;
 }
 .nav a i { font-size: 20px; }
-.nav a .count { margin-left: auto; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: var(--accent); color: var(--on-accent); }
+/* sidebar counts are grey, as in the macOS sidebar: they say how many, not "act now" (the page itself flags what is urgent) */
+.nav a .count { margin-left: auto; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 99px; display: grid; place-items: center; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; background: var(--fill-2); color: var(--ink-2); }
 .nav a .soon { margin-left: auto; font-size: 11px; color: var(--ink-3); font-weight: 400; }
 @media (hover: hover) and (pointer: fine) { .nav a:hover { color: var(--ink); } }
 .nav a:active { transform: scale(.98); }
@@ -10312,7 +10313,7 @@ Cleo.bir = (() => {
             <button class="icon-btn menu-btn" aria-label="Open navigation" data-menu><i class="ph ph-list"></i></button>
             <h1 data-title>${TITLES[state.view]}</h1>
             <span class="spacer"></span>
-            <div class="input-wrap hide-sm" style="width:260px"><i class="ph ph-magnifying-glass lead-icon"></i><input class="input" style="height:40px;border-radius:999px" placeholder="Search products, SKUs, invoices" data-gsearch aria-label="Search"></div>
+            <div class="input-wrap hide-sm" style="width:260px"><i class="ph ph-magnifying-glass lead-icon"></i><input class="input" style="height:40px;border-radius:999px;padding-right:14px" placeholder="Search products or invoices" data-gsearch aria-label="Search"></div>
             <button class="scope-btn" data-scope aria-haspopup="menu" aria-expanded="false"><span class="sb-ic"><i class="ph-fill ph-${state.scope === 'all' ? 'buildings' : 'storefront'}"></i></span><span class="sb-t"><span data-scope-name>${esc(state.scope === 'all' ? 'HQ, all branches' : bName(state.scope))}</span><small data-scope-role>${esc(roleLabel())}</small></span><i class="ph ph-caret-up-down" style="color:var(--ink-3)"></i></button>
           </header>
           <div class="ro-banner" data-ro hidden><i class="ph ph-eye"></i><span>Read-only access. Your role can view reports but can't change prices or stock. HQ sets this in Settings, Roles and permissions.</span></div>
@@ -10638,7 +10639,7 @@ Cleo.bir = (() => {
         acts.innerHTML = '';
         pane.replaceChildren(productsPane(draw));
       } else {
-        acts.innerHTML = `<button class="btn" data-import ${can('edit') ? '' : 'disabled'}><i class="ph ph-upload-simple"></i>Import CSV</button><button class="btn" data-export><i class="ph ph-download-simple"></i>Export</button>${lockedBtn('edit', `${Cleo.actIcon('edit')}${Cleo.actLabel('edit')}`, 'class="btn" data-edit')}${lockedBtn('edit', '<i class="ph ph-plus"></i>Add product', 'class="btn btn-primary" data-add')}`;
+        acts.innerHTML = `<button class="btn" data-import ${can('edit') ? '' : 'disabled'}><i class="ph ph-upload-simple"></i>Import CSV</button><button class="btn" data-export><i class="ph ph-download-simple"></i>Export</button>${lockedBtn('edit', `${Cleo.actIcon('edit')}Edit in table`, 'class="btn" data-edit')}${lockedBtn('edit', '<i class="ph ph-plus"></i>Add product', 'class="btn btn-primary" data-add')}`;
         pane.replaceChildren(productsPane(draw));
         $('[data-add]', acts)?.addEventListener('click', () => productDrawer(null));
         $('[data-edit]', acts)?.addEventListener('click', () => { edits.catalog = {}; draw(); $('[data-ctbl] .cell-in', pane)?.focus(); });
@@ -11074,13 +11075,13 @@ Cleo.bir = (() => {
   /* ---------- inventory ---------- */
   function inventory() {
     const node = el(`<div>
-      <div class="page-head"><div><h2 class="t-title">Inventory</h2><p>${state.scope === 'all' ? 'Stock across every branch' : `Stock at ${esc(bName(state.scope))}`} · every sale, delivery, transfer and adjustment is a movement in the ledger</p></div>
+      <div class="page-head"><div><h2 class="t-title">Inventory</h2><p>${state.scope === 'all' ? 'Stock across every branch' : `Stock at ${esc(bName(state.scope))}`}. Sales, deliveries, transfers and adjustments update it.</p></div>
         <div class="filters"><div class="seg" data-itab role="group" aria-label="Inventory view"><button data-value="stock" aria-pressed="${state.invTab === 'stock'}">Stock on hand</button><button data-value="ledger" aria-pressed="${state.invTab === 'ledger'}">Movements</button><button data-value="count" aria-pressed="${state.invTab === 'count'}">Count</button></div><span class="filters" data-iacts></span></div></div>
       <div data-ipane></div></div>`);
     const pane = $('[data-ipane]', node), acts = $('[data-iacts]', node);
     const draw = () => {
       // Edit and Adjust step aside while the stock table is being edited; its edit bar has Save and Cancel
-      acts.innerHTML = edits.stock ? '' : `${lockedBtn('stock', '<i class="ph ph-sliders"></i>Adjust', 'class="btn" data-adj')}${lockedBtn('stock', `${Cleo.actIcon('edit')}${Cleo.actLabel('edit')}`, 'class="btn" data-iedit')}${lockedBtn('stock', '<i class="ph ph-plus"></i>Add item', 'class="btn btn-primary" data-iadd')}`;
+      acts.innerHTML = edits.stock ? '' : `${lockedBtn('stock', '<i class="ph ph-package"></i>Receive delivery', 'class="btn" data-rcv')}${lockedBtn('stock', '<i class="ph ph-sliders"></i>Adjust stock', 'class="btn" data-adj')}${lockedBtn('stock', `${Cleo.actIcon('edit')}Edit in table`, 'class="btn" data-iedit')}${lockedBtn('stock', '<i class="ph ph-plus"></i>Add item', 'class="btn btn-primary" data-iadd')}`;
       $('[data-iadd]', acts)?.addEventListener('click', () => itemDrawer(null));
       $('[data-iedit]', acts)?.addEventListener('click', () => {
         edits.stock = {};
@@ -11088,6 +11089,7 @@ Cleo.bir = (() => {
         draw(); $('[data-stockpane] .cell-in', pane)?.focus();
       });
       $('[data-adj]', acts)?.addEventListener('click', () => adjustDialog());
+      $('[data-rcv]', acts)?.addEventListener('click', () => receiveDialog());
       $$('[data-itab] button', node).forEach((b) => (b.disabled = !!edits.stock));
       pane.replaceChildren(state.invTab === 'stock' ? stockPane(draw) : state.invTab === 'ledger' ? ledgerPane() : countPane());
     };
@@ -13750,7 +13752,7 @@ Cleo.bir = (() => {
           </div>
           <div>
             <div class="methods" role="group" aria-label="Payment method" style="grid-template-columns:repeat(${M.length},1fr)">
-              ${M.map(([k, l, ic]) => `<button class="method" data-m="${k}" aria-pressed="${st.method === k}" ${k === 'charge' && !cust()?.charge ? 'disabled title="Add a customer with a charge account first"' : ''}><i class="ph${st.method === k ? '-fill' : ''} ph-${ic}"></i>${l}</button>`).join('')}
+              ${M.map(([k, l, ic]) => `<button class="method" data-m="${k}" aria-pressed="${st.method === k}" ${k === 'charge' && !cust()?.charge ? 'disabled title="Add a customer who has a charge account first"' : ''}><i class="ph${st.method === k ? '-fill' : ''} ph-${ic}"></i>${({ charge: 'On account', ewallet: 'E-wallet' })[k] || l}</button>`).join('')}
             </div>
             <div class="pm-pane" data-pane></div>
           </div>
