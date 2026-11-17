@@ -37,6 +37,8 @@ It should say `INSERT 0 1`. `INSERT 0 0` means no confirmed account has that ema
 
 ### 1.3 Open the admin console
 
+**Two ways in:** email and password, or **Continue with Google** (added 2026-11-17). Google only proves who you are: the account must still be an admin, and every admin still enters the authenticator code afterwards. A Google account with the same email as a Cleo account signs in as that account, so `main.code.aeso@gmail.com` can use either. Supabase allows Google to return to `https://cleopos.online/admin/**` and `http://localhost:5175/admin/**`; another address for the console needs adding in **Authentication › URL Configuration** first. Signing in with a Google account that has no Cleo account creates one (with no access), as on Cleo's own sign-in page.
+
 Go to `https://your-domain/admin` (locally: `http://localhost:5175/admin`). The old `admin.html` address forwards there. The first time, it walks you through adding Cleo Admin to an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password). After that every sign-in asks for the 6-digit code. The database enforces this, not the page: no admin function answers a session that has not passed the second step.
 
 ### 1.4 Sign-in settings (changed on 2026-11-17)

@@ -250,6 +250,15 @@ td .badges { max-width: 240px; }
 .todo b { font-weight: 500; }
 .todo p { font-size: 14px; color: var(--ink-2); }
 
+/* ---------- Google sign-in ---------- */
+.oauth { display: grid; gap: 10px; margin-top: 22px; }
+.oauth .note { margin-top: 0; }
+.btn-google { gap: 12px; min-height: 46px; background: var(--card-2); border: 1px solid var(--line-2); font-size: 15px; }
+.btn-google:hover { background: var(--wash-2); }
+.btn-google img { width: 18px; height: 18px; }
+.gate .or { display: flex; align-items: center; gap: 12px; margin: 20px 0 -6px; color: var(--ink-3); font-size: 13px; }
+.gate .or::before, .gate .or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
 /* ---------- dialogs ---------- */
 dialog { width: min(100% - 32px, 460px); max-height: min(100dvh - 32px, 760px); padding: 0; border: 1px solid var(--line-2); border-radius: 26px; background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
 dialog.sheet { width: min(100% - 32px, 860px); }

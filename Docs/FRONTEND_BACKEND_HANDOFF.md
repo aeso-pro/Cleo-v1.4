@@ -21,6 +21,10 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-17 (later) · Claude Code (owner's laptop session), `main`
+
+**Google sign-in on the admin console.** `assets/admin/admin.js`: a **Continue with Google** button (PKCE, `prompt=select_account`, returns to `/admin/`); the return is consumed before the stored session is read and the code is taken out of the address. Admin standing and the `aal2` requirement are unchanged: the database still decides. Supabase Redirect URLs now also allow `https://cleopos.online/admin/**` and `http://localhost:5175/admin/**`. Tested against the stand-in server: admin via Google reaches the code step then the console; a non-admin Google account is refused and signed out; a cancelled sign-in says so.
+
 ### 2026-11-17 · Claude Code (owner's session on his laptop), `main`
 
 **Live project changed, admin console at `/admin`, Facebook sign-in off.** All on the owner's instruction.

@@ -216,12 +216,62 @@
     return false;
   }
 
+  /* ---------- Google ----------
+     Google only proves who someone is. Whether they are an admin is still the database's decision,
+     and every admin still needs the authenticator code afterwards (aal2), exactly as with a password.
+     A Google account with the same email as a Cleo account signs in as that account. */
+  const GOOGLE_MARK = `data:image/svg+xml;charset=utf-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>')}`;
+  /** this page's own address, with nothing after it: where Google sends the admin back to */
+  const returnAddress = () => `${location.origin}${location.pathname}`;
+  async function continueWithGoogle(button, error) {
+    if (button.disabled) return;
+    busy(button, true); error.hidden = true;
+    try {
+      const data = await ask(client().auth.signInWithOAuth({ provider: 'google',
+        options: { redirectTo: returnAddress(), skipBrowserRedirect: true, queryParams: { prompt: 'select_account' } } }));
+      let target = null;
+      try { target = new URL(data?.url); } catch { /* refused below */ }
+      // only ever leave for Cleo's own Supabase project, which forwards to Google
+      if (!target || target.origin !== publicSettings()?.url) throw new Refusal('unavailable', 'Google sign-in couldn’t be opened. Try again.');
+      location.assign(target.href);
+    } catch (failure) {
+      busy(button, false);
+      error.replaceChildren(icon('warning-circle', true), explain(failure).message); error.hidden = false;
+    }
+  }
+  /** back from Google: finish the sign-in, then take every credential out of the address */
+  async function consumeGoogleReturn() {
+    const url = new URL(location.href), q = url.searchParams, fragment = new URLSearchParams(url.hash.slice(1));
+    const code = q.get('code'), flowId = q.get('sb_flow_id');
+    const failed = q.get('error') || fragment.get('error');
+    if (!code && !failed) return '';
+    const why = `${failed || ''} ${q.get('error_code') || fragment.get('error_code') || ''} ${q.get('error_description') || fragment.get('error_description') || ''}`.toLowerCase();
+    for (const key of ['code', 'sb_flow_id', 'state', 'error', 'error_code', 'error_description']) q.delete(key);
+    history.replaceState(null, '', `${url.pathname}${url.search}${failed ? '' : url.hash}`);
+    if (failed) {
+      if (/access_denied|cancel/.test(why)) return 'Google sign-in was cancelled. Nothing was changed.';
+      if (/provider.*(disabled|not enabled)/.test(why)) return 'Google sign-in is switched off for Cleo. Sign in with your email and password.';
+      if (/redirect|\burl\b/.test(why)) return 'This address isn’t on Cleo’s sign-in allow list yet. Sign in with your email and password.';
+      return 'Google sign-in didn’t finish. Try again.';
+    }
+    try { await ask(flowId ? client().auth.exchangeCodeForSession(code, { flowId }) : client().auth.exchangeCodeForSession(code)); }
+    catch (failure) {
+      const code = String(failure?.code || failure?.cause?.code || ''), said = String(failure?.message || '');
+      if (/pkce|flow_state|code verifier/i.test(`${code} ${said}`)) return 'That Google sign-in was started in another tab or browser, or it expired. Start again here.';
+      return explain(failure).message;
+    }
+    return '';
+  }
+
   function signInScreen(notice = '', tone = 'info') {
     state.stage = 'signin';
     const email = h('input', { class: 'input', id: 'ad-email', type: 'email', autocomplete: 'username', inputmode: 'email', required: true, spellcheck: 'false', autocapitalize: 'none' });
     const password = h('input', { class: 'input', id: 'ad-password', type: 'password', autocomplete: 'current-password', required: true });
     const error = h('p', { class: 'note bad', role: 'alert', hidden: true });
     const submit = h('button', { class: 'btn btn-primary btn-block', type: 'submit', text: 'Sign in' });
+    const googleError = h('p', { class: 'note bad', role: 'alert', hidden: true });
+    const googleButton = h('button', { class: 'btn btn-block btn-google', type: 'button' }, h('img', { src: GOOGLE_MARK, alt: '', width: '18', height: '18' }), 'Continue with Google');
+    googleButton.addEventListener('click', () => continueWithGoogle(googleButton, googleError));
     const form = h('form', { novalidate: true },
       h('div', { class: 'field' }, h('label', { for: 'ad-email', text: 'Admin email' }), email),
       h('div', { class: 'field' }, h('label', { for: 'ad-password', text: 'Password' }), password),
@@ -253,8 +303,11 @@
     const { heading } = gateCard({
       title: 'Admin sign-in',
       lede: 'For Cleo platform staff. Business owners and their teams sign in to Cleo itself.',
-      body: [notice ? h('p', { class: `note ${tone === 'bad' ? 'bad' : ''}`, role: 'status' }, icon(tone === 'bad' ? 'warning-circle' : 'info'), notice) : null, form,
-        h('p', { class: 'note' }, icon('shield-check'), 'Admin accounts always need a code from an authenticator app after the password.')],
+      body: [notice ? h('p', { class: `note ${tone === 'bad' ? 'bad' : ''}`, role: 'status' }, icon(tone === 'bad' ? 'warning-circle' : 'info'), notice) : null,
+        h('div', { class: 'oauth' }, googleButton, googleError),
+        h('div', { class: 'or', role: 'separator' }, h('span', { text: 'or with email and password' })),
+        form,
+        h('p', { class: 'note' }, icon('shield-check'), 'Every admin also needs a code from an authenticator app, whichever way they sign in.')],
       foot: [appLink()],
     });
     if (matchMedia('(pointer: coarse)').matches) heading.focus({ preventScroll: true }); else email.focus({ preventScroll: true });
@@ -342,7 +395,7 @@
     state.stage = 'denied';
     const { heading } = gateCard({
       title: 'This account isn’t an admin',
-      lede: 'The password was right, but this account has no access to the admin console. Nothing was shown or changed, and it has been signed out here.',
+      lede: 'You signed in, but this account has no access to the admin console. Nothing was shown or changed, and it has been signed out here.',
       body: [h('p', { class: 'note' }, icon('info'), 'Admin access is granted by the database owner, never from this page. If you should have it, ask whoever runs Cleo’s Supabase project.')],
       foot: [h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: () => signInScreen() }, icon('arrow-left'), 'Use another account'), appLink()],
     });
@@ -1080,6 +1133,8 @@
     if (!publicSettings() || typeof window.supabase?.createClient !== 'function') { unconfiguredScreen(); return; }
     mount(loadingPage('Checking your session'));
     try {
+      const googleProblem = await consumeGoogleReturn();
+      if (googleProblem) { await forget(); signInScreen(googleProblem, 'bad'); return; }
       const session = (await ask(client().auth.getSession()))?.session;
       if (!session) { signInScreen(); return; }
       // a stored session is only a hint; the server says who this is
