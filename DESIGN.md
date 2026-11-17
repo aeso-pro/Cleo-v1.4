@@ -121,7 +121,7 @@ The landing's full feature comparison opens in a native dialog over pricing. Kee
 
 This section applies only to the standalone marketing surface (`source/landing.html` and its landing partials, styles and script). It extends Cleo's sign-in box grid and glass materials; the app, setup and plan guidance above remains in force for those surfaces. The approved surface direction stays in `.impeccable/surfaces/source-landing-html.md`. Values below come from the implementation, including the final control-size, recommendation-label and offline-panel fixes.
 
-**The Same Cleo Rule.** Use the Cleo emblem and wordmark from `assets/brand` (the 2026 rebrand), the Aeso artwork, the existing Cleo typeface, and actual Terminal, Owner Dashboard and Back Office captures. The illuminated opening and closing marks sample the emblem itself; they are not new brand marks. Keep sample-data captions visible.
+**The Same Cleo Rule.** Use the Cleo emblem and wordmark from `assets/brand` (the 2026 rebrand), the Aeso artwork, the existing Cleo typeface, and actual Terminal, Owner Dashboard and Back Office captures. The illuminated opening and closing marks sample the emblem itself; they are not new brand marks. Screens carry no visible caption under them (the owner asked for clean frames); each keeps its sample-data caption for assistive technology, and the enlarged view still says sample data.
 
 ### Colors
 
@@ -170,7 +170,7 @@ Device frames and desktop content panes use 30px corners, with 20px corners arou
 
 ### Do's and Don'ts
 
-- **Do** keep the grid, trace and ports aligned through responsive layout and font loading, and maintain readable screen enlargement and sample-data captions.
+- **Do** keep the grid, trace and ports aligned through responsive layout and font loading, and maintain readable screen enlargement, with the sample-data note in the enlarged view and in each frame's hidden caption.
 - **Do** use the Cleo emblem and wordmark from `assets/brand`, the Aeso artwork and the existing circuit-tree plan marks; all foreground imagery must remain evidence from Cleo.
 - **Don't** turn the marketing story, longer entrances, illuminated light theme or landing-specific colors into global app rules.
 - **Don't** present captured screens, the offline illustration or proposed pricing as live services, customer results or validated accreditation. Product constraints remain in `PRODUCT.md`.

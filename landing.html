@@ -416,8 +416,9 @@ input{caret-color:var(--red-ink)}
 @keyframes screen-wait{from{background-position:150% 0}to{background-position:-100% 0}}
 
 /* glass devices that hold the real screens */
-.device{position:relative;margin:0;padding:11px 11px 0;border-radius:30px}
-.device figcaption{padding:10px 8px 11px;text-align:center;font-size:11px;letter-spacing:.01em;color:var(--muted)}
+.device{position:relative;margin:0;padding:11px;border-radius:30px}
+/* the caption stays for assistive technology (it says the screen is sample data) but is not shown under the screen */
+.device figcaption{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .real-screen{position:relative;aspect-ratio:1.5;overflow:hidden;min-width:0;background:#0d0d0e;isolation:isolate;border-radius:20px;box-shadow:0 0 0 1px rgb(255 255 255/.07)}
 .real-screen iframe{position:absolute;inset:0 auto auto 0;display:block;width:1440px;height:960px;border:0;max-width:none;transform:scale(var(--screen-scale,.4));transform-origin:top left;pointer-events:none;opacity:0;transition:opacity .7s var(--ease)}
 .real-screen.loaded iframe{opacity:1}
@@ -479,16 +480,16 @@ input{caret-color:var(--red-ink)}
 @media(max-width:1100px){.step-device>.port{left:0}}
 @media(max-width:899px){
  .device-rise{width:100%}
- .device{border-radius:24px;padding:8px 8px 0}
+ .device{border-radius:24px;padding:8px}
  .real-screen{border-radius:16px}
  .step-device>.port,.local-rules>.port,.connection-card>.port,.price-card>.port{left:0;top:56px}
  .port-out{left:12px;top:calc(100% + 20px)}
  .hero-foot{padding-left:30px}
 }
 @media(max-width:540px){
- .device{border-radius:20px;padding:6px 6px 0}
+ .device{border-radius:20px;padding:6px}
  .real-screen{border-radius:14px}
- .device figcaption{font-size:10px;padding:8px 6px 9px}
+ 
  .real-screen-open{padding:10px}
  .real-screen-open>span{font-size:11px;padding:7px 12px}
  #screen-dialog{width:calc(100% - 16px);max-height:calc(100dvh - 16px);padding:12px;border-radius:20px}
