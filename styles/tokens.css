@@ -117,11 +117,15 @@
   --glass-saturation: 180%;
   --glass-border: rgb(0 0 0 / .08);
   --glass-specular: rgb(255 255 255 / .85);
+  --glass-edge: rgb(0 0 0 / .07);
+  --glass-rim-light: rgb(255 255 255 / 1);
+  --glass-rim-catch: rgb(255 255 255 / .75);
+  --glass-depth: rgb(0 0 0 / .10);
   --glass-label: #1d1d1f;
   --glass-label-2: #3a3a3c;
   --glass-solid: #f9f9fb;
   --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / .55), rgb(255 255 255 / .12) 38%, rgb(255 255 255 / 0) 62%);
-  --wallpaper: radial-gradient(60% 55% at 8% 0%, rgb(212 0 0 / .07), transparent 70%), radial-gradient(55% 50% at 100% 12%, rgb(42 120 214 / .09), transparent 70%), radial-gradient(70% 60% at 60% 105%, rgb(36 138 61 / .06), transparent 70%);
+  --wallpaper: none; /* light mode: a plain background, no gradients (owner direction, 19 Nov) */
   --scrim: rgb(0 0 0 / .20);
   /* receipts stay on paper in both themes */
   --paper: #ffffff;
@@ -161,11 +165,15 @@
   --glass-saturation: 160%;
   --glass-border: rgb(255 255 255 / .10);
   --glass-specular: rgb(255 255 255 / .14);
+  --glass-edge: rgb(255 255 255 / .12);
+  --glass-rim-light: rgb(255 255 255 / .42);
+  --glass-rim-catch: rgb(255 255 255 / .16);
+  --glass-depth: rgb(0 0 0 / .45);
   --glass-label: #f5f5f7;
   --glass-label-2: #d1d1d6;
   --glass-solid: #1c1c1e;
   --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / .10), rgb(255 255 255 / .03) 38%, rgb(255 255 255 / 0) 62%);
-  --wallpaper: radial-gradient(60% 55% at 8% 0%, rgb(212 0 0 / .16), transparent 70%), radial-gradient(55% 50% at 100% 12%, rgb(64 156 255 / .13), transparent 70%), radial-gradient(70% 60% at 60% 105%, rgb(48 209 88 / .08), transparent 70%);
+  --wallpaper: radial-gradient(70% 42% at 50% -8%, rgb(212 0 0 / .30), rgb(212 0 0 / .08) 45%, transparent 75%);
   --scrim: rgb(0 0 0 / .48);
   --paper: #ffffff;
   --paper-ink: #1d1d1f;
@@ -190,16 +198,17 @@
     --shadow-3: 0 24px 60px -12px rgb(0 0 0 / .7);
     --glass-tint: rgb(36 36 40 / .62); --glass-tint-thick: rgb(30 30 34 / .74); --glass-saturation: 160%;
     --glass-border: rgb(255 255 255 / .10); --glass-specular: rgb(255 255 255 / .14);
+    --glass-edge: rgb(255 255 255 / .12); --glass-rim-light: rgb(255 255 255 / .42); --glass-rim-catch: rgb(255 255 255 / .16); --glass-depth: rgb(0 0 0 / .45);
     --glass-label: #f5f5f7; --glass-label-2: #d1d1d6; --glass-solid: #1c1c1e;
     --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / .10), rgb(255 255 255 / .03) 38%, rgb(255 255 255 / 0) 62%);
-    --wallpaper: radial-gradient(60% 55% at 8% 0%, rgb(212 0 0 / .16), transparent 70%), radial-gradient(55% 50% at 100% 12%, rgb(64 156 255 / .13), transparent 70%), radial-gradient(70% 60% at 60% 105%, rgb(48 209 88 / .08), transparent 70%);
+    --wallpaper: radial-gradient(70% 42% at 50% -8%, rgb(212 0 0 / .30), rgb(212 0 0 / .08) 45%, transparent 75%);
     --scrim: rgb(0 0 0 / .48);
   }
 }
 
 /* ---------- Base: browser surfaces carry the design too ---------- */
 html { font-family: var(--font); font-size: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-/* The wallpaper: a still, soft wash of light behind the glass, so the material has something to frost.
+/* The wallpaper: plain in light mode; in dark mode one still accent glow at the top of the page.
    No motion, no pattern; it never sits on top of content. */
 html { background: var(--bg); }
 body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--wallpaper), var(--bg); }
@@ -213,21 +222,30 @@ a { color: var(--accent-text); text-underline-offset: .18em; text-decoration-thi
 h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
 
-/* ---------- B Liquid Glass (navigation and overlays only) ---------- */
+/* ---------- B Liquid Glass ----------
+   Real glass, not an outline: the backdrop is blurred and then bent at the rim by an SVG displacement map
+   (--refract, set per surface by the app's LiquidGlass module; Chromium), a top-lit sheen sits in the
+   body, and ::before draws the bevel: light catching the upper-left edge, a fainter catch lower-right and
+   a soft inner shade along the bottom for thickness. No hard border. */
+@property --refract { syntax: '*'; inherits: false; }
+.glass, .glass-thick { position: relative; isolation: isolate; }
+.glass::before, .glass-thick::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--glass-edge), inset 1.5px 1.5px 0 -.5px var(--glass-rim-light),
+    inset -1.5px -1.5px 0 -.5px var(--glass-rim-catch), inset 0 -10px 24px -14px var(--glass-depth);
+}
 .glass {
   background: var(--glass-sheen), var(--glass-tint);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  border: 1px solid var(--glass-border);
-  box-shadow: inset 0 1px 0 var(--glass-specular), inset 0 -1px 0 rgb(255 255 255 / .06), var(--shadow-2);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation)) var(--refract,);
+  box-shadow: var(--shadow-2);
   color: var(--glass-label);
 }
 .glass-thick {
   background: var(--glass-sheen), var(--glass-tint-thick);
   -webkit-backdrop-filter: blur(var(--glass-blur-thick)) saturate(var(--glass-saturation));
-  backdrop-filter: blur(var(--glass-blur-thick)) saturate(var(--glass-saturation));
-  border: 1px solid var(--glass-border);
-  box-shadow: inset 0 1px 0 var(--glass-specular), inset 0 -1px 0 rgb(255 255 255 / .06), var(--shadow-2);
+  backdrop-filter: blur(var(--glass-blur-thick)) saturate(var(--glass-saturation)) var(--refract,);
+  box-shadow: var(--shadow-2);
   color: var(--glass-label);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -238,7 +256,7 @@ p { text-wrap: pretty; }
   .glass, .glass-thick { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 @media (prefers-contrast: more) {
-  :root { --label-2: var(--label); --separator: var(--control-border); }
+  :root { --label-2: var(--label); --separator: var(--control-border); --glass-edge: var(--control-border); }
   .glass, .glass-thick { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; border-color: var(--control-border); }
 }
 @media (forced-colors: active) {

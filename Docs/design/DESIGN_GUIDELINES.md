@@ -353,10 +353,11 @@ Plans (owner decision): plan cards are identical solid cards that differ only by
 
 Every column is fully round at its data end (radius = half its width) and softly round on the baseline (30% of its width, at least 4 px); stacked parts stay joined. Donut arcs keep round caps; meters and ranked bars are pills; heatmap cells use 8 px corners and calendar cells 30% corners. Lines (when used) take `stroke-linecap: round; stroke-linejoin: round`.
 
-## K. Sign-in motion (owner direction, 19 Nov)
+## K. Sign-in, loading and waiting (owner direction, 19 Nov)
 
-The sign-in page answers the person without moving on its own:
-- **The orb** — the static Cleo emblem inside a disc of Liquid Glass. It leans toward the pointer (up to 7° / 9° and 10 px; a soft light follows the pointer on its surface), springs back when the pointer leaves (`--ease-spring`, 700 ms), and gives a small press "pop" (0.95 → 1) on a tap.
-- **Entrance** — the card rises 14 px and fades in once (420 ms ease-out); its fields follow 40 ms apart.
-- **Fields and buttons** — a focused field lifts 1 px as its ring eases in; buttons press to 0.97 and spring back.
-- **Reduced motion** — no tilt, no entrance, no lift; the page is still.
+- **Glass that refracts.** Every glass surface bends its backdrop at the rim with an SVG displacement map (`LiquidGlass` in `index.html`, Chromium; others keep the blur), carries a top-lit sheen, and draws a bevel in `::before` (light on the upper-left edge, a fainter catch lower-right, a soft inner shade at the bottom). No hard outline.
+- **Backgrounds.** Light mode: plain `--bg`, no gradients. Dark mode: one still accent glow at the top of the page.
+- **Sign-in.** A still scene (the emblem) under two text-free panes of Liquid Glass — a round lens and a pill — that drift slowly on their own, can be picked up and thrown (momentum, soft walls), and bend the emblem as they pass. The card rises in once; fields lift on focus; buttons press. The lockup in the corner is 36 px; the scene emblem 150–230 px wide.
+- **Start-up loading screen.** Logos only: the Cleo emblem (76 px wide) springs in with the Cleo wordmark (28 px tall) beneath and the Aeso logo at the foot, while three small panes of Liquid Glass float over the emblem and bend it. No visible text, progress bar or spinner; steps are announced to assistive technology only.
+- **Every other loading screen** is a skeleton of the screen that is coming (e.g. the app shell while the business loads; skeleton rows for backup codes; a skeleton square for a QR code). In-place waits ("Waiting for the payment gateway", a working button) show three soft dots, never a circle, box grid or bar.
+- **Reduced motion:** no drift, sweeps or entrances; panes can still be moved by hand.
