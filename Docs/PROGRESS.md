@@ -39,7 +39,7 @@ Skills: Impeccable (critique, audit; then distill, quieter, typeset, layout, ani
 - [x] 1a. Inventory every gridbox pattern and the current fonts → `Docs/design/GRIDBOX_REMOVAL.md`
 - [x] 1b. Before-screenshots at 375, 768, 1024, 1440 px, light and dark (landing, sign-in, Owner, Back Office, Terminal, setup/plans) → `Docs/design/BEFORE/` (44 images, demo data only)
 - [x] 1c. Impeccable critique (dual-agent) and audit → `Docs/design/AUDIT_BEFORE.md` (app 26/40 + 12/20; landing 22/32 + 14/20; snapshots in `.impeccable/critique/`)
-- [ ] 2. `Docs/design/DESIGN_GUIDELINES.md` (sections A–F + route map)
+- [x] 2. `Docs/design/DESIGN_GUIDELINES.md` (sections A–F, page structure, route map, checklist; AA pairs computed)
 - [ ] 3. Token stylesheet; remove every gridbox pattern and its unused CSS/JS
 - [ ] 4. Rebuild `landing.html` and `index.html` (keep IDs, data attributes, form names and Supabase calls; selling screens never block on Supabase)
 - [ ] 5. Clean URLs in `.htaccess` with 301s from every `.html`; internal links, canonical, sitemap, service worker; Auth redirect URL list (staging values; production values for the owner)
@@ -79,6 +79,7 @@ Phase 1 entries:
 - 2026-11-19 · **Public repository:** push the branches, but keep live security findings out of committed files (git-ignored `Docs/private/`).
 - 2026-11-19 · **Production:** https://cleopos.online on Hostinger. GitHub Pages (the current live site) is an interim host to retire.
 - 2026-11-19 · **Live inventory:** read the Supabase dashboard and hPanel in the built-in browser, read-only (no settings changed, no keys revealed).
+- 2026-11-19 · **Phase 2 design direction** (after the before-audit): (1) Cleo's signature is **the real product** — actual Terminal and dashboard screens shown large; the emblem stays a small static mark. (2) **Plans differ by content only** — identical solid cards, the recommended plan gets the one filled button and a "Recommended" label; the plan tab leaves the working sidebar. (3) **Keep both** Owner Dashboard extras (26-week Activity heatmap and the receipt trivia), restyled to the new system. (4) The **Terminal follows the device** appearance (light/dark from the system), switchable in Settings.
 
 ## OWNER PRODUCTION DEPLOY STEPS (per phase)
 - Phase 1: none. Documentation only; review and merge the branch when ready.
