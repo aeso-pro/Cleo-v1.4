@@ -36,8 +36,8 @@ Statuses: NOT_STARTED, IN_PROGRESS, WAITING (hard gate), BLOCKED, DONE
 
 ## CURRENT PHASE CHECKLIST (Phase 1 — System Architecture)
 - [x] 0. Create the branch from `origin/main` (ffdef82), copy the architecture PDF into `Docs/architecture/`, save the superprompt as `Docs/overhaul/SUPERPROMPT.md`, ignore `Docs/private/`, create this file
-- [ ] 1. Read the architecture end to end
-- [ ] 2. Write `Docs/architecture/CLEO_ARCHITECTURE.md` (faithful Markdown + "Platform mapping")
+- [x] 1. Read the architecture end to end (pdftotext + pymupdf tables and page renders; all 28 pages)
+- [x] 2. Write `Docs/architecture/CLEO_ARCHITECTURE.md` (faithful Markdown + "Platform mapping")
 - [ ] 3. Write `Docs/architecture/CURRENT_STATE.md` (repo, Supabase and Hostinger inventories)
 - [ ] 4. Write `Docs/architecture/GAP_ANALYSIS.md` (7 principles + 12 modules, ordered by risk)
 - [ ] 5. Write ADR-011 to ADR-015 in `Docs/architecture/adr/`
