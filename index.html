@@ -60,6 +60,7 @@
 <link rel="stylesheet" href="assets/icons/phosphor/regular/style.css">
 <link rel="stylesheet" href="assets/icons/phosphor/fill/style.css">
 <link rel="stylesheet" href="assets/icons/phosphor/bold/style.css">
+<link rel="stylesheet" href="styles/tokens.css">
 <!-- NOTE: paints the saved (or system) theme before first render, so there is no flash -->
 <script>try{var t=JSON.parse(localStorage.getItem('cleo:theme'));if(!t&&matchMedia('(prefers-color-scheme: light)').matches)t='light';if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
@@ -71,156 +72,74 @@
    Chromium). It is not Apple's platform material.
    ===================================================================== */
 
-/* ASSET: the Cleo Sans family is Helvetica Neue from assets/fonts/ (a commercial font: shipping it needs an
-   embedding licence). To change the typeface, replace these four files and keep the family name. */
-@font-face { font-family: "Cleo Sans"; src: url("assets/fonts/HelveticaNeueLight.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
-@font-face { font-family: "Cleo Sans"; src: url("assets/fonts/HelveticaNeueRoman.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Cleo Sans"; src: url("assets/fonts/HelveticaNeueMedium.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: "Cleo Sans"; src: url("assets/fonts/HelveticaNeueBold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
-
-/* ---------- Tokens ---------- */
-:root, :root[data-theme="dark"] {
-  color-scheme: dark;
-  --font: "Cleo Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-
-  --bg: #0d0d0e;
-  --bg-raise: #161617;
-  --ink: #f3f1ee;
-  --ink-2: rgb(243 241 238 / .72);
-  --ink-3: rgb(243 241 238 / .56);
-  --ink-4: rgb(243 241 238 / .34);
-  --line: rgb(255 255 255 / .08);
-  --line-2: rgb(255 255 255 / .14);
-  --wash: rgb(255 255 255 / .05);
-  --wash-2: rgb(255 255 255 / .09);
-
-  --brand: #d40000;
-  --accent: #d40000;
-  --accent-hover: #e8100c;
-  --accent-press: #b80000;
-  --accent-ink: #ff5a4f;
-  --accent-soft: rgb(212 0 0 / .18);
-  --accent-glow: rgb(212 0 0 / .55);
-  --on-accent: #fff8f6;
-
-  /* status in Apple's dark-mode system colours (green, orange, red, blue) */
-  --good: #30d158;  --good-soft: rgb(48 209 88 / .16);
-  --warn: #ff9f0a;  --warn-soft: rgb(255 159 10 / .16);
-  --serious: #ef8a5d; --serious-soft: rgb(239 138 93 / .16);
-  --bad: #ff453a;   --bad-soft: rgb(255 69 58 / .16);
-  --info: #0a84ff;  --info-soft: rgb(10 132 255 / .18);
-  /* system fills, as Apple uses them: tracks and toggles (fill-2), fields and segmented tracks (fill-3) */
-  --fill-2: rgb(120 120 128 / .32);
-  --fill-3: rgb(118 118 128 / .24);
-  --switch-on: #30d158;
-  --seg-thumb: #636366;
-
-  --glass: rgb(28 28 31 / .46);
-  --glass-thick: rgb(22 22 25 / .72);
-  --glass-thin: rgb(255 255 255 / .055);
-  --glass-solid: #18181a;
-  --glass-rim: rgb(255 255 255 / .10);
-  --glass-hi: rgb(255 255 255 / .17);
-  --glass-lo: rgb(255 255 255 / .03);
-  /* the embossed rim of every glass panel (see "Glass materials"): a hairline edge, light along the
-     upper-left bevel, and a softer catch of light refracted through to the lower-right */
-  --rim-edge: rgb(255 255 255 / .13);
-  --rim-light: rgb(255 255 255 / .42);
-  --rim-catch: rgb(255 255 255 / .15);
-  --shadow-lg: 0 30px 70px -18px rgb(0 0 0 / .62), 0 3px 10px rgb(0 0 0 / .28);
-  --shadow-md: 0 14px 34px -12px rgb(0 0 0 / .55), 0 1px 4px rgb(0 0 0 / .24);
-  --shadow-sm: 0 4px 12px -4px rgb(0 0 0 / .45);
-  --scrim: rgb(6 6 7 / .55);
-
-  /* the colours of the light on the loading and sign-in grid; the apps sit on the plain background */
-  --amb-1: rgb(212 0 0 / .26);
-  --amb-2: rgb(122 6 16 / .34);
-  --amb-3: rgb(255 112 52 / .10);
-  --amb-4: rgb(54 62 84 / .45);
-  --grain-opacity: .035;
-
-  /* chart chrome */
-  --grid: rgb(255 255 255 / .07);
-  --axis: rgb(255 255 255 / .16);
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #9085e9; --s6: #d55181;
-  --star: #f5b301;
-  --seq: #3987e5; /* sequential charts (heatmap, activity calendar): one hue, faint to full */
-
-  --focus: rgb(243 241 238 / .78);
-  --focus-soft: rgb(243 241 238 / .12);
-  --blur: 26px;
-  --sat: 165%;
-}
-
-/* Light theme: frosted surfaces with a bright top edge, fine rims and soft shadows tinted to the backdrop.
-   Behind them sit a few still, faint lights (the ambient layer), so the glass has something to frost;
-   no glows, grain or motion. */
-:root[data-theme="light"] {
-  color-scheme: light;
-  --bg: #f3f3f4;
-  --bg-raise: #ffffff;
-  --ink: #141414;
-  --ink-2: rgb(20 20 20 / .72);
-  --ink-3: rgb(20 20 20 / .62); /* 4.5:1 or more on the light ground and white */
-  --ink-4: rgb(20 20 20 / .36);
-  --line: rgb(20 20 20 / .08);
-  --line-2: rgb(20 20 20 / .14);
-  --wash: rgb(20 20 20 / .04);
-  --wash-2: rgb(20 20 20 / .07);
-
-  --accent-ink: #c20000;
-  --accent-soft: rgb(212 0 0 / .10);
-  --accent-glow: rgb(212 0 0 / .35);
-
-  --good: #0a6e3a;  --good-soft: rgb(15 138 74 / .12); /* status inks: 4.5:1 or more on their own soft fill */
-  --warn: #855400;  --warn-soft: rgb(154 98 0 / .12);
-  --serious: #9c4519; --serious-soft: rgb(239 138 93 / .18);
-  --bad: #b3241d;   --bad-soft: rgb(198 42 34 / .10);
-  --info: #1f63c4;  --info-soft: rgb(31 99 196 / .10);
-  --fill-2: rgb(120 120 128 / .16);
-  --fill-3: rgb(118 118 128 / .12);
-  --switch-on: #34c759;
+/* ---------- Tokens ----------
+   The design tokens and Cleo Sans live in styles/tokens.css (spec: Docs/design/DESIGN_GUIDELINES.md),
+   linked before this block, light and dark included. The names below are the app's older names, kept
+   as aliases of those tokens while each screen moves to the new names. Nothing here defines a new
+   colour; delete an alias once nothing uses it. */
+:root {
+  --bg-raise: var(--bg-elevated);
+  --ink: var(--label);
+  --ink-2: var(--label-2);
+  --ink-3: var(--label-2);
+  --ink-4: var(--label-3);
+  --line: var(--separator);
+  --line-2: var(--separator);
+  --wash: var(--fill);
+  --wash-2: var(--fill-strong);
+  --brand: var(--accent);
+  --accent-press: var(--accent-pressed);
+  --accent-ink: var(--accent-text);
+  --accent-soft: var(--accent-fill);
+  --good: var(--success);         --good-soft: var(--success-fill);
+  --warn: var(--warning);         --warn-soft: var(--warning-fill);
+  --serious: var(--warning);      --serious-soft: var(--warning-fill);
+  --bad: var(--destructive);      --bad-soft: var(--destructive-fill);
+  --info-soft: var(--info-fill);
+  --fill-2: var(--fill-strong);
+  --fill-3: var(--fill);
+  --glass: var(--glass-tint);
+  --glass-thick: var(--glass-tint-thick);
+  --glass-thin: var(--fill);
+  --glass-rim: var(--glass-border);
+  --glass-hi: var(--glass-specular);
+  --glass-lo: transparent;
+  --shadow-lg: var(--shadow-3);
+  --shadow-md: var(--shadow-2);
+  --shadow-sm: var(--shadow-1);
+  --focus: var(--accent);
+  --focus-soft: var(--accent-fill);
+  --blur: var(--glass-blur);
+  --sat: var(--glass-saturation);
+  --r-xs: var(--radius-xs); --r-sm: var(--radius-sm); --r-md: var(--radius-md);
+  --r-lg: var(--radius-lg); --r-xl: var(--radius-xl); --r-pill: var(--radius-pill);
+  --ease-drawer: var(--ease-out);
+  /* --spring is replaced at runtime by a solved spring curve (see core.js) */
+  --spring: var(--ease-spring);
+  --t-press: var(--dur-micro); --t-fast: var(--dur-micro); --t-ui: var(--dur-short); --t-panel: var(--dur-medium); --t-screen: var(--dur-short);
+  /* app component tokens: the segmented thumb and the chart palette (data colours, not decoration) */
   --seg-thumb: #ffffff;
-
-  --glass: rgb(255 255 255 / .6);
-  --glass-thick: rgb(255 255 255 / .78);
-  --glass-thin: rgb(20 20 20 / .03);
-  --glass-solid: #ffffff;
-  --glass-rim: rgb(20 20 20 / .07);
-  --glass-hi: rgb(255 255 255 / 1);
-  --glass-lo: rgb(20 20 20 / .04);
-  --rim-edge: rgb(20 20 20 / .09);
-  --rim-light: rgb(255 255 255 / 1);
-  --rim-catch: rgb(255 255 255 / .8);
-  --shadow-lg: 0 26px 52px -28px rgb(28 24 32 / .26), 0 2px 6px rgb(28 24 32 / .05);
-  --shadow-md: 0 12px 28px -18px rgb(28 24 32 / .22), 0 1px 3px rgb(28 24 32 / .05);
-  --shadow-sm: 0 3px 10px -6px rgb(28 24 32 / .2);
-  --scrim: rgb(16 16 20 / .30);
-
-  /* the light on the loading screen's grid (see "Ambient world"); applyBrand follows the brand colour */
-  --amb-1: rgb(212 0 0 / .045);
-  --amb-2: rgb(255 150 120 / .09);
-  --amb-3: rgb(255 205 170 / .13);
-  --amb-4: rgb(120 138 190 / .16);
-  --grain-opacity: 0;
-
-  --grid: rgb(20 20 20 / .07);
-  --axis: rgb(20 20 20 / .18);
+  --grid: var(--separator);
+  --axis: rgb(60 60 67 / .36);
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #6c5fd8; --s6: #c63c70;
   --star: #b07a00;
   --seq: #2a78d6;
-  --focus: rgb(20 20 20 / .72);
-  --focus-soft: rgb(20 20 20 / .10);
 }
-
-:root {
-  --r-xs: 8px; --r-sm: 12px; --r-md: 16px; --r-lg: 24px; --r-xl: 32px; --r-pill: 999px;
-  --ease-out: cubic-bezier(.23, 1, .32, 1);
-  --ease-in-out: cubic-bezier(.77, 0, .175, 1);
-  --ease-drawer: cubic-bezier(.32, .72, 0, 1);
-  /* --spring is replaced at runtime by a solved spring curve (see core.js) */
-  --spring: cubic-bezier(.23, 1, .32, 1);
-  --t-press: 140ms; --t-fast: 180ms; --t-ui: 240ms; --t-panel: 260ms; --t-screen: 240ms;
+:root[data-theme="dark"] {
+  --seg-thumb: #636366;
+  --axis: rgb(235 235 245 / .30);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #9085e9; --s6: #d55181;
+  --star: #f5b301;
+  --seq: #3987e5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --seg-thumb: #636366;
+    --axis: rgb(235 235 245 / .30);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #9085e9; --s6: #d55181;
+    --star: #f5b301;
+    --seq: #3987e5;
+  }
 }
 
 /* ---------- Base ---------- */
@@ -262,65 +181,21 @@ h1, h2, h3 { text-wrap: balance; }
 [hidden] { display: none !important; }
 i.ph, i.ph-fill, i.ph-bold { line-height: 1; display: inline-block; flex: none; }
 
-/* ---------- Ambient world behind the glass ----------
-   The Terminal, Owner Dashboard and Back Office sit on the theme's plain background, with no coloured light. */
-.ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background: var(--bg); }
-/* dark mode, loading and sign-in screens: a grid of boxes lit by moving light (the ambient module in
-   core.js draws it). It fades in over the plain background and fades out when the app opens.
-   Light mode shows it only behind the loading screen, where its ripples carry the wait. */
-.ambient canvas.amb-grid { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1000ms var(--ease-out); }
-:root.amb-on .ambient canvas.amb-grid { opacity: 1; transition-duration: 500ms; }
-:root[data-theme="light"]:not(.amb-boot) .ambient canvas.amb-grid { display: none; }
-/* light mode: no grain behind the panels */
-:root[data-theme="light"] body::after { display: none; }
-body::after {
-  content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none;
-  opacity: var(--grain-opacity);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-}
 
-/* ---------- Glass materials ----------
-   glass        floating functional layer (nav, toolbars, cards that hold controls)
-   glass-thick  surfaces that carry dense data; more opaque so text stays crisp
-   glass-thin   chips and buttons sitting on top of other material (no blur)
-   The fill is one flat tint over the blurred backdrop: no sheen gradient. What makes it read as glass
-   is the edge. LiquidGlass (core.js) bends the backdrop inside a narrow rim, the way the curved edge of
-   a real slab refracts what is behind it (Chromium; it sets --refract), and ::before draws the embossed
-   stroke: a hairline edge, light along the upper-left bevel and a softer catch on the lower-right. */
-.glass, .glass-thick, .lg {
-  position: relative; isolation: isolate;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
-  backdrop-filter: blur(var(--blur)) saturate(var(--sat)) var(--refract,);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-lg);
+/* ---------- Glass ----------
+   styles/tokens.css defines .glass and .glass-thick (Liquid Glass: navigation and overlays only, with the
+   reduced-transparency, more-contrast and forced-colours fallbacks). Here: their shape, .lg for surfaces
+   that set their own tint, and .glass-thin for chips and buttons on top of material (no blur). */
+.glass, .glass-thick, .lg { position: relative; isolation: isolate; border-radius: var(--r-lg); }
+.lg {
+  background: var(--lg-tint, var(--glass-tint));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-specular), var(--shadow-2);
 }
-.glass-thick { background: var(--glass-thick); box-shadow: var(--shadow-md); }
-.glass::before, .glass-thick::before, .lg::before {
-  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  box-shadow:
-    inset 0 0 0 1px var(--rim-edge),
-    inset 1.5px 1.5px 0 -0.5px var(--rim-light),
-    inset -1.5px -1.5px 0 -0.5px var(--rim-catch);
-}
-.glass-thin {
-  background: var(--glass-thin);
-  box-shadow: inset 0 0 0 1px var(--rim-edge), inset 1px 1px 0 -0.5px var(--rim-light);
-}
-/* LiquidGlass.attach(el, { tint }) gives a surface its own tint over the same material */
-.lg { background: var(--lg-tint, var(--glass)) !important; }
-/* each surface carries its own rim map; a nested panel must never borrow its parent's */
-@property --refract { syntax: '*'; inherits: false; }
+.glass-thin { background: var(--fill); }
 
-/* Pointer sheen for small interactive glass */
-.sheen { position: relative; overflow: hidden; }
-.sheen::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(180px circle at var(--mx, 50%) var(--my, -40%), rgb(255 255 255 / .14), transparent 60%);
-  opacity: 0; transition: opacity 240ms ease;
-}
-@media (hover: hover) and (pointer: fine) { .sheen:hover::after { opacity: 1; } }
-:root[data-theme="light"] .sheen::after { background: radial-gradient(180px circle at var(--mx, 50%) var(--my, -40%), rgb(255 255 255 / .75), transparent 60%); }
 
 /* ---------- Type ---------- */
 .t-hero { font-size: 52px; line-height: 1; font-weight: 300; letter-spacing: -.035em; }
@@ -615,8 +490,8 @@ button.chip:active { transform: scale(.96); }
 /* the emblem's place: an image that is never shown. The background grid lights the boxes it covers (the
    landing page's closing mark), so the grid alone draws the logo. boot() sets --h, its height, to a whole
    number of the grid's boxes, as large as the screen allows. */
-.boot-lockup { --h: 216px; display: flex; }
-.boot-mark { display: block; width: calc(var(--h) * .7366); height: var(--h); visibility: hidden; }
+.boot-lockup { --h: 96px; display: flex; }
+.boot-mark { display: block; width: calc(var(--h) * .7366); height: var(--h); }
 /* there is no progress bar: organic ripples from behind the mark (the background grid) carry the wait */
 .boot-foot { position: absolute; bottom: 28px; left: 0; right: 0; display: flex; justify-content: center; opacity: 0; }
 
@@ -639,21 +514,7 @@ button.chip:active { transform: scale(.96); }
 .link-btn { color: var(--accent-ink); font-size: 13px; font-weight: 500; border-radius: 6px; }
 @media (hover: hover) and (pointer: fine) { .link-btn:hover { text-decoration: underline; text-underline-offset: 3px; } }
 .login-art { position: relative; overflow: hidden; display: grid; place-items: center; }
-/* the Cleo mark in lit boxes (gridMark in core.js draws it on this canvas and makes it respond to the pointer) */
-.art-grid { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
-.art-grid.grabbing { cursor: grabbing; }
-/* where the mark sits, so the loading screen's mark can glide into it */
-.art-mark { position: absolute; pointer-events: none; view-transition-name: cleo-mark; }
-/* the mark answers to the pointer without a caption telling people to play with it */
-.art-hint { display: none !important; }
-/* the Cleo mark in 3D (emblem3d in core.js draws it with WebGL2; its pillars answer the pointer). Behind it,
-   a soft accent glow in dark mode; in light mode a faint grid and the mark's own soft shadow (the art-ghost canvas). */
-.art-3d, .art-ghost { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.art-3d { touch-action: none; cursor: grab; }
-.art-3d.grabbing { cursor: grabbing; }
-.art-ghost { pointer-events: none; }
-.login-art.is-3d::before { content: ""; position: absolute; left: 50%; top: 50%; width: min(58%, 600px); aspect-ratio: .8; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, var(--accent-glow), transparent 72%); opacity: .3; pointer-events: none; }
-:root[data-theme="light"] .login-art.is-3d::before { display: none; }
+.login-emblem { width: min(46%, 220px); height: auto; }
 .login-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .shake { animation: shake 420ms var(--ease-out); }
 @keyframes shake { 15% { transform: translateX(-9px); } 35% { transform: translateX(7px); } 55% { transform: translateX(-4px); } 75% { transform: translateX(2px); } }
@@ -833,8 +694,7 @@ button.chip:active { transform: scale(.96); }
 @media (max-width: 900px) {
   .login { grid-template-columns: 1fr; }
   /* behind the card on phones: a quiet backdrop that leaves touches to the page */
-  .login-art { position: fixed; inset: 0; z-index: 0; opacity: .5; pointer-events: none; }
-  .art-hint { display: none; }
+  .login-art { display: none; }
   .login-left { padding: 20px 16px; }
   .login-card { padding: 28px 22px 24px; }
 }
@@ -981,7 +841,7 @@ a.plan-tab:active { transform: scale(.98); }
   .glass, .glass-thick, .lg { background: var(--glass-solid) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 }
 @media (prefers-contrast: more) {
-  :root { --glass: var(--glass-solid); --glass-thick: var(--glass-solid); --glass-rim: var(--ink-3); --rim-edge: var(--ink-3); --ink-3: var(--ink-2); }
+  :root { --glass: var(--glass-solid); --glass-thick: var(--glass-solid); --glass-rim: var(--ink-3); --ink-3: var(--ink-2); }
 }
 
 /* ---------- subscription payment methods (Cleo.billing in core.js): the plan pages, Owner Dashboard ›
@@ -1169,7 +1029,7 @@ a.plan-tab:active { transform: scale(.98); }
 }
 @media (max-width: 800px) {
   /* Keep account fields readable and avoid automatic focus zoom on phones. */
-  [data-amb="login"] .input { font-size: 16px; }
+  [data-surface="auth"] .input { font-size: 16px; }
   .is-setup .login-left { max-width: 568px; padding: 24px; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr auto; gap: 28px; }
   .onboard .login-left, .onboard.paying .login-left { max-width: 620px; grid-template-columns: minmax(0, 1fr); padding-inline: 24px; }
   .setup-guide { padding-top: 0; }
@@ -1375,8 +1235,7 @@ a.plan-tab:active { transform: scale(.98); }
 .main { min-width: 0; padding: 12px 20px 48px 20px; }
 .nav-scrim { display: none; }
 /* scroll edge effect: content softens as it slides under the floating top bar.
-   Blur only, no tint, and only once something has scrolled under the bar, so at rest the
-   top bar refracts the same ambient light as the sidebar instead of a dark band. */
+   Blur only, no tint, and only once something has scrolled under the bar (a scroll edge, not a divider). */
 .edge-fade { position: sticky; top: 0; z-index: 24; height: 0; }
 .edge-fade::before {
   content: ""; position: absolute; left: -20px; right: -20px; top: 0; height: 84px; pointer-events: none;
@@ -2078,7 +1937,6 @@ body.is-terminal { overflow: hidden; background: #050506; }
 /* light mode: a plain desk colour around the tablet, the bezel stays dark like the real device */
 :root[data-theme="light"] body.is-terminal, :root[data-theme="light"] .stage-wrap { background: #e4e4e6; }
 :root[data-theme="light"] .stage.framed { box-shadow: 0 0 0 12px #141416, 0 0 0 13px #2b2b2e, 0 40px 100px -30px rgb(16 16 20 / .35); }
-.stage .ambient { position: absolute; }
 .dp { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; transform: scale(1.6); transform-origin: 0 0; font-size: 15px; }
 .dp #app { position: relative; z-index: 1; width: 1280px; height: 800px; min-height: 0; overflow: hidden; }
 .dp .screen { width: 1280px; height: 800px; min-height: 0; overflow: hidden; position: relative; }
@@ -2716,7 +2574,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 /* ---------- customer-facing display (#/terminal/display: full window, outside the stage) ---------- */
 .cdisp { display: grid; grid-template-columns: minmax(280px, 34%) minmax(0, 1fr); gap: 16px; padding: 16px; min-height: 100dvh; }
 .cd-brand { border-radius: 28px; padding: 32px; display: grid; grid-template-rows: auto 1fr auto auto; gap: 24px; align-content: start; }
-.cd-logo { width: 72px; height: 72px; border-radius: 20px; display: grid; place-items: center; font-size: 26px; font-weight: 700; color: var(--on-accent); background: var(--accent); box-shadow: 0 14px 30px -12px var(--accent-glow); }
+.cd-logo { width: 72px; height: 72px; border-radius: 20px; display: grid; place-items: center; font-size: 26px; font-weight: 700; color: var(--on-accent); background: var(--accent); box-shadow: var(--shadow-1); }
 .cd-brand h1 { font-size: clamp(30px, 4vw, 52px); font-weight: 400; letter-spacing: -.035em; line-height: 1.05; }
 .cd-brand p { margin-top: 10px; font-size: clamp(15px, 1.5vw, 19px); color: var(--ink-2); }
 .cd-promos { display: grid; gap: 8px; }
@@ -2827,7 +2685,6 @@ body.is-terminal { overflow: hidden; background: #050506; }
 </style>
 </head>
 <body>
-<div class="ambient" aria-hidden="true"></div>
 <div id="app" class="app-root"></div>
 <!-- Terms and Conditions and Privacy Policy, from source/legal/*.md (also published as legal/*.html) -->
 <script type="application/json" id="cleo-legal">{"version":"privacy 1.0, terms 1.0","docs":{"privacy":{"title":"Cleo Privacy Policy","effective":"October 6, 2026","version":"1.0","html":"\u003cp>Cleo is a point-of-sale and business management service made by Aeso Technologies Inc. (\"Aeso\", \"we\", \"us\"). This policy explains what personal data we collect when you use Cleo, why we collect it, how we protect it, and the rights you have. It covers the Cleo Terminal, Owner Dashboard, Back Office, Cleo Cloud and the Cleo website.\u003c/p>\n\u003cp>We follow the Data Privacy Act of 2012 (Republic Act No. 10173), its Implementing Rules and Regulations, and the issuances of the National Privacy Commission (NPC). We collect only what Cleo needs to work, keep it only as long as we need it, and never sell it.\u003c/p>\n\u003ch2 id=\"1-who-this-policy-covers-and-our-role\">1. Who this policy covers, and our role\u003c/h2>\n\u003cul>\u003cli>\u003cstrong>People who sign in to Cleo\u003c/strong>: business owners, managers, accountants and staff. For your account, Aeso decides how your data is used, so we are the personal information controller.\u003c/li>\u003cli>\u003cstrong>Customers of businesses that use Cleo.\u003c/strong> When a café, store or service shop records its own customers in Cleo, that business is the personal information controller of that data. Aeso processes it only on the business's instructions, as its personal information processor, under the data processing terms in our \u003ca href=\"terms.html\">Terms and Conditions\u003c/a>. If you are a customer of a business that uses Cleo, ask that business first; we help businesses answer these requests.\u003c/li>\u003cli>\u003cstrong>Visitors to the Cleo website.\u003c/strong>\u003c/li>\u003c/ul>\n\u003ch2 id=\"2-personal-data-we-collect\">2. Personal data we collect\u003c/h2>\n\u003ch3 id=\"when-you-have-a-cleo-account\">When you have a Cleo account\u003c/h3>\n\u003cul>\u003cli>\u003cstrong>Account details:\u003c/strong> your name, work email, mobile number, role and the branches you work in. We store your password only as a salted hash, never in readable form.\u003c/li>\u003cli>\u003cstrong>Google or Facebook sign-in:\u003c/strong> if you choose \"Continue with Google\" or \"Continue with Facebook\", the provider shares your name, email address and profile picture link with your permission. We never receive your Google or Facebook password, and we never post on your behalf.\u003c/li>\u003cli>\u003cstrong>Security records:\u003c/strong> your two-step sign-in setting, whether your backup codes have been used (the codes themselves are stored as hashes), sign-in times, devices, IP addresses, and failed sign-in and PIN attempts.\u003c/li>\u003cli>\u003cstrong>Work records the business keeps about you:\u003c/strong> your staff PIN (stored as a hash), time-clock entries, and the sales, voids, refunds, discounts and approvals linked to your name. Businesses use these for their audit trail, shift reconciliation and staff reports.\u003c/li>\u003cli>\u003cstrong>Billing details:\u003c/strong> your plan, invoices and billing contact. Card details are collected and stored by our payment provider, not by Aeso. We only see the card brand, the last four digits and the expiry date.\u003c/li>\u003cli>\u003cstrong>Messages you send us\u003c/strong>, such as support requests.\u003c/li>\u003c/ul>\n\u003ch3 id=\"data-a-business-records-in-cleo-we-process-it-for-the-business\">Data a business records in Cleo (we process it for the business)\u003c/h3>\n\u003cul>\u003cli>\u003cstrong>Customer profiles:\u003c/strong> name, mobile number, email, birthday, home branch, TIN and address for invoices, loyalty points, purchase history, charge account limits and balances, and the date the customer agreed to be recorded.\u003c/li>\u003cli>\u003cstrong>Statutory discount details:\u003c/strong> for senior citizen, PWD, National Athletes and Coaches, and Solo Parent discounts, the ID type, ID number and name on the ID. The laws on these discounts (Republic Act Nos. 9994, 10754, 10699 and 11861) and the BIR's sales books require businesses to record them.\u003c/li>\u003cli>\u003cstrong>Delivery orders\u003c/strong> from GrabFood or foodpanda, when the business connects them: the customer's first name or initial and what they ordered.\u003c/li>\u003cli>\u003cstrong>E-receipts:\u003c/strong> the mobile number or email a receipt is sent to.\u003c/li>\u003cli>\u003cstrong>Expense receipt photos\u003c/strong>, which can show names.\u003c/li>\u003c/ul>\n\u003ch3 id=\"collected-automatically\">Collected automatically\u003c/h3>\n\u003cul>\u003cli>\u003cstrong>Device and app details:\u003c/strong> device type, operating system, app version, which branch a terminal is registered to, sync status and error reports.\u003c/li>\u003cli>\u003cstrong>Data kept on your device:\u003c/strong> so a terminal can keep selling without internet, Cleo stores what it needs on the device: the catalog, prices, the staff list and sales that haven't synced yet. It also remembers your preferences, such as light or dark mode, the mode this device opens in and your table layouts. This data stays on the device until it syncs, until you sign out or unregister the terminal, or until you clear the app's data.\u003c/li>\u003cli>\u003cstrong>Cookies and similar storage:\u003c/strong> only what is needed to keep you signed in, remember your settings and keep Cleo secure. We don't use advertising cookies and we don't share data with advertisers.\u003c/li>\u003c/ul>\n\u003ch2 id=\"3-why-we-use-personal-data\">3. Why we use personal data\u003c/h2>\n\u003cdiv class=\"legal-tbl\">\u003ctable>\u003cthead>\u003ctr>\u003cth scope=\"col\">Purpose\u003c/th>\u003cth scope=\"col\">Legal basis\u003c/th>\u003c/tr>\u003c/thead>\u003ctbody>\u003ctr>\u003ctd>To run Cleo for you: accounts, sign-in, syncing terminals, receipts, reports and support\u003c/td>\u003ctd>Our contract with you or your business\u003c/td>\u003c/tr>\u003ctr>\u003ctd>To keep Cleo and your business secure: two-step sign-in, fraud checks, the audit trail\u003c/td>\u003ctd>Our legitimate interest in a secure service, and legal obligations\u003c/td>\u003c/tr>\u003ctr>\u003ctd>To help businesses meet BIR, tax and statutory discount rules\u003c/td>\u003ctd>Legal obligations of the business, which Cleo is built to support\u003c/td>\u003c/tr>\u003ctr>\u003ctd>To bill your subscription\u003c/td>\u003ctd>Our contract with you\u003c/td>\u003c/tr>\u003ctr>\u003ctd>To send service messages: outages, security notices, changes to these policies\u003c/td>\u003ctd>Our contract with you, and our legitimate interest\u003c/td>\u003c/tr>\u003ctr>\u003ctd>To improve Cleo, using combined or de-identified usage data\u003c/td>\u003ctd>Our legitimate interest\u003c/td>\u003c/tr>\u003ctr>\u003ctd>To tell you about other Aeso products\u003c/td>\u003ctd>Your consent, which you can withdraw at any time\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\n\u003cp>Some details are sensitive personal information under the Data Privacy Act, such as PWD status and government-issued ID numbers. Cleo processes them only because the discount laws above require the business to record them, and only the roles that need them can see them.\u003c/p>\n\u003ch2 id=\"4-who-we-share-personal-data-with\">4. Who we share personal data with\u003c/h2>\n\u003cul>\u003cli>\u003cstrong>Service providers\u003c/strong> that host Cleo, process payments (QR Ph and cards), deliver SMS and email, and support our help desk. They act on our instructions under written contracts that require them to protect the data.\u003c/li>\u003cli>\u003cstrong>Google and Meta (Facebook)\u003c/strong>, only when you choose to sign in with them. Their own privacy policies apply to what you share with them.\u003c/li>\u003cli>\u003cstrong>Services a business connects\u003c/strong>, such as GrabFood and foodpanda, for orders and menus. The business decides whether to connect them and can disconnect them at any time.\u003c/li>\u003cli>\u003cstrong>The business you work for and its authorized users.\u003c/strong> For example, an owner can see the sales and approvals linked to each staff member.\u003c/li>\u003cli>\u003cstrong>Government authorities\u003c/strong>, such as the BIR, the NPC or the courts, when the law requires it.\u003c/li>\u003cli>\u003cstrong>A buyer or successor\u003c/strong>, if Aeso is part of a merger or acquisition. We will tell you before your data moves to a new company and becomes subject to a different privacy policy.\u003c/li>\u003c/ul>\n\u003cp>We do not sell personal data.\u003c/p>\n\u003ch2 id=\"5-where-data-is-stored\">5. Where data is stored\u003c/h2>\n\u003cp>Cleo Cloud stores data with established hosting providers. Some providers may process data outside the Philippines. When they do, we stay responsible for that data under the Data Privacy Act and require the same level of protection by contract. You can ask us for the current list of service providers and hosting locations at \u003ca href=\"mailto:privacy@aeso.ph\">privacy@aeso.ph\u003c/a>.\u003c/p>\n\u003ch2 id=\"6-how-long-we-keep-data\">6. How long we keep data\u003c/h2>\n\u003cul>\u003cli>\u003cstrong>Account data:\u003c/strong> while your account is active. If your business cancels Cleo, your data stays available to export for 90 days, and then we delete or anonymize it, except where the law requires us to keep it.\u003c/li>\u003cli>\u003cstrong>Sales, invoices, the electronic journal and the audit trail:\u003c/strong> for as long as Philippine tax law requires the business to keep them. We keep them for the business during that time, or hand them over in an export.\u003c/li>\u003cli>\u003cstrong>Security logs:\u003c/strong> up to 12 months.\u003c/li>\u003cli>\u003cstrong>Backups:\u003c/strong> backups are replaced on a rolling basis and kept for up to 30 days.\u003c/li>\u003cli>\u003cstrong>Marketing consent:\u003c/strong> until you withdraw it.\u003c/li>\u003c/ul>\n\u003cp>When a business removes a customer from Cleo, their profile and contact details are erased. Past invoices keep only the buyer details that tax law requires.\u003c/p>\n\u003ch2 id=\"7-how-we-protect-personal-data\">7. How we protect personal data\u003c/h2>\n\u003cul>\u003cli>Encryption in transit and at rest.\u003c/li>\u003cli>Passwords, staff PINs and backup codes are stored only as hashes.\u003c/li>\u003cli>Two-step sign-in for owner and HQ manager accounts.\u003c/li>\u003cli>Access by role and branch, so each person sees only what their role allows.\u003c/li>\u003cli>An audit trail that records who changed what, and cannot be edited.\u003c/li>\u003cli>Each terminal is registered to one branch and can be unregistered remotely.\u003c/li>\u003cli>Staff who handle personal data are trained and bound by confidentiality.\u003c/li>\u003cli>Regular backups and tested recovery.\u003c/li>\u003c/ul>\n\u003cp>If a personal data breach is likely to put you at real risk, we will notify the NPC and the people affected within 72 hours of learning about it, as NPC Circular No. 16-03 requires. For data we process for a business, we will tell that business without undue delay so it can meet its own duties.\u003c/p>\n\u003ch2 id=\"8-your-rights\">8. Your rights\u003c/h2>\n\u003cp>Under the Data Privacy Act you have the right to:\u003c/p>\n\u003cul>\u003cli>\u003cstrong>be informed\u003c/strong> about how your personal data is used;\u003c/li>\u003cli>\u003cstrong>access\u003c/strong> your personal data;\u003c/li>\u003cli>\u003cstrong>object\u003c/strong> to processing, including direct marketing;\u003c/li>\u003cli>\u003cstrong>have it erased or blocked\u003c/strong> when it is no longer needed or was processed unlawfully;\u003c/li>\u003cli>\u003cstrong>correct\u003c/strong> data that is wrong or incomplete;\u003c/li>\u003cli>\u003cstrong>get a copy\u003c/strong> in a common electronic format (data portability);\u003c/li>\u003cli>\u003cstrong>claim damages\u003c/strong> if you are harmed by inaccurate, incomplete, outdated, false, unlawfully obtained or unauthorized use of your personal data;\u003c/li>\u003cli>\u003cstrong>file a complaint\u003c/strong> with the \u003ca href=\"https://www.privacy.gov.ph\" target=\"_blank\" rel=\"noopener\">National Privacy Commission\u003c/a>.\u003c/li>\u003c/ul>\n\u003cp>You can update most of your account details yourself in Owner Dashboard › Settings › Account and security. For anything else, email \u003ca href=\"mailto:privacy@aeso.ph\">privacy@aeso.ph\u003c/a>. We will confirm who you are, then reply within 15 working days.\u003c/p>\n\u003cp>If you are a customer of a business that uses Cleo, send your request to that business. If you contact us instead, we will pass it on to them.\u003c/p>\n\u003cp>Some data must be kept even after an erasure request, such as invoice copies the BIR requires. We will tell you when that applies.\u003c/p>\n\u003ch2 id=\"9-children\">9. Children\u003c/h2>\n\u003cp>Cleo accounts are for people 18 and over who act for a business. A business that records customers under 18, for example in a loyalty program, is responsible for getting a parent's or guardian's consent where the law requires it.\u003c/p>\n\u003ch2 id=\"10-service-messages-and-marketing\">10. Service messages and marketing\u003c/h2>\n\u003cp>We send service messages about your account, security, billing and important changes. You can't turn these off while your account is active. Marketing messages about other Aeso products are sent only with your consent, and every one includes a way to stop them.\u003c/p>\n\u003ch2 id=\"11-changes-to-this-policy\">11. Changes to this policy\u003c/h2>\n\u003cp>When we make an important change, we will tell you by email or in Cleo at least 15 days before it takes effect, and we will ask you to accept the new version the next time you sign in. Each version shows its effective date at the top.\u003c/p>\n\u003ch2 id=\"12-contact-us\">12. Contact us\u003c/h2>\n\u003cp>Aeso Technologies Inc. · Batangas City, Philippines\u003c/p>\n\u003cul>\u003cli>Data Protection Officer: \u003ca href=\"mailto:privacy@aeso.ph\">privacy@aeso.ph\u003c/a>\u003c/li>\u003cli>Support: \u003ca href=\"mailto:support@aeso.ph\">support@aeso.ph\u003c/a>\u003c/li>\u003c/ul>\n\u003cp>Cleo is a product of Aeso. One Phase Ahead.\u003c/p>"},"terms":{"title":"Cleo Terms and Conditions","effective":"October 6, 2026","version":"1.0","html":"\u003cp>These Terms and Conditions (\"Terms\") are an agreement between Aeso Technologies Inc. (\"Aeso\", \"we\", \"us\") and the business that uses Cleo (\"you\", \"the Customer\"). They cover the Cleo Terminal, Owner Dashboard, Back Office, Cleo Cloud, the Cleo apps and website, and their documentation (together, \"Cleo\").\u003c/p>\n\u003cp>By ticking \"I agree\" or by using Cleo, you accept these Terms. If you accept on behalf of a business, you confirm you are authorized to bind it. Staff who sign in to Cleo use it under these Terms and their employer's instructions.\u003c/p>\n\u003cp>Please also read our \u003ca href=\"privacy.html\">Privacy Policy\u003c/a>, which explains how we handle personal data.\u003c/p>\n\u003ch2 id=\"1-your-account\">1. Your account\u003c/h2>\n\u003cul>\u003cli>You must be at least 18 years old and give accurate details when you sign up. Keep them up to date.\u003c/li>\u003cli>Keep passwords, staff PINs and backup codes secret. The account owner is responsible for everyone they invite and the roles they give them.\u003c/li>\u003cli>Two-step sign-in is required for owner and HQ manager accounts on the web.\u003c/li>\u003cli>If you sign in with Google or Facebook, that provider's terms also apply to your use of their sign-in.\u003c/li>\u003cli>Tell us right away at \u003ca href=\"mailto:support@aeso.ph\">support@aeso.ph\u003c/a> if you think someone has used your account without permission.\u003c/li>\u003c/ul>\n\u003ch2 id=\"2-plans-fees-and-billing\">2. Plans, fees and billing\u003c/h2>\n\u003cul>\u003cli>Cleo is offered in plans (currently Basic, Pro and Enterprise) with different limits on terminals and features. Your plan and price are shown in Owner Dashboard › Plan and billing, or in a written order for Enterprise.\u003c/li>\u003cli>Fees are billed monthly in advance in Philippine pesos. Unless stated otherwise, prices exclude value-added tax, which is added where it applies.\u003c/li>\u003cli>Your subscription renews every month until you cancel it.\u003c/li>\u003cli>Payments are processed by our payment provider. If a payment fails, we will remind you. If it is still unpaid 15 days after the due date, we may suspend access until it is paid. Your data is not deleted during a suspension.\u003c/li>\u003cli>We will give you at least 30 days' notice before a price change takes effect.\u003c/li>\u003cli>When you move to a smaller plan, your branches and terminals must fit its limits.\u003c/li>\u003cli>Fees already paid are not refunded for partial months, except where the law requires a refund.\u003c/li>\u003c/ul>\n\u003ch2 id=\"3-bir-and-tax-compliance\">3. BIR and tax compliance\u003c/h2>\n\u003cp>Cleo produces the records Philippine tax rules call for, including sales invoices, X-readings and Z-readings, the electronic journal, sales books and the audit trail. You remain responsible for:\u003c/p>\n\u003cul>\u003cli>registering each terminal with the BIR and holding a Permit to Use (PTU) for each machine;\u003c/li>\u003cli>entering correct business, tax and price settings, and choosing the right tax treatment for each product;\u003c/li>\u003cli>granting statutory discounts correctly and keeping the required proof;\u003c/li>\u003cli>filing your returns and keeping your books for as long as the law requires.\u003c/li>\u003c/ul>\n\u003cp>Cleo is a tool, not tax or legal advice. Check your reports before you file them. We will tell you when a change in BIR rules, or in Cleo's accreditation status, affects how you can use Cleo.\u003c/p>\n\u003ch2 id=\"4-your-data\">4. Your data\u003c/h2>\n\u003cul>\u003cli>\u003cstrong>You own your data.\u003c/strong> This includes your catalog, sales, stock, customers, staff records and settings (\"Customer Data\"). You allow Aeso to host, copy and process it only to provide and support Cleo for you.\u003c/li>\u003cli>\u003cstrong>You can export it\u003c/strong> at any time from the reports and exports in Cleo.\u003c/li>\u003cli>\u003cstrong>We don't sell it\u003c/strong> or use it to advertise to your customers.\u003c/li>\u003cli>We may use combined, de-identified data that cannot identify you or anyone else to keep Cleo running well and to improve it.\u003c/li>\u003c/ul>\n\u003ch2 id=\"5-data-processing-terms\">5. Data processing terms\u003c/h2>\n\u003cp>When Customer Data includes personal data about your customers or staff, you are the personal information controller and Aeso is your personal information processor under the Data Privacy Act of 2012. Aeso will:\u003c/p>\n\u003cul>\u003cli>process that data only to provide Cleo and as you instruct through your settings and use of Cleo;\u003c/li>\u003cli>keep it confidential, and make sure our staff and service providers are bound to do the same;\u003c/li>\u003cli>protect it with the security measures described in the Privacy Policy;\u003c/li>\u003cli>use service providers only under written contracts with equal protections, and tell you about important changes to them;\u003c/li>\u003cli>help you answer requests from the people whose data you hold, and with any inquiry from the National Privacy Commission;\u003c/li>\u003cli>tell you without undue delay, and within 72 hours, if we learn of a breach affecting that data;\u003c/li>\u003cli>return or delete it when your subscription ends, as described in section 13.\u003c/li>\u003c/ul>\n\u003cp>You are responsible for having a lawful basis to record your customers' data. This includes asking for their consent where needed, using the consent step Cleo shows when you add a customer, and giving them your own privacy notice.\u003c/p>\n\u003ch2 id=\"6-offline-selling-and-sync\">6. Offline selling and sync\u003c/h2>\n\u003cp>Cleo Terminals keep selling without internet and sync when they reconnect. Sales made offline are stored only on that device until they sync. If a device is lost, damaged or reset before it syncs, those sales can be lost. Keep your devices secure and connect them regularly.\u003c/p>\n\u003cp>Some things need internet to work: automatic QR Ph confirmation, remote approvals, live loyalty points across branches and stock transfers. Stock can go below zero while a terminal is offline, and Cleo flags this when it syncs.\u003c/p>\n\u003ch2 id=\"7-payments-integrations-and-other-services\">7. Payments, integrations and other services\u003c/h2>\n\u003cul>\u003cli>\u003cstrong>Payments.\u003c/strong> QR Ph and card payments are processed by payment providers under their own terms. Aeso is not a bank or an e-money issuer and never holds your customers' payments. Settlements come to you from those providers.\u003c/li>\u003cli>\u003cstrong>Integrations.\u003c/strong> Services you connect, such as GrabFood, foodpanda, Google and Facebook, are run by other companies under their own terms. We aren't responsible for them or for their availability. You can disconnect them at any time.\u003c/li>\u003cli>\u003cstrong>Hardware.\u003c/strong> Cleo works with the printers, scanners, cash drawers, card terminals and Android devices we support. Hardware is sold separately, and the list of supported devices may change.\u003c/li>\u003c/ul>\n\u003ch2 id=\"8-acceptable-use\">8. Acceptable use\u003c/h2>\n\u003cp>You and your users must not:\u003c/p>\n\u003cul>\u003cli>use Cleo for anything illegal, fraudulent or misleading;\u003c/li>\u003cli>alter, delete or hide sales records, invoice numbers, grand totals or the audit trail outside Cleo's own void, refund and return documents;\u003c/li>\u003cli>copy, modify, reverse engineer or resell Cleo, except where the law expressly allows it;\u003c/li>\u003cli>test Cleo's security, or put an unusual load on it, without our written permission;\u003c/li>\u003cli>upload malware, or content that infringes someone else's rights;\u003c/li>\u003cli>share accounts or PINs between people.\u003c/li>\u003c/ul>\n\u003cp>We may suspend users who break these rules. Where we can, we will warn you first.\u003c/p>\n\u003ch2 id=\"9-availability-and-support\">9. Availability and support\u003c/h2>\n\u003cp>We work to keep Cleo available at all times, apart from planned maintenance. We announce maintenance in advance and schedule it outside busy selling hours where we can. Support is available at \u003ca href=\"mailto:support@aeso.ph\">support@aeso.ph\u003c/a> during Philippine business hours. Enterprise customers get the support terms in their order.\u003c/p>\n\u003ch2 id=\"10-changes-to-cleo\">10. Changes to Cleo\u003c/h2>\n\u003cp>Cleo improves over time. We may add, change or retire features. We won't remove a core feature of your paid plan during a billing period, and we will give you at least 30 days' notice before removing one.\u003c/p>\n\u003ch2 id=\"11-ownership\">11. Ownership\u003c/h2>\n\u003cp>Aeso owns Cleo, including its software, design and documentation, and the Cleo and Aeso names and logos. While your subscription is active, we grant you a limited, non-exclusive, non-transferable right to use Cleo for your business. If you send us feedback, we may use it to improve Cleo with no obligation to you.\u003c/p>\n\u003ch2 id=\"12-confidentiality\">12. Confidentiality\u003c/h2>\n\u003cp>Each of us will keep the other's non-public business information confidential. Each will use it only for this agreement, unless the law requires disclosure.\u003c/p>\n\u003ch2 id=\"13-cancellation-and-termination\">13. Cancellation and termination\u003c/h2>\n\u003cul>\u003cli>You can cancel at any time in Owner Dashboard › Plan and billing or by writing to \u003ca href=\"mailto:support@aeso.ph\">support@aeso.ph\u003c/a>. Cancellation takes effect at the end of the current billing month.\u003c/li>\u003cli>We may end or suspend your access if you seriously break these Terms and don't fix it within 15 days of our notice. We may also do so immediately if the law requires it, or to stop fraud or harm to others.\u003c/li>\u003cli>After your subscription ends, your account becomes read-only and your data stays available to export for 90 days. After that we delete it, except for records the law requires us to keep.\u003c/li>\u003c/ul>\n\u003ch2 id=\"14-warranties\">14. Warranties\u003c/h2>\n\u003cp>We will provide Cleo with reasonable skill and care. Beyond that, and as far as the law allows, Cleo is provided \"as is\", without other promises, including that it will be uninterrupted or error-free.\u003c/p>\n\u003ch2 id=\"15-limits-on-liability\">15. Limits on liability\u003c/h2>\n\u003cp>As far as the law allows, neither party is liable for indirect or consequential losses, such as lost profits, lost revenue or lost data, that the other could not reasonably foresee. Each party's total liability under these Terms is limited to the fees you paid Aeso in the 12 months before the claim.\u003c/p>\n\u003cp>These limits don't apply to fraud, gross negligence, willful misconduct, your payment obligations, or anything else the law does not allow to be limited.\u003c/p>\n\u003ch2 id=\"16-indemnity\">16. Indemnity\u003c/h2>\n\u003cp>You will defend and compensate Aeso for claims brought by third parties because of your Customer Data, or because you or your users broke these Terms or the law. Aeso will defend and compensate you for claims that Cleo, used as permitted, infringes someone else's intellectual property rights.\u003c/p>\n\u003ch2 id=\"17-changes-to-these-terms\">17. Changes to these Terms\u003c/h2>\n\u003cp>We may update these Terms. For important changes, we will tell you by email or in Cleo at least 30 days before they take effect, and we will ask you to accept the new version the next time you sign in. If you don't agree, you can cancel before the change takes effect.\u003c/p>\n\u003ch2 id=\"18-governing-law-and-disputes\">18. Governing law and disputes\u003c/h2>\n\u003cp>These Terms are governed by the laws of the Philippines. If a dispute arises, we will first try to settle it in good faith within 30 days of written notice. If we can't, the courts of Makati City have exclusive jurisdiction.\u003c/p>\n\u003ch2 id=\"19-general\">19. General\u003c/h2>\n\u003cul>\u003cli>These Terms, the Privacy Policy and any written order make up the whole agreement between us about Cleo.\u003c/li>\u003cli>Neither party may transfer this agreement without the other's consent, except to a successor in a merger or acquisition.\u003c/li>\u003cli>Neither party is responsible for delays caused by events beyond its reasonable control, such as natural disasters, power or network outages, or government action.\u003c/li>\u003cli>We may send notices by email to the account owner or show them in Cleo. Send notices to us at \u003ca href=\"mailto:support@aeso.ph\">support@aeso.ph\u003c/a>.\u003c/li>\u003cli>If part of these Terms can't be enforced, the rest still applies.\u003c/li>\u003cli>Accepting these Terms electronically has the same effect as a signed agreement under the Electronic Commerce Act (Republic Act No. 8792).\u003c/li>\u003c/ul>\n\u003ch2 id=\"20-contact-us\">20. Contact us\u003c/h2>\n\u003cp>Aeso Technologies Inc. · Batangas City, Philippines · \u003ca href=\"mailto:support@aeso.ph\">support@aeso.ph\u003c/a>\u003c/p>\n\u003cp>Cleo is a product of Aeso. One Phase Ahead.\u003c/p>"}}}</script>
@@ -3312,7 +3169,7 @@ const Cleo = (() => {
   /* ---------- brand color: the client's accent replaces Cleo red across the interface ---------- */
   const BRAND_PRESETS = [['#d40000', 'Cleo red'], ['#e5571f', 'Ember'], ['#b7791f', 'Turmeric'], ['#1f8a5b', 'Forest'], ['#1f6fd1', 'Ocean'], ['#6d4bd8', 'Ube'], ['#c2306b', 'Bougainvillea'], ['#45454b', 'Graphite']];
   function applyBrand() {
-    const keys = ['--accent', '--accent-hover', '--accent-press', '--accent-ink', '--accent-soft', '--accent-glow', '--on-accent', '--amb-1', '--amb-2', '--amb-3', '--focus'];
+    const keys = ['--accent', '--accent-hover', '--accent-pressed', '--accent-text', '--accent-fill', '--on-accent'];
     const st = document.documentElement.style;
     const hex = String(config.get('brand.accent') || '#d40000').toLowerCase();
     if (hex === '#d40000' || !/^#[0-9a-f]{6}$/.test(hex)) { keys.forEach((k) => st.removeProperty(k)); return; }
@@ -3330,299 +3187,15 @@ const Cleo = (() => {
     const onDark = { r: 255, g: 248, b: 246 }, onLight = { r: 20, g: 20, b: 20 };
     st.setProperty('--accent', css(c));
     st.setProperty('--accent-hover', css(mix(c, W, 0.12)));
-    st.setProperty('--accent-press', css(mix(c, K, 0.15)));
-    st.setProperty('--accent-ink', css(ink));
-    st.setProperty('--accent-soft', css(c, dark ? 0.2 : 0.12));
-    st.setProperty('--accent-glow', css(c, dark ? 0.5 : 0.32));
+    st.setProperty('--accent-pressed', css(mix(c, K, 0.15)));
+    st.setProperty('--accent-text', css(ink));
+    st.setProperty('--accent-fill', css(c, dark ? 0.18 : 0.10));
     st.setProperty('--on-accent', css(contrast(onDark, c) >= contrast(onLight, c) ? onDark : onLight));
-    // the ambient light stays quiet in any brand colour, as it does in Cleo red (core.css tokens)
-    st.setProperty('--amb-1', css(c, dark ? 0.24 : 0.05));
-    st.setProperty('--amb-2', dark ? css(mix(c, K, 0.55), 0.34) : css(mix(c, W, 0.55), 0.1));
-    st.setProperty('--amb-3', dark ? css(mix(c, W, 0.25), 0.1) : css(mix(c, W, 0.75), 0.13));
   }
   applyBrand();
   document.addEventListener('cleo:theme', applyBrand);
   config.onChange(({ path }) => { if (path === '*' || path.startsWith('brand')) applyBrand(); });
 
-  /* ---------- ripples: an organic wavefront, never a perfect circle ----------
-     A ripple widens from where it started, but its edge wobbles with direction (a few slow harmonics with
-     random phases that drift as it travels), it runs further one way than another, its front breaks into
-     brighter and fainter stretches, a fainter echo follows it, and boxes just behind the front twinkle on
-     their own. Most ripples also throw two or three smaller ones nearby a moment later, like a splash. Every
-     ripple draws a fresh shape, so no two look alike. Distances are in the caller's units (screen pixels
-     for the background grid, grid cells for the 3D mark).
-       make(x, y, t0, { speed, life, band, splash })  the ripple and its splash, as a list
-       prepare(r, t)   once per frame: where its front has reached in every direction (false when over)
-       at(r, dx, dy, ph)  0 to 1: how strongly it lights a point dx, dy from its start (ph: that point's own phase) */
-  const Ripple = (() => {
-    const TAU = Math.PI * 2, BINS = 96, rnd = Math.random;
-    const one = (x, y, t0, speed, life, band, k) => ({
-      x, y, t0, speed: speed * (0.82 + rnd() * 0.36), life, band, k,
-      harm: [2, 3, 4, 6].map((n, i) => [n, (0.05 + rnd() * 0.1) / (1 + i * 0.45), rnd() * TAU, (rnd() - 0.5) * 2.4]),
-      dir: rnd() * TAU, skew: 0.06 + rnd() * 0.2, lobes: 2 + Math.floor(rnd() * 3), lp: [rnd() * TAU, rnd() * TAU],
-      echo: 0.48 + rnd() * 0.2, sh: new Float32Array(BINS), pa: new Float32Array(BINS),
-    });
-    function make(x, y, t0, { speed = 620, life = 1.9, band = 20, splash = true } = {}) {
-      const out = [one(x, y, t0, speed, life, band, 1)];
-      if (splash && rnd() < 0.75) for (let i = 0, n = 1 + Math.floor(rnd() * 3); i < n; i++) {
-        const a = rnd() * TAU, d = band * (2.5 + rnd() * 5);
-        out.push(one(x + Math.cos(a) * d, y + Math.sin(a) * d, t0 + 0.1 + rnd() * 0.35, speed * (0.4 + rnd() * 0.3), life * (0.5 + rnd() * 0.2), band * 0.7, 0.5 + rnd() * 0.25));
-      }
-      return out;
-    }
-    function prepare(r, t) {
-      const age = t - r.t0; r.age = age;
-      if (age <= 0 || age >= r.life) return false;
-      let hi = 0, lo = 9;
-      for (let b = 0; b < BINS; b++) {
-        const th = (b / BINS) * TAU - Math.PI;
-        let s = 1 + r.skew * Math.cos(th - r.dir);
-        for (const [n, a, p, w] of r.harm) s += a * Math.sin(n * th + p + w * age);
-        r.sh[b] = s; if (s > hi) hi = s; if (s < lo) lo = s;
-        // brighter and fainter stretches along the front, drifting as it travels
-        r.pa[b] = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(r.lobes * th + r.lp[0] + age * 1.4)) * (0.6 + 0.4 * Math.sin((r.lobes + 3) * th + r.lp[1] - age * 0.9));
-      }
-      r.reach = r.speed * age; r.sig = r.band * (1 + age * 0.35); r.fade = (1 - age / r.life) ** 1.5 * r.k;
-      r.max = r.reach * hi + r.sig * 3; r.min = Math.max(0, r.reach * lo * Math.min(r.echo, 0.45) - r.sig * 3);
-      return true;
-    }
-    function at(r, dx, dy, ph = 0) {
-      let dist = Math.hypot(dx, dy);
-      if (dist > r.max || dist < r.min) return 0;
-      dist += Math.sin(ph * 3.7) * r.band * 0.35; // a ragged edge: each point is reached a little early or late
-      const f = ((Math.atan2(dy, dx) + Math.PI) / TAU) * BINS, i0 = Math.floor(f) % BINS, i1 = (i0 + 1) % BINS, u = f - Math.floor(f);
-      const R = r.reach * (r.sh[i0] + (r.sh[i1] - r.sh[i0]) * u), pa = r.pa[i0] + (r.pa[i1] - r.pa[i0]) * u, s2 = 2 * r.sig * r.sig;
-      let v = Math.exp(-((dist - R) ** 2) / s2) + 0.38 * Math.exp(-((dist - R * r.echo) ** 2) / (s2 * 0.7));
-      if (dist < R && dist > R * 0.45) v += 0.32 * (0.5 + 0.5 * Math.sin(ph * 5.3 + r.age * 21)) ** 6 * ((dist - R * 0.45) / (R * 0.55));
-      return Math.min(1, v * pa * r.fade);
-    }
-    return { make, prepare, at };
-  })();
-
-  /* ---------- background: a grid of boxes lit by moving light ----------
-     Dark mode, behind the loading screen and the sign-in screens (the web sign-in and the Terminal's staff
-     PIN screen). Everywhere else the grid fades away to the theme's plain background. Light mode shows it
-     only while loading, as faint ink boxes.
-       - loading (mode 'boot', set by boot()): the grid is barely there, so the organic ripples of accent light
-         that spread from behind the logo, now and then and at every step (pulse()), carry the screen; first the
-         emblem lights up in the grid's own boxes (mark()).
-       - sign-in (mode 'login', a screen with data-amb="login"; show() reads it): dimmer still, so the mark
-         and the form lead.
-     Every box takes part: lit boxes shimmer on their own beat and the unlit grid breathes softly, so
-     no part of the screen sits still. With a mouse, a faint light follows the pointer.
-     Performance: the light is computed on a tiny canvas with one pixel per box, then drawn scaled up
-     without smoothing and masked by a tile of one rounded box, so a frame is two draws. It runs at the
-     display's frame rate only while the grid shows, pauses in hidden tabs, and draws a single still
-     frame when motion is reduced. Every .ambient element on the page gets a canvas (the web page has
-     one; the Terminal moves it into its device stage). */
-  const ambient = (() => {
-    const CELL = 18, GAP = 5, RAD = 3.5;
-    // lights: [colour index, centre x, sway x, period x (s), centre y, sway y, period y (s), radius (share of the long side), strength]
-    const LIGHTS = [[0, 0.16, 0.16, 23, 0.10, 0.12, 29, 0.44, 0.95], [1, 0.84, 0.14, 31, 0.88, 0.12, 37, 0.48, 1], [2, 0.70, 0.20, 19, 0.16, 0.16, 26, 0.30, 0.9], [3, 0.38, 0.22, 34, 0.94, 0.10, 24, 0.42, 0.85]];
-    // each level: [light gain, brightest box, unlit grid, ripple strength]. Kept low so the text on top always reads first.
-    const LEVEL = { boot: [0.05, 0.04, 0.006, 1.3], login: [0.15, 0.11, 0.013, 0.85] };
-    const views = new Map(); let colours = [], accent = [212, 0, 0, 1], raf = 0, last = 0, scanAt = 0;
-    let on = false, target = 'boot', cur = LEVEL.boot.slice(), offUntil = 0, settleT = 0;
-    const ripples = []; // Ripple.make() entries, in client px
-    let shape = null; // the mark lit in the boxes (mark()): { v, c0, r0, nc, nr, cov, delays, born, fadeAt, hold }
-    const pointer = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4, a: 0, seen: 0 };
-    const probe = document.createElement('i');
-    const rgba = (v) => {
-      probe.style.color = ''; probe.style.color = v; if (!probe.isConnected) document.documentElement.appendChild(probe);
-      const m = getComputedStyle(probe).color.match(/[\d.]+/g) || [0, 0, 0, 0];
-      return [+m[0], +m[1], +m[2], m[3] == null ? 1 : +m[3]];
-    };
-    const readColours = () => {
-      const s = getComputedStyle(document.documentElement);
-      colours = [1, 2, 3, 4].map((i) => rgba(s.getPropertyValue(`--amb-${i}`).trim() || 'transparent'));
-      accent = rgba(s.getPropertyValue('--accent').trim() || '#d40000'); probe.remove();
-    };
-    const dark = () => theme.get() === 'dark';
-    // light mode draws the grid only while loading; a switch to dark mode on a sign-in screen brings it in
-    const running = (now) => (dark() || target === 'boot') && (on || now < offUntil);
-    function attach(el) {
-      const canvas = document.createElement('canvas'); canvas.className = 'amb-grid';
-      el.prepend(canvas);
-      const field = document.createElement('canvas'); const tile = document.createElement('canvas');
-      const v = { el, canvas, ctx: canvas.getContext('2d'), field, fctx: field.getContext('2d'), tile, cols: 0, rows: 0, phase: null, pattern: null };
-      new ResizeObserver(() => size(v)).observe(el);
-      size(v); views.set(el, v);
-    }
-    function size(v) {
-      const w = v.el.clientWidth, h = v.el.clientHeight; if (!w || !h) return;
-      const dpr = Math.min(2, devicePixelRatio || 1);
-      v.w = w; v.h = h; v.dpr = dpr;
-      v.canvas.width = Math.round(w * dpr); v.canvas.height = Math.round(h * dpr);
-      v.cols = Math.ceil(w / CELL); v.rows = Math.ceil(h / CELL);
-      v.field.width = v.cols; v.field.height = v.rows; v.img = v.fctx.createImageData(v.cols, v.rows);
-      v.phase = Float32Array.from({ length: v.cols * v.rows }, () => Math.random() * Math.PI * 2);
-      // one rounded box per cell, used as a mask
-      const c = CELL * dpr, g = (GAP / 2) * dpr, s = c - g * 2, r = RAD * dpr; v.tile.width = v.tile.height = Math.round(c);
-      const t = v.tile.getContext('2d'); t.clearRect(0, 0, c, c); t.beginPath();
-      t.moveTo(g + r, g); t.arcTo(g + s, g, g + s, g + s, r); t.arcTo(g + s, g + s, g, g + s, r); t.arcTo(g, g + s, g, g, r); t.arcTo(g, g, g + s, g, r); t.closePath(); t.fillStyle = '#000'; t.fill();
-      v.pattern = v.ctx.createPattern(v.tile, 'repeat');
-      if (running(performance.now())) render(v, performance.now() / 1000);
-    }
-    function render(v, t) {
-      if (!v.cols || !v.pattern) return;
-      const { cols, rows, w, h, img, phase } = v; const d = img.data; const L = Math.max(w, h);
-      const [gain, cap, ghost, rgain] = cur;
-      const ink = dark() ? 255 : 24; // the unlit grid: faint white in dark mode, faint ink in light mode
-      const lights = LIGHTS.map(([ci, cx, sx, px, cy, sy, py, rr, k]) => {
-        const c = colours[ci] || [0, 0, 0, 0];
-        return [(cx + sx * Math.sin((t / px) * Math.PI * 2 + ci)) * w, (cy + sy * Math.cos((t / py) * Math.PI * 2 + ci * 1.7)) * h, (rr * L) ** 2, c[0], c[1], c[2], c[3] * k * (0.85 + 0.15 * Math.sin(t * 0.35 + ci))];
-      });
-      if (pointer.a > 0.01) { const c = colours[2] || [0, 0, 0, 0]; lights.push([pointer.x, pointer.y, 180 ** 2, c[0], c[1], c[2], Math.min(1, c[3] * 2.2) * pointer.a]); }
-      // ripples start in screen pixels; measure them from this element's corner (the Terminal stage is scaled)
-      const rect = v.el.getBoundingClientRect(), sx = w / (rect.width || w), sy = h / (rect.height || h);
-      const live = ripples.filter((r) => Ripple.prepare(r, t));
-      live.forEach((r) => { r.lx = (r.x - rect.left) * sx; r.ly = (r.y - rect.top) * sy; });
-      const M = shape && shape.v === v ? shape : null;
-      for (let y = 0, i = 0; y < rows; y++) {
-        const py = (y + 0.5) * CELL;
-        for (let x = 0; x < cols; x++, i++) {
-          const px = (x + 0.5) * CELL; let R = 0, G = 0, B = 0, Wt = 0;
-          for (let l = 0; l < lights.length; l++) {
-            const s = lights[l]; const dx = px - s[0], dy = py - s[1];
-            const wgt = s[6] * Math.exp(-((dx * dx + dy * dy) / s[2]) * 2.4);
-            if (wgt < 0.002) continue; R += s[3] * wgt; G += s[4] * wgt; B += s[5] * wgt; Wt += wgt;
-          }
-          const tw = 0.82 + 0.18 * Math.sin(t * 1.1 + phase[i]); // each lit box shimmers on its own beat
-          // colour of the light on this box, and how strongly the box is lit
-          let cr = Wt ? R / Wt : 0, cg = Wt ? G / Wt : 0, cb = Wt ? B / Wt : 0, lit = Math.min(cap, Wt * tw * gain);
-          // the mark's boxes rise centre first in the accent, hold, then go out from fadeAt (the landing page's marks)
-          const mi = M ? x - M.c0 : -1, mj = M ? y - M.r0 : -1;
-          if (M && mi >= 0 && mi < M.nc && mj >= 0 && mj < M.nr && M.cov[mj * M.nc + mi]) {
-            const k = mj * M.nc + mi, since = t - M.born - M.delays[k];
-            if (since > 0) {
-              const rise = 1 - (1 - Math.min(1, since / 0.42)) ** 3;
-              const out = M.fadeAt === Infinity ? 0 : clamp((t - M.fadeAt - M.delays[k] * 0.6) / 0.6, 0, 1);
-              const a = 0.8 * M.cov[k] * tw * rise * (1 - out) * (M.hold + (1 - M.hold) * Math.exp(-Math.max(0, since - 0.42) * 2.5)), sum = lit + a;
-              if (a > 0.004) { cr = (cr * lit + accent[0] * a) / sum; cg = (cg * lit + accent[1] * a) / sum; cb = (cb * lit + accent[2] * a) / sum; lit = Math.min(0.9, sum); }
-            }
-          }
-          for (let k = 0; k < live.length; k++) {
-            const r = live[k], s = Ripple.at(r, px - r.lx, py - r.ly, phase[i]);
-            if (s < 0.01) continue;
-            // accent light, blended over the light already here by strength; its brightest stretches run warmer
-            const a = Math.min(0.62, 0.5 * s * rgain), warm = Math.max(0, s - 0.55) * 0.55, sum = lit + a;
-            cr = (cr * lit + (accent[0] + (255 - accent[0]) * warm) * a) / sum;
-            cg = (cg * lit + (accent[1] + (120 - accent[1]) * warm) * a) / sum;
-            cb = (cb * lit + (accent[2] + (90 - accent[2]) * warm) * a) / sum;
-            lit = Math.min(0.85, sum);
-          }
-          // the unlit grid breathes softly under the light
-          const gh = ghost * (1 + 0.32 * Math.sin(t * 0.8 + phase[i] * 1.7));
-          const tot = lit + gh, o = i * 4;
-          d[o] = (cr * lit + ink * gh) / tot;
-          d[o + 1] = (cg * lit + ink * gh) / tot;
-          d[o + 2] = (cb * lit + ink * gh) / tot;
-          d[o + 3] = Math.min(255, tot * 255);
-        }
-      }
-      v.fctx.putImageData(img, 0, 0);
-      const ctx = v.ctx, cw = cols * CELL * v.dpr, ch = rows * CELL * v.dpr;
-      ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, v.canvas.width, v.canvas.height);
-      ctx.imageSmoothingEnabled = false; ctx.drawImage(v.field, 0, 0, cols, rows, 0, 0, cw, ch);
-      ctx.globalCompositeOperation = 'destination-in'; ctx.fillStyle = v.pattern; ctx.fillRect(0, 0, cw, ch);
-      ctx.globalCompositeOperation = 'source-over';
-    }
-    function scan() {
-      document.querySelectorAll('.ambient').forEach((el) => { if (!views.has(el)) attach(el); });
-      views.forEach((v, el) => { if (!el.isConnected) views.delete(el); });
-    }
-    // every display frame while the grid shows; motion is eased by elapsed time, so it stays smooth at any frame rate
-    function frame(now) {
-      raf = 0;
-      if (!running(now) || document.hidden) return;
-      if (now - scanAt > 1000) { scan(); scanAt = now; }
-      const dt = Math.min(0.05, last ? (now - last) / 1000 : 0.016); last = now;
-      const ease = (tau) => 1 - Math.exp(-dt / tau);
-      // the level glides between loading and sign-in
-      const goal = LEVEL[target]; for (let k = 0; k < 3; k++) cur[k] += (goal[k] - cur[k]) * ease(0.6);
-      // the pointer light eases toward the pointer, and fades out two seconds after it stops
-      pointer.x += (pointer.tx - pointer.x) * ease(0.12); pointer.y += (pointer.ty - pointer.y) * ease(0.12);
-      pointer.a += ((now - pointer.seen < 2000 ? 1 : 0) - pointer.a) * ease(0.5);
-      for (let k = ripples.length - 1; k >= 0; k--) if (now / 1000 - ripples[k].t0 > ripples[k].life) ripples.splice(k, 1);
-      if (shape && now / 1000 > shape.fadeAt + 1.4) shape = null;
-      views.forEach((v) => render(v, now / 1000));
-      raf = requestAnimationFrame(frame);
-    }
-    function start() {
-      scan(); readColours();
-      if (!running(performance.now())) return;
-      if (reduced()) { cur = LEVEL[target].slice(); views.forEach((v) => render(v, 40)); return; }
-      if (!raf) { last = 0; raf = requestAnimationFrame(frame); }
-    }
-    /* 'boot' while the loading screen shows, 'login' on sign-in screens, 'off' everywhere else.
-       The grid fades in and out in CSS (:root.amb-on); it keeps drawing until the fade has finished. */
-    function mode(name) {
-      clearTimeout(settleT);
-      const root = document.documentElement;
-      if (LEVEL[name]) {
-        if (!on) cur = LEVEL[name].slice(); // appearing: start at this level (the fade-in covers it)
-        on = true; target = name; root.classList.add('amb-on');
-      } else if (on) { on = false; offUntil = performance.now() + 1200; root.classList.remove('amb-on'); }
-      root.classList.toggle('amb-boot', on && name === 'boot');
-      if (name !== 'boot') shape = null;
-      start();
-    }
-    // after loading, the next screen sets the level; if none does in a moment, the grid fades away
-    function settle() { clearTimeout(settleT); settleT = setTimeout(() => mode('off'), 900); }
-    // an organic ripple of light from a point on screen (client coordinates), e.g. behind the Cleo mark;
-    // opts tune it (Ripple.make): the loading screen sends slower, wider ones
-    function pulse(x, y, opts) {
-      if (reduced() || !on) return;
-      ripples.push(...Ripple.make(x, y, performance.now() / 1000, opts));
-      if (ripples.length > 18) ripples.splice(0, ripples.length - 18);
-      start();
-    }
-    /* the emblem lit in the grid's own boxes, over an image of it on screen (the loading screen's emblem):
-       the boxes it covers light up in the accent, centre first, hold, and go out from fadeAt (seconds on the
-       performance clock, like born). The image must have loaded. With reduced motion there is none. */
-    function mark(img, { born = performance.now() / 1000, fadeAt = Infinity, hold = 0.85 } = {}) {
-      shape = null;
-      if (!img || reduced()) return;
-      scan();
-      const v = views.get(img.closest('.dp')?.querySelector('.ambient') || document.querySelector('body > .ambient'));
-      if (!v || !v.w) return;
-      const er = v.el.getBoundingClientRect(), r = img.getBoundingClientRect(), sx = v.w / (er.width || v.w), sy = v.h / (er.height || v.h);
-      const x0 = (r.left - er.left) * sx, y0 = (r.top - er.top) * sy, w = r.width * sx, h = r.height * sy;
-      const c0 = Math.floor(x0 / CELL), r0 = Math.floor(y0 / CELL), nc = Math.ceil((x0 + w) / CELL) - c0, nr = Math.ceil((y0 + h) / CELL) - r0;
-      if (nc < 1 || nr < 1 || !w || !h) return;
-      // four samples a side for every box it covers
-      const S = 4, c = document.createElement('canvas'); c.width = nc * S; c.height = nr * S;
-      const x = c.getContext('2d', { willReadFrequently: true });
-      x.drawImage(img, (x0 / CELL - c0) * S, (y0 / CELL - r0) * S, (w / CELL) * S, (h / CELL) * S);
-      const px = x.getImageData(0, 0, c.width, c.height).data, cov = new Float32Array(nc * nr), delays = new Float32Array(nc * nr);
-      for (let j = 0; j < nr; j++) for (let i = 0; i < nc; i++) {
-        let sum = 0;
-        for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += px[((j * S + yy) * c.width + i * S + xx) * 4 + 3];
-        const f = sum / (S * S * 255);
-        cov[j * nc + i] = f < 0.22 ? 0 : Math.min(1, (f - 0.22) / 0.4);
-        delays[j * nc + i] = Math.hypot((i + 0.5) / nc - 0.5, (j + 0.5) / nr - 0.5) * 0.85 + Math.random() * 0.16;
-      }
-      shape = { v, c0, r0, nc, nr, cov, delays, born, fadeAt, hold };
-      start();
-    }
-    if (mq('(pointer: fine)').matches) addEventListener('pointermove', (e) => {
-      if (!on) return;
-      // the stage of the Terminal is scaled; map the pointer into the element the light is drawn on
-      const v = [...views.values()][0]; if (!v) return;
-      const r = v.el.getBoundingClientRect(); const sx = v.w / r.width, sy = v.h / r.height;
-      pointer.tx = (e.clientX - r.left) * sx; pointer.ty = (e.clientY - r.top) * sy; pointer.seen = performance.now();
-      if (pointer.x < -1000) { pointer.x = pointer.tx; pointer.y = pointer.ty; }
-    }, { passive: true });
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
-    document.addEventListener('cleo:theme', () => setTimeout(start, 30));
-    mq('(prefers-reduced-motion: reduce)').addEventListener?.('change', start);
-    // the lit mark goes out now, if it was set to hold
-    const unmark = () => { if (shape && shape.fadeAt === Infinity) { shape.fadeAt = performance.now() / 1000; start(); } };
-    return { start, mode, settle, pulse, mark, unmark, refresh: () => { readColours(); start(); } };
-  })();
-  // the lights follow the brand colour (applyBrand sets --amb-1 … --amb-3)
-  config.onChange(({ path }) => { if (path === '*' || path.startsWith('brand')) setTimeout(ambient.refresh, 30); });
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ambient.start); else setTimeout(ambient.start, 0);
 
   /* ---------- demo clock ----------
      Demo only (Cleo.env.demo). The sample business always runs inside café hours: outside 9 AM to 9 PM
@@ -3701,187 +3274,7 @@ const Cleo = (() => {
     el._cu = requestAnimationFrame(step);
   }
 
-  /* ---------- liquid glass: every glass surface refracts at its rim ----------
-     Each surface's backdrop is blurred, then bent inside a narrow rim by an SVG displacement map: the way
-     the curved edge of a real glass slab refracts what lies behind it, light from just past the edge is
-     drawn into the rim while the middle stays still. The fill is a flat tint and ::before draws the
-     embossed stroke (core.css "Glass materials"); there is no sheen gradient.
-     Every .glass, .glass-thick and .lg element (and [data-lg]) is picked up on its own, including ones
-     added later, so new screens need nothing. attach(el, { bezel, scale, tint }) still works for a surface
-     that wants a wider rim or its own tint. Chromium only (an SVG filter inside backdrop-filter); elsewhere,
-     and with reduced transparency, surfaces keep the plain blur.
-     Performance: maps are drawn small (the filter stretches them), built a few per frame, and shared
-     between surfaces of the same size and corner radius; a surface that leaves the page releases its map. */
-  const LiquidGlass = (() => {
-    const brands = navigator.userAgentData?.brands?.map((b) => b.brand).join(' ') || '';
-    const chromium = /Chromium|Google Chrome|Microsoft Edge|Opera/.test(brands) || (!!window.chrome && !/Firefox/.test(navigator.userAgent));
-    const enabled = chromium && !mq('(prefers-reduced-transparency: reduce)').matches;
-    if (enabled) document.documentElement.classList.add('has-refraction');
-    const NS = 'http://www.w3.org/2000/svg';
-    const SEL = '.glass, .glass-thick, .lg, [data-lg]';
-    let defs, uid = 0;
-    const ensureDefs = () => {
-      if (defs?.isConnected) return defs;
-      const svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.setAttribute('aria-hidden', 'true');
-      svg.style.position = 'absolute';
-      defs = document.createElementNS(NS, 'defs');
-      svg.appendChild(defs); document.body.appendChild(svg);
-      return defs;
-    };
-    const parseRadius = (el, w, h) => {
-      const r = getComputedStyle(el).borderTopLeftRadius;
-      if (r.endsWith('%')) return (Math.min(w, h) * parseFloat(r)) / 100;
-      return Math.min(parseFloat(r) || 0, Math.min(w, h) / 2);
-    };
-    // the rim: neutral (128, 128) inside; within `bezel` of the edge a push outward along the edge's normal,
-    // strongest at the edge and easing to nothing, so the backdrop just beyond the edge bends into the rim
-    function buildMap(w, h, radius, bezel) {
-      const S = Math.min(1, Math.max(6 / bezel, 360 / Math.max(w, h)));
-      const cw = Math.max(8, Math.round(w * S)), ch = Math.max(8, Math.round(h * S));
-      const c = document.createElement('canvas'); c.width = cw; c.height = ch;
-      const ctx = c.getContext('2d'); const img = ctx.createImageData(cw, ch); const d = img.data;
-      const r = radius * (cw / w), bz = Math.max(2, bezel * (cw / w)), hx = cw / 2, hy = ch / 2;
-      for (let y = 0, i = 0; y < ch; y++) {
-        const py = y + 0.5 - hy, qy = Math.abs(py) - (hy - r);
-        for (let x = 0; x < cw; x++, i += 4) {
-          let R = 128, G = 128;
-          const px = x + 0.5 - hx, qx = Math.abs(px) - (hx - r);
-          const inside = -(Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - r);
-          if (inside >= 0 && inside < bz) {
-            const m = (1 - inside / bz) ** 2.2 * 127;
-            let nx, ny;
-            if (qx > 0 && qy > 0) { const l = Math.hypot(qx, qy) || 1; nx = (qx / l) * Math.sign(px); ny = (qy / l) * Math.sign(py); }
-            else if (qx > qy) { nx = Math.sign(px); ny = 0; } else { nx = 0; ny = Math.sign(py); }
-            R = 128 + nx * m; G = 128 + ny * m;
-          }
-          d[i] = R; d[i + 1] = G; d[i + 2] = 128; d[i + 3] = 255;
-        }
-      }
-      ctx.putImageData(img, 0, 0);
-      return c.toDataURL();
-    }
-    const maps = new Map();     // size key -> { id, filter, users }
-    const surfaces = new Map(); // element -> { bezel, scale, key }
-    function acquire(w, h, r, bezel, scale) {
-      const key = `${w}x${h}r${Math.round(r)}b${bezel}s${scale}`;
-      let m = maps.get(key);
-      if (!m) {
-        const id = 'lgf' + ++uid;
-        const filter = document.createElementNS(NS, 'filter');
-        for (const [k, v] of Object.entries({ id, x: 0, y: 0, width: w, height: h, filterUnits: 'userSpaceOnUse', primitiveUnits: 'userSpaceOnUse', 'color-interpolation-filters': 'sRGB' })) filter.setAttribute(k, v);
-        const img = document.createElementNS(NS, 'feImage');
-        for (const [k, v] of Object.entries({ x: 0, y: 0, width: w, height: h, preserveAspectRatio: 'none', result: 'rim', href: buildMap(w, h, r, bezel) })) img.setAttribute(k, v);
-        const disp = document.createElementNS(NS, 'feDisplacementMap');
-        for (const [k, v] of Object.entries({ in: 'SourceGraphic', in2: 'rim', scale, xChannelSelector: 'R', yChannelSelector: 'G' })) disp.setAttribute(k, v);
-        filter.append(img, disp); ensureDefs().appendChild(filter);
-        m = { id, filter, users: 0 }; maps.set(key, m);
-      }
-      m.users++;
-      return key;
-    }
-    function release(key) {
-      const m = maps.get(key); if (!m) return;
-      if (--m.users <= 0) { m.filter.remove(); maps.delete(key); }
-    }
-    // a narrow rim on small controls, up to 20px on large panels; the push reaches about one bezel past the edge
-    const autoBezel = (r, w, h) => Math.max(4, Math.round(Math.min(clamp(r * 0.8, 8, 20), Math.min(w, h) / 4)));
-    function refresh(el) {
-      const s = surfaces.get(el); if (!s) return;
-      const w = el.offsetWidth, h = el.offsetHeight;
-      if (!w || !h) return; // not laid out yet: the ResizeObserver brings it back
-      const r = parseRadius(el, w, h);
-      const bezel = s.bezel ?? autoBezel(r, w, h), scale = s.scale ?? Math.round(bezel * 1.9);
-      const key = `${w}x${h}r${Math.round(r)}b${bezel}s${scale}`;
-      if (key === s.key) return;
-      if (s.key) release(s.key);
-      s.key = acquire(w, h, r, bezel, scale);
-      el.style.setProperty('--refract', `url(#${maps.get(s.key).id})`);
-    }
-    // maps are built a few per frame so a new screen never stalls
-    const queue = new Set(); let qRaf = 0;
-    function flush() {
-      qRaf = 0; const t0 = performance.now();
-      for (const el of queue) {
-        queue.delete(el);
-        if (el.isConnected) refresh(el);
-        if (performance.now() - t0 > 6) break;
-      }
-      if (queue.size) qRaf = requestAnimationFrame(flush);
-    }
-    const schedule = (el) => { queue.add(el); if (!qRaf) qRaf = requestAnimationFrame(flush); };
-    const ro = enabled && 'ResizeObserver' in window ? new ResizeObserver((entries) => {
-      for (const e of entries) { clearTimeout(e.target._lgT); e.target._lgT = setTimeout(() => schedule(e.target), 90); }
-    }) : null;
-    function register(el, { bezel, scale } = {}) {
-      if (!enabled || !el) return;
-      const s = surfaces.get(el);
-      if (s) {
-        if (bezel == null && scale == null) return;
-        s.bezel = bezel ?? s.bezel; s.scale = scale ?? s.scale;
-        if (s.key) { release(s.key); s.key = null; }
-      } else {
-        const lg = el.dataset?.lg ? +el.dataset.lg : undefined;
-        surfaces.set(el, { bezel: bezel ?? lg, scale, key: null });
-        ro?.observe(el);
-      }
-      schedule(el);
-    }
-    function unregister(el) {
-      const s = surfaces.get(el); if (!s) return;
-      ro?.unobserve(el); clearTimeout(el._lgT); queue.delete(el);
-      if (s.key) release(s.key);
-      surfaces.delete(el); el.style.removeProperty('--refract');
-    }
-    function scan(root = document) {
-      if (!enabled) return;
-      if (root.matches?.(SEL)) register(root);
-      root.querySelectorAll?.(SEL).forEach((el) => register(el));
-    }
-    const prune = () => surfaces.forEach((s, el) => { if (!el.isConnected) unregister(el); });
-    if (enabled) {
-      const added = new Set(); let mRaf = 0, removed = false;
-      const mo = new MutationObserver((records) => {
-        for (const r of records) {
-          r.addedNodes.forEach((n) => { if (n.nodeType === 1) added.add(n); });
-          if (r.removedNodes.length) removed = true;
-        }
-        if (!mRaf) mRaf = requestAnimationFrame(() => {
-          mRaf = 0;
-          added.forEach((n) => { if (n.isConnected) scan(n); }); added.clear();
-          if (removed) { removed = false; prune(); }
-        });
-      });
-      const start = () => { mo.observe(document.body, { childList: true, subtree: true }); scan(document); };
-      if (document.body) start(); else document.addEventListener('DOMContentLoaded', start, { once: true });
-    }
-    // kept for surfaces that want a wider rim, a stronger push or their own tint
-    function attach(el, { bezel, scale, tint } = {}) {
-      if (!el) return;
-      el.classList.add('lg');
-      if (tint) el.style.setProperty('--lg-tint', tint);
-      register(el, { bezel, scale });
-    }
-    // an element leaving for good (a closed dialog) drops its map at once
-    const detach = (el) => unregister(el);
-    return { attach, detach, scan, enabled, refresh: (el) => schedule(el) };
-  })();
 
-  /* ---------- pointer sheen (one delegated listener) ---------- */
-  let sheenEl = null, sheenFrame = 0, sheenEv = null;
-  document.addEventListener('pointermove', (e) => {
-    sheenEv = e;
-    if (sheenFrame) return;
-    sheenFrame = requestAnimationFrame(() => {
-      sheenFrame = 0;
-      const t = sheenEv.target.closest?.('.sheen');
-      if (t !== sheenEl) sheenEl = t;
-      if (!t) return;
-      const r = t.getBoundingClientRect();
-      t.style.setProperty('--mx', `${sheenEv.clientX - r.left}px`);
-      t.style.setProperty('--my', `${sheenEv.clientY - r.top}px`);
-    });
-  }, { passive: true });
 
   /* overlays and toasts live in #layer when the page provides one (the Terminal stage).
      NOTE: the host is re-checked on every use, so a toast created before the Terminal stage
@@ -3951,13 +3344,12 @@ const Cleo = (() => {
     overlayHost.appendChild(o);
     const panel = o.querySelector('[role="dialog"]');
     panel.tabIndex = -1;
-    if (refract) LiquidGlass.attach(panel, { bezel: 22, tint: 'var(--glass-thick)' });
     let closed = false;
     const close = (result) => {
       if (closed) return; closed = true;
       o.dataset.closing = ''; delete o.dataset.open;
       document.removeEventListener('keydown', onKey, true);
-      setTimeout(() => { LiquidGlass.detach(panel); o.remove(); prev?.focus?.({ preventScroll: true }); }, kind === 'drawer' ? 280 : 200);
+      setTimeout(() => { o.remove(); prev?.focus?.({ preventScroll: true }); }, kind === 'drawer' ? 280 : 200);
       onClose?.(result);
     };
     const onKey = (e) => {
@@ -4057,8 +3449,7 @@ const Cleo = (() => {
   /* ---------- screen router with view transitions ---------- */
   const root = () => $('#app');
   async function show(renderFn, { vt = true } = {}) {
-    // the new screen picks the background: the box grid on sign-in screens (data-amb), none elsewhere
-    const swap = () => { const node = renderFn(); root().replaceChildren(node); ambient.mode(node.dataset?.amb || 'off'); return node; };
+    const swap = () => { const node = renderFn(); root().replaceChildren(node); return node; };
     if (vt && document.startViewTransition && !reduced()) {
       let node;
       const t = document.startViewTransition(() => { node = swap(); });
@@ -4275,581 +3666,38 @@ const Cleo = (() => {
      work: optional [[label, async fn], ...]. Each step runs its task (no step is faked); a task that fails
      ends the loading screen early and boot() resolves { node, error }. Without work, steps are the labels
      of start-up that happens elsewhere (the demo's own data loads instantly). */
-  async function boot({ app, steps, minTotal = 3400, work = null }) {
+  async function boot({ app, steps, minTotal = 1200, work = null }) {
     if (work) steps = work.map((w) => w[0]);
     const node = el(`
       <section class="screen boot" aria-label="Loading Cleo ${esc(app)}">
         <div class="boot-center">
           <div class="boot-lockup" aria-hidden="true"><img class="boot-mark" src="assets/brand/cleo-emblem.svg" alt=""></div>
+          <span class="spinner" aria-hidden="true"></span>
         </div>
         <div class="sr-only" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress></div>
         <p class="sr-only" aria-live="polite" data-step>${esc(steps[0])}</p>
         <div class="boot-foot">${aeso()}</div>
       </section>`);
     root().replaceChildren(node);
-    const mark = $('.boot-mark', node), lockup = $('.boot-lockup', node), foot = $('.boot-foot', node);
     const prog = $('[data-progress]', node), status = $('[data-step]', node);
-    const red = reduced(), quick = red || minTotal < 2000;
-    // the emblem as large as the screen allows, in whole boxes of the background grid (18px)
-    const W = node.clientWidth || innerWidth, H = node.clientHeight || innerHeight;
-    lockup.style.setProperty('--h', `${clamp(Math.floor(Math.min(W * 0.43, H * 0.34) / 18), 8, 16) * 18}px`);
-    // the background grid shows while loading, dimmed almost to nothing, with ripples from behind the logo
-    ambient.mode('boot');
-    // each ripple starts somewhere behind the emblem, not always its centre, so the patterns never repeat
-    const ripple = (big = false) => {
-      const r = mark.getBoundingClientRect(), a = Math.random() * Math.PI * 2, d = Math.random() * (big ? 0.12 : 0.3);
-      ambient.pulse(r.left + r.width * (0.5 + Math.cos(a) * d), r.top + r.height * (0.5 + Math.sin(a) * d), { speed: big ? 560 : 440, life: big ? 2.3 : 2, band: big ? 22 : 17 });
-    };
-    let idle = 0;
-    const drift = () => { if (!mark.isConnected) return; ripple(); idle = setTimeout(drift, 1100 + Math.random() * 1000); };
     const t0 = performance.now();
-    // the emblem lights up in the grid's boxes as soon as its image is ready (its place is already laid out),
-    // and holds until loading ends
-    (mark.decode ? mark.decode() : Promise.resolve()).then(() => {
-      if (mark.isConnected) ambient.mark(mark, { born: (quick ? performance.now() : t0 + 120) / 1000 });
-    }).catch(() => {});
-    if (quick) foot.style.opacity = 1;
-    else foot.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 1100, fill: 'both' });
-    // the first ripple as the emblem completes in the grid, then a quiet drift of them until loading ends
-    await wait(quick ? 200 : 650);
-    ripple(true); idle = setTimeout(drift, 900);
-    const done = () => { clearTimeout(idle); ambient.settle(); };
-    const per = Math.max(260, (minTotal - (performance.now() - t0)) / steps.length);
+    const per = Math.max(120, (minTotal - (performance.now() - t0)) / steps.length);
     for (let i = 0; i < steps.length; i++) {
       if (i > 0) status.textContent = steps[i];
       if (work) {
         try { await Promise.all([work[i][1](), wait(Math.min(per, 400))]); }
-        catch (error) { done(); return { node, error }; }
+        catch (error) { return { node, error }; }
       }
-      prog.setAttribute('aria-valuenow', Math.round(((i + 1) / steps.length) * 100)); ripple(true);
+      prog.setAttribute('aria-valuenow', Math.round(((i + 1) / steps.length) * 100));
       if (!work) await wait(per);
     }
     status.textContent = 'Ready';
-    // the lit emblem goes out, centre first, before the next screen
-    ambient.unmark();
-    await wait(red ? 160 : quick ? 420 : 900);
-    // the next screen decides whether the grid stays (sign-in) or fades away (show() reads data-amb)
-    done();
     return node;
   }
 
-  /* ---------- the Cleo mark in lit boxes (sign-in art on narrow screens, and wherever WebGL2 is missing) ----------
-     The emblem drawn on Cleo's box grid: 18px rounded boxes, the same grid the background lights in dark
-     mode and aligned to it, lit in Cleo red. It answers the pointer:
-       - the boxes under the pointer dim, like a shadow passing over them;
-       - press and drag parts the boxes around the pointer, like a magnet; they spring home on release,
-         with a little bounce because the drag carried momentum;
-       - a tap sends an organic ripple of light through the grid (Ripple), and each box hops as it passes.
-     At rest every box shimmers on its own beat. Light mode draws its own faint grid around the mark
-     (the background grid is dark mode only).
-     With reduced motion the mark is drawn once and holds still. It stops when its screen leaves.
-     ASSET: assets/brand/cleo-emblem.svg, sampled into boxes. */
-  function gridMark(area) {
-    const CELL = 18, GAP = 5, RAD = 3.5, BOX = CELL - GAP;
-    const canvas = document.createElement('canvas'); canvas.className = 'art-grid';
-    area.prepend(canvas);
-    const ctx = canvas.getContext('2d'); if (!ctx) return () => {};
-    const hint = $('.art-hint', area); if (hint?.lastChild) { hint.lastChild.textContent = 'Drag across the mark'; hint.hidden = reduced(); }
-    const slot = $('.art-mark', area);
-    const still = reduced();
-    const emblem = new Image(); let ready = false;
-    emblem.onload = () => { ready = true; layout(); }; emblem.src = 'assets/brand/cleo-emblem.svg';
-    let W = 0, H = 0, dpr = 1, ox = 0, oy = 0, k = 1, dark = true, cells = [], ghost = null, raf = 0, last = 0, drawnAt = 0;
-    let brand = [212, 0, 0], ink = [255, 255, 255];
-    const HOT = [255, 106, 82];
-    let t = Math.random() * 6;
-    const ptr = { x: -1e4, y: -1e4, a: 0, down: false, id: null, sx: 0, sy: 0, travel: 0, seen: -1e4 };
-    const rings = []; // Ripple.make() entries, in this canvas's pixels
-    const rgbOf = (v, d) => { const m = String(v).match(/\d+(\.\d+)?/g); return m && m.length >= 3 ? m.slice(0, 3).map(Number) : d; };
-    function readColours() {
-      const s = getComputedStyle(document.documentElement);
-      dark = document.documentElement.dataset.theme !== 'light';
-      const probe = document.createElement('i'); probe.style.color = s.getPropertyValue('--brand').trim() || '#d40000';
-      document.body.appendChild(probe); brand = rgbOf(getComputedStyle(probe).color, [212, 0, 0]); probe.remove();
-      ink = dark ? [255, 255, 255] : [20, 20, 24];
-    }
-    // the mark's boxes: the emblem sampled at four points per side of every box, kept where it covers enough
-    function layout() {
-      const w = area.offsetWidth, h = area.offsetHeight;
-      if (!w || !h) return;
-      readColours();
-      dpr = Math.min(2, devicePixelRatio || 1); W = w; H = h;
-      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
-      // align to the background grid (it starts at the corner of the .ambient layer); the Terminal stage is scaled
-      const amb = area.closest('.dp')?.querySelector('.ambient') || document.querySelector('.ambient');
-      const r = area.getBoundingClientRect(); k = r.width / w || 1;
-      const ar = amb ? amb.getBoundingClientRect() : { left: 0, top: 0 };
-      ox = (CELL - (((r.left - ar.left) / k) % CELL) + CELL) % CELL; oy = (CELL - (((r.top - ar.top) / k) % CELL) + CELL) % CELL;
-      ghost = null; cells = [];
-      if (!ready) { draw(); return; }
-      const ratio = emblem.naturalHeight / emblem.naturalWidth || 1.3576;
-      const cols = Math.round(clamp(Math.min(w * 0.62, (h * 0.62) / ratio, 640 / Math.max(1, ratio)) / CELL, 12, 36)), rows = Math.round(cols * ratio);
-      const S = 4, c = document.createElement('canvas'); c.width = cols * S; c.height = rows * S;
-      const x = c.getContext('2d'); x.drawImage(emblem, 0, 0, c.width, c.height);
-      const a = x.getImageData(0, 0, c.width, c.height).data;
-      const c0 = Math.round((w / 2 - (cols * CELL) / 2 - ox) / CELL), r0 = Math.round((h / 2 - (rows * CELL) / 2 - oy) / CELL);
-      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
-        let sum = 0;
-        for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += a[(((j * S + yy) * c.width) + i * S + xx) * 4 + 3];
-        const cov = sum / (S * S * 255);
-        if (cov < 0.22) continue;
-        const hx = ox + (c0 + i) * CELL + GAP / 2, hy = oy + (r0 + j) * CELL + GAP / 2;
-        cells.push({ hx, hy, cx: hx + BOX / 2, cy: hy + BOX / 2, a: Math.min(1, (cov - 0.22) / 0.45), dx: 0, dy: 0, vx: 0, vy: 0, ph: Math.random() * Math.PI * 2 });
-      }
-      if (slot) Object.assign(slot.style, { left: `${ox + c0 * CELL}px`, top: `${oy + r0 * CELL}px`, width: `${cols * CELL}px`, height: `${rows * CELL}px` });
-      draw(); request();
-    }
-    // light mode: a faint grid around the mark that fades out toward the edges (drawn once per layout)
-    function ghostLayer() {
-      const g = document.createElement('canvas'); g.width = canvas.width; g.height = canvas.height;
-      const x = g.getContext('2d'); x.scale(dpr, dpr);
-      const cxm = W / 2, cym = H / 2, reach = Math.min(W, H) * 0.62;
-      for (let y = oy - CELL; y < H; y += CELL) for (let xx = ox - CELL; xx < W; xx += CELL) {
-        const d = Math.hypot(xx + CELL / 2 - cxm, (y + CELL / 2 - cym) * 1.15) / reach;
-        const al = 0.055 * Math.max(0, 1 - d * d);
-        if (al < 0.004) continue;
-        x.fillStyle = `rgb(${ink[0]} ${ink[1]} ${ink[2]} / ${al.toFixed(3)})`;
-        x.beginPath(); x.roundRect(xx + GAP / 2, y + GAP / 2, BOX, BOX, RAD); x.fill();
-      }
-      return g;
-    }
-    function draw() {
-      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!W) return;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (!dark) { ghost ||= ghostLayer(); ctx.drawImage(ghost, 0, 0, W, H); }
-      const live = still ? [] : rings.filter((r) => Ripple.prepare(r, t));
-      for (const c of cells) {
-        const x = c.cx + c.dx, y = c.cy + c.dy;
-        let heat = 0, hop = 0, dim = 0;
-        if (!still) {
-          // the pointer's shade: the boxes under it dim, most at its centre
-          if (ptr.a > 0.01) { const d = Math.hypot(x - ptr.x, y - ptr.y); dim = ptr.a * Math.exp(-(d * d) / (2 * 64 * 64)); }
-          for (const g of live) { const f = Ripple.at(g, x - g.x, y - g.y, c.ph); heat += 0.75 * f; hop = Math.max(hop, f); }
-        }
-        heat = Math.min(1, heat);
-        const shimmer = still ? 1 : 0.84 + 0.16 * Math.sin(t * 1.3 + c.ph);
-        const al = Math.min(1, c.a * shimmer + heat * 0.35) * (1 - 0.55 * dim);
-        const col = brand.map((v, n) => Math.round((v + (HOT[n] - v) * heat) * (1 - 0.4 * dim)));
-        const s = BOX * (1 + 0.28 * hop), off = (s - BOX) / 2;
-        ctx.fillStyle = `rgb(${col[0]} ${col[1]} ${col[2]} / ${al.toFixed(3)})`;
-        ctx.beginPath(); ctx.roundRect(c.hx + c.dx - off, c.hy + c.dy - off, s, s, RAD * (1 + 0.28 * hop)); ctx.fill();
-      }
-    }
-    // the boxes' springs: home is where the emblem puts them; a held pointer pushes them aside
-    function step(dt) {
-      const stiff = (2 * Math.PI / 0.34) ** 2, damp = 2 * 0.74 * Math.sqrt(stiff);
-      let moving = false;
-      for (const c of cells) {
-        let fx = 0, fy = 0;
-        if (ptr.a > 0.01) {
-          const ddx = c.cx - ptr.x, ddy = c.cy - ptr.y, d = Math.hypot(ddx, ddy) || 1;
-          const push = (ptr.down ? 34 : 4) * ptr.a * Math.exp(-(d * d) / (2 * (ptr.down ? 86 : 60) ** 2));
-          fx = (ddx / d) * push; fy = (ddy / d) * push;
-        }
-        c.vx += (stiff * (fx - c.dx) - damp * c.vx) * dt; c.vy += (stiff * (fy - c.dy) - damp * c.vy) * dt;
-        c.dx += c.vx * dt; c.dy += c.vy * dt;
-        if (Math.abs(c.vx) + Math.abs(c.vy) > 0.5 || Math.abs(c.dx) + Math.abs(c.dy) > 0.3) moving = true;
-      }
-      return moving;
-    }
-    function frame(now) {
-      raf = 0;
-      if (!canvas.isConnected) { stop(); return; }
-      if (document.hidden) return;
-      const dt = Math.min(1 / 30, last ? (now - last) / 1000 : 1 / 60);
-      const active = ptr.down || rings.length || ptr.a > 0.01;
-      // at rest the shimmer needs no more than about 30 frames a second
-      if (!active && last && now - drawnAt < 30) { raf = requestAnimationFrame(frame); return; }
-      last = now; drawnAt = now; t += dt;
-      ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.25));
-      for (let k = rings.length - 1; k >= 0; k--) if (t - rings[k].t0 > rings[k].life) rings.splice(k, 1);
-      step(dt); draw();
-      raf = requestAnimationFrame(frame);
-    }
-    function request() { if (!still && !raf && canvas.isConnected) raf = requestAnimationFrame(frame); }
-    // pointer coordinates are screen pixels; the art may sit inside the Terminal's scaled stage
-    const local = (e) => { const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / k, (e.clientY - r.top) / k]; };
-    canvas.addEventListener('pointermove', (e) => {
-      if (still) return;
-      [ptr.x, ptr.y] = local(e); ptr.seen = performance.now();
-      if (ptr.down && e.pointerId === ptr.id) ptr.travel = Math.max(ptr.travel, Math.hypot(ptr.x - ptr.sx, ptr.y - ptr.sy));
-      request();
-    });
-    canvas.addEventListener('pointerdown', (e) => {
-      if (still || e.button > 0) return;
-      canvas.setPointerCapture(e.pointerId); canvas.classList.add('grabbing');
-      [ptr.x, ptr.y] = local(e); ptr.sx = ptr.x; ptr.sy = ptr.y; ptr.travel = 0; ptr.down = true; ptr.id = e.pointerId; ptr.seen = performance.now();
-      request();
-    });
-    const release = (e) => {
-      if (!ptr.down || (e && e.pointerId !== ptr.id)) return;
-      ptr.down = false; canvas.classList.remove('grabbing');
-      // a tap (no real drag) sends an organic ripple of light through the boxes
-      if (ptr.travel < 10) { rings.push(...Ripple.make(ptr.x, ptr.y, t, { speed: 520, life: 1.6, band: 16 })); if (rings.length > 14) rings.splice(0, rings.length - 14); }
-      ptr.seen = performance.now(); request();
-    };
-    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
-    canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.seen = performance.now() - 1500; });
-    const ro = new ResizeObserver(() => layout()); ro.observe(area);
-    const onTheme = () => setTimeout(() => { readColours(); ghost = null; draw(); request(); }, 30);
-    document.addEventListener('cleo:theme', onTheme);
-    document.addEventListener('visibilitychange', request);
-    function stop() { cancelAnimationFrame(raf); raf = 0; ro.disconnect(); document.removeEventListener('cleo:theme', onTheme); document.removeEventListener('visibilitychange', request); }
-    layout();
-    return stop;
-  }
-
-  /* ---------- the Cleo mark in 3D (sign-in art beside the form) ----------
-     The emblem laid flat and seen from above at a fixed angle, with no perspective (an orthographic view),
-     built from the grid's own rounded boxes: each box is a pillar standing on the ground with a bevelled
-     top, lit like glossy glass over the dimmed background grid. The mark itself never moves; its pillars do.
-       - Arrival: the pillars rise out of the ground, the centre first, overshoot a little and settle.
-       - At rest every pillar has its own height and keeps changing it: two slow waves of different
-         lengths cross the mark, so its skyline is never the same twice. Taller pillars run warmer, and
-         every few seconds a quiet ripple lifts through it.
-       - Pointer: the pillars under it dim and dip a little, a soft shade that follows it.
-       - Press: the pillars under the finger sink, like pressing into pin art, and a ring around them rises;
-         drag to move the dent. Let go and they spring back up, sending a ripple out.
-       - A tap sends an organic ripple (Ripple) through the pillars and through the background grid.
-     With reduced motion it is drawn once, its heights still varied. Where WebGL2 is missing or would run in
-     software, or its context is lost, the 2D mark takes over (fallback). It stops when its screen leaves.
-     ASSET: assets/brand/cleo-emblem.svg, sampled into boxes. */
-  function emblem3d(area, fallback) {
-    const canvas = document.createElement('canvas'); canvas.className = 'art-3d';
-    let gl = null;
-    // no software WebGL: a computer without graphics acceleration keeps the 2D mark instead of a slow 3D one
-    try { gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true, powerPreference: 'low-power', failIfMajorPerformanceCaveat: true }); } catch { gl = null; }
-    if (!gl) return null;
-    const TAU = Math.PI * 2, RAD = Math.PI / 180;
-    // the fixed view: steeply down onto the ground and square to the mark, so it reads upright while the
-    // near side of every pillar shows its height
-    const SIDE = 28, BEV = 0.08, ELEV = 74 * RAD, AZIM = 0, H_MIN = 0.22, H_TALL = 3.4;
-    // ---- shaders: pillars lit by a key and a fill light, a soft shade toward the ground and the pointer's shade, in linear light ----
-    const VS = `#version 300 es
-      layout(location = 0) in vec3 aPos; layout(location = 1) in vec3 aNor;
-      layout(location = 2) in vec4 aCell; layout(location = 3) in vec4 aMove;
-      uniform mat4 uProj, uView, uModel; uniform float uBevel;
-      out vec3 vNor; out vec3 vModel; out float vHeat; out float vTop; out float vH; out float vDim;
-      void main() {
-        float h = aMove.x, s = aMove.z;
-        float z = (aPos.z > 0.5 ? h - uBevel : 0.0) + (aPos.z > 1.5 ? uBevel : 0.0);
-        vec3 p = vec3(aPos.xy * s + aCell.xy, z);
-        vModel = p; vNor = mat3(uModel) * aNor; vHeat = aMove.y; vTop = aNor.z; vH = h; vDim = aMove.w;
-        gl_Position = uProj * uView * uModel * vec4(p, 1.0);
-      }`;
-    const FS = `#version 300 es
-      precision highp float;
-      in vec3 vNor; in vec3 vModel; in float vHeat; in float vTop; in float vH; in float vDim;
-      uniform vec3 uBase, uHot, uKey, uFill, uEye; uniform float uAmb, uEmis;
-      out vec4 o;
-      void main() {
-        vec3 N = normalize(vNor);
-        float d = max(dot(N, uKey), 0.0), f = max(dot(N, uFill), 0.0);
-        float sp = pow(max(dot(N, normalize(uKey + uEye)), 0.0), 60.0);
-        float fr = pow(1.0 - max(dot(N, uEye), 0.0), 3.0);
-        vec3 base = mix(uBase, uHot, clamp(vHeat + smoothstep(0.9, 2.8, vH) * 0.32, 0.0, 1.0));
-        float ao = mix(mix(0.42, 1.0, smoothstep(0.0, 1.5, vModel.z)), 1.0, step(0.5, vTop));
-        vec3 c = base * (uAmb + 0.85 * d + 0.25 * f) * ao + base * (uEmis + vHeat * 0.7);
-        c += vec3(1.0, 0.94, 0.9) * sp * (0.6 + vHeat * 0.4);
-        c += mix(base, vec3(1.0), 0.35) * fr * 0.16;
-        c *= 1.0 - 0.6 * vDim;
-        c = c / (1.0 + c * 0.35);
-        o = vec4(pow(c, vec3(1.0 / 2.2)), 1.0);
-      }`;
-    const shader = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
-    const vs = shader(gl.VERTEX_SHADER, VS), fs = shader(gl.FRAGMENT_SHADER, FS);
-    if (!vs || !fs) return null;
-    const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
-    const U = {}; ['uProj', 'uView', 'uModel', 'uBevel', 'uEye', 'uBase', 'uHot', 'uKey', 'uFill', 'uAmb', 'uEmis'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
-    // ---- one pillar: a rounded square (the grid's box) extruded upward, with a 45° bevel round its top ----
-    // z codes: 0 the ground, 1 where the bevel starts, 2 the top; the shader turns them into height
-    const mesh = (() => {
-      const hb = 13 / 36, rc = 3.5 / 18, c = hb - rc, ring = [], v = [], idx = [], k45 = Math.SQRT1_2;
-      [[c, c, 0], [-c, c, 90], [-c, -c, 180], [c, -c, 270]].forEach(([cx, cy, a0]) => {
-        for (let k = 0; k <= 5; k++) { const a = (a0 + k * 18) * RAD; ring.push([cx + rc * Math.cos(a), cy + rc * Math.sin(a), Math.cos(a), Math.sin(a)]); }
-      });
-      const add = (x, y, z, nx, ny, nz) => { v.push(x, y, z, nx, ny, nz); return v.length / 6 - 1; };
-      const M = ring.length;
-      for (let j = 0; j < M; j++) {
-        const [x0, y0, nx0, ny0] = ring[j], [x1, y1, nx1, ny1] = ring[(j + 1) % M];
-        const a = add(x0, y0, 0, nx0, ny0, 0), b = add(x1, y1, 0, nx1, ny1, 0), cc = add(x1, y1, 1, nx1, ny1, 0), d = add(x0, y0, 1, nx0, ny0, 0);
-        idx.push(a, b, cc, a, cc, d);
-        const e = add(x0, y0, 1, nx0 * k45, ny0 * k45, k45), f = add(x1, y1, 1, nx1 * k45, ny1 * k45, k45);
-        const g = add(x1 - nx1 * BEV, y1 - ny1 * BEV, 2, nx1 * k45, ny1 * k45, k45), h = add(x0 - nx0 * BEV, y0 - ny0 * BEV, 2, nx0 * k45, ny0 * k45, k45);
-        idx.push(e, f, g, e, g, h);
-      }
-      const tc = add(0, 0, 2, 0, 0, 1);
-      const top = ring.map(([x, y, nx, ny]) => add(x - nx * BEV, y - ny * BEV, 2, 0, 0, 1));
-      for (let j = 0; j < M; j++) idx.push(tc, top[j], top[(j + 1) % M]);
-      return { v: new Float32Array(v), i: new Uint16Array(idx) };
-    })();
-    // ---- small matrix helpers (column-major) ----
-    const mul = (a, b) => { const o = new Float32Array(16); for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3]; return o; };
-    const trans = (x, y, z) => new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1]);
-    const rotX = (a) => { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]); };
-    const rotY = (a) => { const c = Math.cos(a), s = Math.sin(a); return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]); };
-    const ortho = (l, r, b, t, n, f) => new Float32Array([2 / (r - l), 0, 0, 0, 0, 2 / (t - b), 0, 0, 0, 0, -2 / (f - n), 0, -(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1]);
-    const apply = (m, x, y, z) => [m[0] * x + m[4] * y + m[8] * z + m[12], m[1] * x + m[5] * y + m[9] * z + m[13]];
-    const norm = (x, y, z) => { const l = Math.hypot(x, y, z) || 1; return [x / l, y / l, z / l]; };
-    const lin = (c) => c.map((v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
-    // the mark lies on the ground: its own height (z) points up, its top edge away from you
-    const model = rotX(-90 * RAD), view = mul(trans(0, 0, -60), mul(rotX(ELEV), rotY(AZIM)));
-    // lights and the eye, in the same (world) space as the normals
-    const key = norm(-0.35, 0.92, 0.18), fill = norm(0.55, 0.3, 0.75);
-    const eye = (() => { const s = Math.sin(ELEV), c = Math.cos(ELEV); return norm(-c * Math.sin(AZIM), s, c * Math.cos(AZIM)); })();
-    // ---- buffers ----
-    const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
-    const vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo); gl.bufferData(gl.ARRAY_BUFFER, mesh.v, gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
-    gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12);
-    const ibo = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.i, gl.STATIC_DRAW);
-    const cellBuf = gl.createBuffer(), moveBuf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf); gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(2, 1);
-    gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 4, gl.FLOAT, false, 16, 0); gl.vertexAttribDivisor(3, 1);
-    gl.bindVertexArray(null);
-    area.prepend(canvas);
-    const ghost = document.createElement('canvas'); ghost.className = 'art-ghost'; area.prepend(ghost);
-    const shade = document.createElement('canvas'); shade.className = 'art-ghost'; shade.style.opacity = 0; ghost.after(shade);
-    area.classList.add('is-3d');
-    const slot = $('.art-mark', area);
-    const still = reduced();
-    // the hint names what the mark answers to; a still mark answers to nothing, so it has none
-    const hint = $('.art-hint', area); if (hint?.lastChild) { hint.lastChild.textContent = 'Hover, press or tap the mark'; hint.hidden = still; }
-    // ---- state ----
-    let n = 0, cols = 0, rows = 0, X, Y, SEED, DELAY, HGT, VEL, HEAT, DIM, move = new Float32Array(0);
-    let W = 0, H = 0, dpr = 1, proj = null, frame2 = { cx: 0, cy: 0, hw: 1, hh: 1 }, foot = null, dark = true, base = lin([212, 0, 0]);
-    const hot = lin([255, 106, 82]);
-    let t = still ? 7.3 : 0, raf = 0, last = 0, drawnAt = 0, stopped = false, busy = true, nextRipple = 6, shown = -1;
-    const ptr = { a: 0, mx: -99, my: -99, down: false, id: null, sx: 0, sy: 0, travel: 0, press: 0, seen: -1e4 };
-    const ripples = [];
-    function readColours() {
-      dark = document.documentElement.dataset.theme !== 'light';
-      const probe = document.createElement('i'); probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#d40000';
-      document.body.appendChild(probe); const m = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g); probe.remove();
-      if (m && m.length >= 3) base = lin(m.slice(0, 3).map(Number));
-    }
-    // the emblem's boxes (SIDE of them along its longer side): sampled at four points per side of every box,
-    // kept where it covers enough
-    const emblem = new Image();
-    emblem.onload = () => {
-      const ratio = emblem.naturalHeight / emblem.naturalWidth || 1.3576, S = 4;
-      cols = ratio > 1 ? Math.round(SIDE / ratio) : SIDE; rows = ratio > 1 ? SIDE : Math.round(SIDE * ratio);
-      const c = document.createElement('canvas'); c.width = cols * S; c.height = rows * S;
-      const x = c.getContext('2d'); x.drawImage(emblem, 0, 0, c.width, c.height);
-      const a = x.getImageData(0, 0, c.width, c.height).data, cells = [];
-      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
-        let sum = 0;
-        for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) sum += a[((j * S + yy) * c.width + i * S + xx) * 4 + 3];
-        if (sum / (S * S * 255) >= 0.22) cells.push([i - (cols - 1) / 2, (rows - 1) / 2 - j]);
-      }
-      n = cells.length; X = new Float32Array(n); Y = new Float32Array(n); SEED = new Float32Array(n); DELAY = new Float32Array(n);
-      HGT = new Float32Array(n).fill(H_MIN); VEL = new Float32Array(n); HEAT = new Float32Array(n); DIM = new Float32Array(n); move = new Float32Array(n * 4);
-      const far = Math.hypot(cols / 2, rows / 2), stat = new Float32Array(n * 4);
-      cells.forEach(([cx, cy], k) => {
-        X[k] = cx; Y[k] = cy; SEED[k] = Math.random();
-        DELAY[k] = 0.1 + (Math.hypot(cx, cy) / far) * 0.7 + Math.random() * 0.15; // the centre rises first
-        stat.set([cx, cy, SEED[k], 1], k * 4);
-      });
-      gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf); gl.bufferData(gl.ARRAY_BUFFER, stat, gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.bufferData(gl.ARRAY_BUFFER, move.byteLength, gl.DYNAMIC_DRAW);
-      layout(); update(0); draw(); request();
-    };
-    emblem.src = 'assets/brand/cleo-emblem.svg';
-    // ---- size, the orthographic frame around the mark, and the faint grid and shadow behind it in light mode ----
-    function layout() {
-      const w = area.offsetWidth, h = area.offsetHeight;
-      if (!w || !h || !rows) return;
-      readColours();
-      W = w; H = h; dpr = Math.min(2, devicePixelRatio || 1);
-      if (w * h * dpr * dpr > 3.6e6) dpr = Math.sqrt(3.6e6 / (w * h));
-      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
-      // the mark's footprint and its tallest pillars, seen through the fixed view, framed with room to spare
-      const m = mul(view, model);
-      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
-      for (const cx of [-cols / 2, cols / 2]) for (const cy of [-rows / 2, rows / 2]) for (const cz of [0, H_TALL]) {
-        const [px, py] = apply(m, cx, cy, cz); x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
-      }
-      const asp = w / h;
-      let hw = Math.max((x1 - x0) / 2 / 0.78, ((y1 - y0) / 2 / 0.76) * asp); const hh = hw / asp;
-      frame2 = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hw, hh };
-      proj = ortho(frame2.cx - hw, frame2.cx + hw, frame2.cy - hh, frame2.cy + hh, 1, 200);
-      // the mark on screen: its footprint on the ground (light mode's shadow), and its outline at a pillar's
-      // height (where the loading screen's mark glides into)
-      const pm = mul(proj, m), onScreen = (z) => {
-        let sx0 = 1e9, sy0 = 1e9, sx1 = -1e9, sy1 = -1e9;
-        for (const cx of [-cols / 2, cols / 2]) for (const cy of [-rows / 2, rows / 2]) {
-          const [px, py] = apply(pm, cx, cy, z), sx = (px * 0.5 + 0.5) * w, sy = (0.5 - py * 0.5) * h;
-          sx0 = Math.min(sx0, sx); sx1 = Math.max(sx1, sx); sy0 = Math.min(sy0, sy); sy1 = Math.max(sy1, sy);
-        }
-        return { x: sx0, y: sy0, w: sx1 - sx0, h: sy1 - sy0 };
-      };
-      foot = onScreen(0);
-      ghostGrid();
-      if (slot) { const r = onScreen(1); Object.assign(slot.style, { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` }); }
-    }
-    function ghostGrid() {
-      shadeLayer();
-      ghost.width = Math.round(W * dpr); ghost.height = Math.round(H * dpr);
-      const x = ghost.getContext('2d'); x.clearRect(0, 0, ghost.width, ghost.height);
-      if (dark) return; // dark mode: the background grid itself, dimmed on sign-in screens
-      x.scale(dpr, dpr);
-      const CELL = 18, BOX = 13, amb = document.querySelector('.ambient'), r = area.getBoundingClientRect(), ar = amb ? amb.getBoundingClientRect() : { left: 0, top: 0 };
-      const ox = (CELL - ((r.left - ar.left) % CELL) + CELL) % CELL, oy = (CELL - ((r.top - ar.top) % CELL) + CELL) % CELL, reach = Math.min(W, H) * 0.7;
-      for (let yy = oy - CELL; yy < H; yy += CELL) for (let xx = ox - CELL; xx < W; xx += CELL) {
-        const d = Math.hypot(xx + CELL / 2 - W / 2, (yy + CELL / 2 - H / 2) * 1.15) / reach, al = 0.035 * Math.max(0, 1 - d * d);
-        if (al < 0.004) continue;
-        x.fillStyle = `rgb(20 20 24 / ${al.toFixed(3)})`; x.beginPath(); x.roundRect(xx + 2.5, yy + 2.5, BOX, BOX, 3.5); x.fill();
-      }
-    }
-    // light mode: the mark's own soft shadow, a little toward you, so it stands on the page instead of floating
-    // over it. It is the shadow of a copy drawn off the canvas (shadow offsets and blur are in device pixels),
-    // and it grows in with the pillars (draw).
-    function shadeLayer() {
-      shade.width = Math.round(W * dpr); shade.height = Math.round(H * dpr);
-      if (dark || !foot) return;
-      const x = shade.getContext('2d');
-      x.shadowColor = 'rgb(20 20 24 / .14)'; x.shadowBlur = foot.h * 0.045 * dpr;
-      x.shadowOffsetX = 1e4 * dpr; x.shadowOffsetY = foot.h * 0.02 * dpr;
-      x.drawImage(emblem, (foot.x - 1e4) * dpr, foot.y * dpr, foot.w * dpr, foot.h * dpr);
-    }
-    // ---- motion: every pillar springs toward a height made of the waves, the pointer and the ripples ----
-    // the resting skyline: two slow waves of different lengths crossing the mark, and a little of each pillar's own
-    const skyline = (x, y, s, tt) => 0.5 + 0.28 * Math.sin(tt * 0.55 + x * 0.32 + Math.sin(tt * 0.21 + y * 0.18) * 1.4) + 0.22 * Math.sin(tt * 0.37 - y * 0.41 + x * 0.12 + s * 2.1);
-    function update(dt) {
-      const calm = still ? 1 : clamp((t - 1.4) / 1.2, 0, 1);
-      if (!still && t > nextRipple && n) { const k = Math.floor(Math.random() * n); ripples.push(...Ripple.make(X[k], Y[k], t, { speed: 7, life: 1.8, band: 0.8, splash: false }).map((r) => ({ ...r, k: 0.4 }))); nextRipple = t + 5 + Math.random() * 4; }
-      for (let k = ripples.length - 1; k >= 0; k--) if (t - ripples[k].t0 > ripples[k].life) ripples.splice(k, 1);
-      const live = ripples.filter((r) => Ripple.prepare(r, t));
-      ptr.press += ((ptr.down ? 1 : 0) - ptr.press) * (still ? 1 : 1 - Math.exp(-dt / 0.12));
-      let moving = false;
-      for (let k = 0; k < n; k++) {
-        const x = X[k], y = Y[k], since = t - DELAY[k];
-        let target = 0.4 + 1.35 * skyline(x, y, SEED[k], t) * (0.35 + 0.65 * calm), heat = since > 0 && !still ? Math.max(0, 1 - since / 0.8) * 0.8 : 0, dim = 0;
-        if (ptr.a > 0.01) {
-          const d = Math.hypot(x - ptr.mx, y - ptr.my);
-          const near = Math.exp(-(d * d) / (2 * 2.3 * 2.3)) * ptr.a;
-          // hovering dims the pillars under the pointer and lowers them a little, like a shade passing over;
-          // pressing sinks the middle of it and lifts a ring around the finger
-          const dent = Math.exp(-(d * d) / (2 * 1.5 * 1.5)), rim = Math.exp(-((d - 2.9) ** 2) / (2 * 0.9 * 0.9));
-          target -= near * 0.3 * target * (1 - ptr.press);
-          target += ptr.press * ptr.a * (rim * 1.3 - dent * target);
-          heat += ptr.press * ptr.a * rim * 0.5;
-          dim = near * (1 - 0.5 * ptr.press);
-        }
-        for (const r of live) { const s = Ripple.at(r, x - r.x, y - r.y, SEED[k] * TAU); if (s > 0.01) { target += 2.4 * s; heat += 0.9 * s; } }
-        target = Math.max(H_MIN, target);
-        if (still) HGT[k] = target;
-        else if (since > 0) {
-          const kk = (TAU / 0.4) ** 2, c = 2 * 0.52 * Math.sqrt(kk);
-          VEL[k] += (kk * (target - HGT[k]) - c * VEL[k]) * dt; HGT[k] = Math.max(H_MIN, HGT[k] + VEL[k] * dt);
-          // the drifting skyline alone is slow; anything faster (pointer, ripples, arrival) wants every frame
-          if (Math.abs(target - HGT[k]) > 0.12 || Math.abs(VEL[k]) > 0.6) moving = true;
-        }
-        HEAT[k] += (Math.min(1, heat) - HEAT[k]) * (still ? 1 : 1 - Math.exp(-dt / 0.16));
-        DIM[k] += (dim - DIM[k]) * (still ? 1 : 1 - Math.exp(-dt / 0.12));
-        const scale = still ? 1 : since <= 0 ? 0.001 : 1 - (1 - Math.min(1, since / 0.18)) ** 3;
-        move.set([HGT[k], HEAT[k], scale, DIM[k]], k * 4);
-      }
-      return t < 2.6 || ptr.a > 0.01 || ptr.press > 0.01 || live.length > 0 || moving;
-    }
-    function draw() {
-      if (!n || !W || !proj) return;
-      const grown = still ? 1 : clamp((t - 0.3) / 1.2, 0, 1) ** 1.5;
-      if (grown !== shown) { shown = grown; shade.style.opacity = grown.toFixed(3); }
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
-      gl.useProgram(prog);
-      gl.uniformMatrix4fv(U.uProj, false, proj); gl.uniformMatrix4fv(U.uView, false, view); gl.uniformMatrix4fv(U.uModel, false, model);
-      gl.uniform1f(U.uBevel, BEV); gl.uniform3fv(U.uEye, eye);
-      gl.uniform3fv(U.uBase, base); gl.uniform3fv(U.uHot, hot); gl.uniform3fv(U.uKey, key); gl.uniform3fv(U.uFill, fill);
-      gl.uniform1f(U.uAmb, dark ? 0.2 : 0.32); gl.uniform1f(U.uEmis, dark ? 0.12 : 0.04);
-      gl.bindBuffer(gl.ARRAY_BUFFER, moveBuf); gl.bufferSubData(gl.ARRAY_BUFFER, 0, move);
-      gl.bindVertexArray(vao); gl.drawElementsInstanced(gl.TRIANGLES, mesh.i.length, gl.UNSIGNED_SHORT, 0, n); gl.bindVertexArray(null);
-    }
-    function frame(now) {
-      raf = 0;
-      if (stopped) return;
-      if (!canvas.isConnected) { stop(); return; }
-      if (document.hidden) return;
-      // when nothing is touched the slow skyline needs no more than about 30 frames a second
-      if (!busy && last && now - drawnAt < 30) { raf = requestAnimationFrame(frame); return; }
-      // the springs step at most a 60th of a second at a time, so a slow frame keeps time without overshooting
-      const real = Math.min(0.25, last ? (now - last) / 1000 : 1 / 60), steps = Math.ceil(real * 60), dt = real / steps;
-      last = now; drawnAt = now;
-      for (let i = 0; i < steps; i++) {
-        t += dt;
-        ptr.a += ((now - ptr.seen < 1800 || ptr.down ? 1 : 0) - ptr.a) * (1 - Math.exp(-dt / 0.3));
-        busy = update(dt);
-      }
-      draw();
-      raf = requestAnimationFrame(frame);
-    }
-    function request() { if (!still && !raf && !stopped && canvas.isConnected) raf = requestAnimationFrame(frame); }
-    // ---- pointer: where it meets the mark, a little above the ground (about the height of the pillars) ----
-    function aim(e) {
-      const r = canvas.getBoundingClientRect();
-      const nx = ((e.clientX - r.left) / r.width) * 2 - 1, ny = 1 - ((e.clientY - r.top) / r.height) * 2;
-      const vx = frame2.cx + nx * frame2.hw, vy = frame2.cy + ny * frame2.hh;
-      // undo the view for the point under the pointer, then slide along the view until it meets that height
-      const se = Math.sin(ELEV), ce = Math.cos(ELEV), sa = Math.sin(AZIM), ca = Math.cos(AZIM), PLANE = 1;
-      const vz = (PLANE - ce * vy) / se, a = vx, c = -se * vy + ce * vz;
-      const wx = ca * a - sa * c, wz = sa * a + ca * c;
-      ptr.mx = wx; ptr.my = -wz;
-    }
-    canvas.addEventListener('pointermove', (e) => {
-      if (still) return;
-      aim(e); ptr.seen = performance.now();
-      if (ptr.down && e.pointerId === ptr.id) ptr.travel = Math.max(ptr.travel, Math.hypot(e.clientX - ptr.sx, e.clientY - ptr.sy));
-      request();
-    });
-    canvas.addEventListener('pointerdown', (e) => {
-      if (still || e.button > 0) return;
-      canvas.setPointerCapture(e.pointerId); canvas.classList.add('grabbing'); aim(e);
-      Object.assign(ptr, { down: true, id: e.pointerId, sx: e.clientX, sy: e.clientY, travel: 0, seen: performance.now() });
-      request();
-    });
-    const release = (e) => {
-      if (!ptr.down || (e && e.pointerId !== ptr.id)) return;
-      ptr.down = false; canvas.classList.remove('grabbing');
-      // a tap sends a full ripple through the pillars and the background grid; letting go after a press, a smaller one
-      const tap = ptr.travel < 8;
-      ripples.push(...Ripple.make(ptr.mx, ptr.my, t, { speed: tap ? 9 : 7, life: tap ? 1.9 : 1.4, band: tap ? 0.9 : 0.7, splash: tap }).map((r) => ({ ...r, k: r.k * (tap ? 1 : 0.6) })));
-      if (ripples.length > 14) ripples.splice(0, ripples.length - 14);
-      if (tap && e) ambient.pulse(e.clientX, e.clientY);
-      ptr.seen = performance.now(); request();
-    };
-    canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
-    canvas.addEventListener('pointerleave', () => { if (!ptr.down) ptr.seen = performance.now() - 1500; });
-    canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); stop(); canvas.remove(); ghost.remove(); shade.remove(); area.classList.remove('is-3d'); fallback?.(); });
-    const ro = new ResizeObserver(() => { layout(); if (n) { update(0); draw(); } }); ro.observe(area);
-    const onTheme = () => setTimeout(() => { readColours(); ghostGrid(); draw(); request(); }, 30);
-    document.addEventListener('cleo:theme', onTheme);
-    document.addEventListener('visibilitychange', request);
-    function stop() {
-      stopped = true; cancelAnimationFrame(raf); raf = 0; ro.disconnect();
-      document.removeEventListener('cleo:theme', onTheme); document.removeEventListener('visibilitychange', request);
-    }
-    return stop;
-  }
-  /* the sign-in art: the 3D mark where the panel sits beside the form, the 2D mark (gridMark) on narrow
-     screens, where it shows half-hidden behind the form and takes no touches */
+  /* the sign-in art: the static Cleo emblem beside the form on wide screens */
   function signArt(area) {
-    const wide = mq('(min-width: 901px)');
-    let stop = null, mode = '';
-    const pick = () => {
-      if (!area.isConnected && mode) { wide.removeEventListener('change', pick); stop?.(); return; }
-      const next = wide.matches ? '3d' : '2d';
-      if (next === mode) return;
-      stop?.(); stop = null;
-      area.querySelectorAll('canvas').forEach((c) => c.remove()); area.classList.remove('is-3d');
-      mode = next;
-      if (next === '3d') stop = emblem3d(area, () => { mode = '2d'; stop = gridMark(area); });
-      if (!stop) { mode = '2d'; stop = gridMark(area); }
-    };
-    pick(); wide.addEventListener('change', pick);
+    if (area) area.replaceChildren(el('<img class="login-emblem" src="assets/brand/cleo-emblem.svg" alt="">'));
   }
 
   /* ---------- Terms and Conditions, Privacy Policy ----------
@@ -5134,7 +3982,7 @@ const Cleo = (() => {
       </div>`;
     const otpBoxes = (name, length) => `<div class="otp" data-otp="${name}" data-digits="${length}" role="group" aria-label="${length}-digit code" style="--otp-digits:${length}">${Array.from({ length }, (_, i) => `<input inputmode="numeric" autocomplete="${i === 0 ? 'one-time-code' : 'off'}" aria-label="Digit ${i + 1} of ${length}">`).join('')}</div>`;
     const node = el(`
-      <section class="screen login" data-amb="login">
+      <section class="screen login" data-surface="auth">
         <div class="login-left">
           <div class="login-meta">${lockup(app)}${themeBtn()}</div>
           ${setupGuide(5, { hidden: true })}
@@ -5249,7 +4097,6 @@ const Cleo = (() => {
         </div>
         <div class="login-art" aria-hidden="true">
           <div class="art-mark"></div>
-          <p class="art-hint"><i class="ph ph-hand-pointing"></i>Drag across the mark</p>
         </div>
       </section>`);
     const card = $('.login-card', node), stepsEl = $('.steps', node);
@@ -5590,7 +4437,6 @@ const Cleo = (() => {
     });
 
     requestAnimationFrame(() => {
-      LiquidGlass.attach(card, { bezel: 24, tint: 'var(--glass)' });
       signArt($('.login-art', node));
       if (!mq('(pointer: coarse)').matches) focusFirst(cur);
     });
@@ -5659,7 +4505,7 @@ const Cleo = (() => {
             <div class="input-wrap"><i class="ph ph-magnifying-glass lead-icon"></i><input class="input" type="search" placeholder="Search branches" aria-label="Search branches" data-q></div>
           </div>
           <div class="branch-grid stagger" role="list">${cards.map((c, i) => `
-            <button class="bcard glass sheen ${c.wide ? 'wide' : ''}" role="listitem" style="--i:${i}" data-id="${c.id}" data-name="${esc(c.name.toLowerCase())} ${esc((c.area || '').toLowerCase())}">
+            <button class="bcard glass ${c.wide ? 'wide' : ''}" role="listitem" style="--i:${i}" data-id="${c.id}" data-name="${esc(c.name.toLowerCase())} ${esc((c.area || '').toLowerCase())}">
               <div class="top"><div><h3>${esc(c.name)}</h3><p class="addr">${esc(c.area)}</p></div>${c.badge || ''}</div>
               ${c.body}
               <div class="foot">${c.foot}<span class="go" aria-hidden="true"><i class="ph ph-arrow-right"></i></span></div>
@@ -6026,7 +4872,7 @@ const Cleo = (() => {
     },
   };
 
-  return { env: CleoEnv, appearanceSection, plans, parsePlans, planTab, planLogo, planCard, planPrice, planStatus, billing, setupGuide, $, $$, el, esc, wait, raf, clamp, reduced, store, theme, fmt, manila, now, rng, countUp, LiquidGlass, toast, overlay, popover, seg, btnState, show, bindShellNavigation, watchTitle, boot, loginScreen, legal, legalDoc, legalLinks, branchScreen, sparkSVG, lockup, aeso, themeBtn, ACTIONS, actIcon, actLabel, springEasing, SPRING, SPRING_BOUNCE, config, settingsUI, bizSections, BRAND_PRESETS, route, MODE_IDS, downloadCSV, printNode, apps: {} };
+  return { env: CleoEnv, appearanceSection, plans, parsePlans, planTab, planLogo, planCard, planPrice, planStatus, billing, setupGuide, $, $$, el, esc, wait, raf, clamp, reduced, store, theme, fmt, manila, now, rng, countUp, toast, overlay, popover, seg, btnState, show, bindShellNavigation, watchTitle, boot, loginScreen, legal, legalDoc, legalLinks, branchScreen, sparkSVG, lockup, aeso, themeBtn, ACTIONS, actIcon, actLabel, springEasing, SPRING, SPRING_BOUNCE, config, settingsUI, bizSections, BRAND_PRESETS, route, MODE_IDS, downloadCSV, printNode, apps: {} };
 })();
 
 ;
@@ -9198,7 +8044,7 @@ Cleo.bir = (() => {
               Live sales and approvals arrive through Cleo.db and Cleo.bus.
    ===================================================================== */
 (() => {
-  const { $, $$, el, esc, fmt, wait, rng, LiquidGlass, toast, overlay, popover, seg, show, btnState } = Cleo;
+  const { $, $$, el, esc, fmt, wait, rng, toast, overlay, popover, seg, show, btnState } = Cleo;
   const B = Cleo.data.branches;
   // the signed-in owner (Cleo.account, api.js)
   const me = () => Cleo.account() || { id: null, name: 'Signed in', email: '', role: 'Owner', initials: '?', color: '#45454b' };
@@ -9378,9 +8224,6 @@ Cleo.bir = (() => {
         <nav class="tabbar" aria-label="Sections">${['dashboard', 'branches', 'live', 'pnl', 'alerts'].map((id) => { const n = NAV.find((x) => x.id === id); return `<a href="#/owner/${id}" data-nav="${id}"><i class="ph ph-${n.icon}"></i>${esc(n.label.split(' ')[0])}</a>`; }).join('')}</nav>
       </div>`);
     requestAnimationFrame(() => {
-      LiquidGlass.attach($('.sidebar', node), { bezel: 20, tint: 'var(--glass)' });
-      LiquidGlass.attach($('.topbar', node), { bezel: 16, tint: 'var(--glass)' });
-      LiquidGlass.attach($('.tabbar', node), { bezel: 16, tint: 'var(--glass)' });
       placePill(false);
     });
     Cleo.bindShellNavigation(node);
@@ -10366,7 +9209,7 @@ Cleo.bir = (() => {
               "Preview as" role switcher exist only in the demo (Cleo.env.demo).
    ===================================================================== */
 (() => {
-  const { $, $$, el, esc, fmt, wait, rng, LiquidGlass, toast, overlay, popover, seg, show, btnState } = Cleo;
+  const { $, $$, el, esc, fmt, wait, rng, toast, overlay, popover, seg, show, btnState } = Cleo;
   const DEMO = Cleo.env.demo;
   const B = Cleo.data.branches;
   const bName = (id) => (id === 'all' ? 'All branches' : B.find((b) => b.id === id)?.name || id);
@@ -10530,7 +9373,7 @@ Cleo.bir = (() => {
           <div class="brand">${Cleo.lockup()}<span class="badge">Back Office</span></div>
           <nav class="nav"><span class="nav-pill" aria-hidden="true"></span>${navHTML()}</nav>
           <div class="foot">
-            <button class="plan-card glass-thin sheen" data-role style="text-align:left">
+            <button class="plan-card glass-thin" data-role style="text-align:left">
               <div class="row"><span class="t-cap">Signed in as</span><i class="ph ph-caret-up-down muted"></i></div>
               <div style="display:flex;gap:10px;align-items:center"><span class="avatar" style="--av:${esc(me().color)}">${esc(me().initials)}</span><div style="min-width:0"><b class="t-h4" style="display:block">${esc(me().name)}</b><span class="t-cap" data-role-label>${esc(roleLabel())}</span></div></div>
             </button>
@@ -10553,8 +9396,6 @@ Cleo.bir = (() => {
         </main>
       </div>`);
     requestAnimationFrame(() => {
-      LiquidGlass.attach($('.sidebar', node), { bezel: 20, tint: 'var(--glass)' });
-      LiquidGlass.attach($('.topbar', node), { bezel: 16, tint: 'var(--glass)' });
       placePill(false);
     });
     Cleo.bindShellNavigation(node);
@@ -12546,7 +11387,7 @@ Cleo.bir = (() => {
               Search this file for BACKEND:.
    ===================================================================== */
 (() => {
-  const { $, $$, el, esc, fmt, wait, rng, LiquidGlass, toast, overlay, seg, show, btnState } = Cleo;
+  const { $, $$, el, esc, fmt, wait, rng, toast, overlay, seg, show, btnState } = Cleo;
   // BIR documents, the fiscal memory and the electronic journal (bir.js)
   const BIR = Cleo.bir, R2 = Cleo.bir.R2;
   const DEMO = Cleo.env.demo;
@@ -12563,12 +11404,10 @@ Cleo.bir = (() => {
   function prepare() {
     if (prepared) return; prepared = true;
     document.body.classList.add('is-terminal');
-    document.querySelector('body > .ambient')?.remove();
     const app = $('#app');
     document.body.prepend(el('<div class="stage-wrap"><div class="stage" id="stage"><div class="dp" id="dp"><div id="layer"></div></div></div></div>'));
     $('#dp').prepend(app);
     stage = $('#stage');
-    stage.insertAdjacentHTML('afterbegin', '<div class="ambient" aria-hidden="true"></div>');
     document.body.insertAdjacentHTML('beforeend', `<div class="preview-bar" data-pbar><span data-pscale></span><button data-frame>Device frame</button><button data-phide aria-label="Hide preview bar">Hide</button></div>`);
     addEventListener('resize', fit); fit();
     if ('ResizeObserver' in window) new ResizeObserver(() => fit()).observe(document.documentElement);
@@ -12881,7 +11720,7 @@ Cleo.bir = (() => {
     const addClerk = () => staffDialog(null, () => pinScreen(), { title: 'Add clerk' });
     if (!staff.length) {
       show(() => {
-        const node = el(`<section class="screen pin-screen" data-amb="login"><div class="pin-left"><div>${Cleo.lockup('Terminal')}</div><div style="align-self:center"><h1 class="t-display" style="font-size:34px">No staff can sign in here yet</h1><p class="ink-2" style="margin-top:8px;max-width:520px">Add the first clerk for ${esc(branch()?.name || 'this branch')}. They sign in on this terminal with a 4-digit PIN.</p><button class="btn btn-primary btn-lg" data-add-clerk style="margin-top:22px"><i class="ph ph-user-plus"></i>Add clerk</button></div><span class="t-small ink-2">${esc(branch()?.name || '')} · T${S.term}</span></div></section>`);
+        const node = el(`<section class="screen pin-screen" data-surface="auth"><div class="pin-left"><div>${Cleo.lockup('Terminal')}</div><div style="align-self:center"><h1 class="t-display" style="font-size:34px">No staff can sign in here yet</h1><p class="ink-2" style="margin-top:8px;max-width:520px">Add the first clerk for ${esc(branch()?.name || 'this branch')}. They sign in on this terminal with a 4-digit PIN.</p><button class="btn btn-primary btn-lg" data-add-clerk style="margin-top:22px"><i class="ph ph-user-plus"></i>Add clerk</button></div><span class="t-small ink-2">${esc(branch()?.name || '')} · T${S.term}</span></div></section>`);
         $('[data-add-clerk]', node).addEventListener('click', addClerk);
         return node;
       });
@@ -12890,7 +11729,7 @@ Cleo.bir = (() => {
     let sel = staff[0], pin = '', mode = 'sell';
     show(() => {
       const node = el(`
-        <section class="screen pin-screen" data-amb="login">
+        <section class="screen pin-screen" data-surface="auth">
           <div class="pin-left">
             <div style="display:flex;justify-content:space-between;align-items:center">${Cleo.lockup('Terminal')}<span class="t-small ink-2">${esc(branch().name)} · T${S.term}</span></div>
             <div style="align-self:center">
@@ -12960,7 +11799,7 @@ Cleo.bir = (() => {
       $('[data-keys]', node).addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) press(b.dataset.k); });
       node.addEventListener('keydown', (e) => { if (/^\d$/.test(e.key)) press(e.key); if (e.key === 'Backspace') press('back'); });
       node.tabIndex = -1;
-      requestAnimationFrame(() => { LiquidGlass.attach(card, { bezel: 22, tint: 'var(--glass)' }); node.focus({ preventScroll: true }); });
+      requestAnimationFrame(() => { node.focus({ preventScroll: true }); });
       return node;
     });
   }
@@ -12993,7 +11832,6 @@ Cleo.bir = (() => {
         kickDrawer(`Opening float ${fmt.peso(S.float)}`);
         mainScreen();
       });
-      requestAnimationFrame(() => LiquidGlass.attach($('.float-card', node), { bezel: 22, tint: 'var(--glass)' }));
       return node;
     });
   }
@@ -13037,8 +11875,6 @@ Cleo.bir = (() => {
     $('[data-dev]', node).addEventListener('click', () => { const bad = HW.printers.find((p) => p.status !== 'ready'); setSec = bad ? 'printers' : HW.scanner.connected || HW.scanner.mode === 'camera' ? 'card' : 'scanner'; S.view = 'more'; renderView(); });
     clearInterval(clockT); clockT = setInterval(() => { const c = $('[data-clock]', node); if (c) c.textContent = fmt.time(); }, 10000);
     requestAnimationFrame(() => {
-      LiquidGlass.attach($('.rail', node), { bezel: 18, tint: 'var(--glass)' });
-      LiquidGlass.attach(cartEl, { bezel: 20, tint: 'var(--terminal-order-surface)' });
       paintNet(node); placeRail(false, node); paintDevices();
     });
     return node;
@@ -15737,7 +14573,7 @@ Cleo.bir = (() => {
             <p class="lede"><b>${esc(Cleo.config.get('business.name') || Cleo.data.biz.name || 'Your business')}</b> · Pick a mode for this device. You can switch at any time.</p>
           </div>
           <div class="mode-grid stagger" role="list">${modes.map((k, i) => { const m = MODES[k]; return `
-            <button class="mode-card glass sheen" role="listitem" data-mode="${k}" style="--i:${i}" aria-describedby="mc-${k}">
+            <button class="mode-card glass" role="listitem" data-mode="${k}" style="--i:${i}" aria-describedby="mc-${k}">
               <span class="mc-art">${ART[k]}</span>
               <span class="mc-head"><span class="mc-ic"><i class="ph-fill ph-${m.icon}"></i></span><span class="mc-t"><b>${m.title}</b><span>${m.who}</span></span></span>
               <span class="mc-what" id="mc-${k}">${m.what}</span>
@@ -15786,7 +14622,7 @@ Cleo.bir = (() => {
   function onboardShell(at, main) {
     const paying = !!Cleo.api.subscription();
     return el(`
-      <section class="screen login is-setup onboard${paying ? ' paying' : ''}" data-amb="login">
+      <section class="screen login is-setup onboard${paying ? ' paying' : ''}" data-surface="auth">
         <div class="login-left">
           <div class="login-meta"><span class="onboard-brand">${Cleo.lockup()}</span><span class="onboard-tools">${acctChip()}${Cleo.themeBtn()}</span></div>
           ${paying ? '' : Cleo.setupGuide(at)}
@@ -15972,7 +14808,6 @@ Cleo.bir = (() => {
       // after a call request the panel shows it, and the owner stays on this tab
       if (sl) salesDialog(Cleo.plans.get(sl.dataset.sales), (p) => { const c = $(`[data-plan-card="${CSS.escape(p.id)}"]`, node); $('.po-status', c).innerHTML = status(p); $('.po-act', c).innerHTML = `${action(p)}${noteHTML(p)}`; });
     });
-    requestAnimationFrame(() => { const f = $('.plan-opt.featured', node); if (f) Cleo.LiquidGlass.attach(f, { bezel: 22, tint: 'var(--glass)' }); });
     return node;
   }
 
@@ -16211,7 +15046,7 @@ Cleo.bir = (() => {
     if (!error) return true;
     const e = Cleo.errors.from(error);
     await show(() => {
-      const node = el(`<section class="screen login" data-amb="login"><div class="login-left"><div class="login-meta">${Cleo.lockup()}${Cleo.themeBtn()}</div>
+      const node = el(`<section class="screen login" data-surface="auth"><div class="login-left"><div class="login-meta">${Cleo.lockup()}${Cleo.themeBtn()}</div>
         <div class="login-card"><div class="steps"><div class="step"><h1>We couldn’t load your business</h1><p class="lede">${esc(e.message)}</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="btn btn-primary btn-lg" data-retry>Try again</button><button class="btn btn-lg" data-out>${Cleo.actLabel('signOut')}</button></div>
         ${Cleo.env.demoAvailable ? '<p class="fine"><i class="ph ph-info"></i><span>Want to look around first? <a href="?demo#/">Explore the demo</a> with a sample business.</span></p>' : ''}</div></div></div>

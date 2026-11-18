@@ -64,22 +64,18 @@
  if (!still && !location.hash) root.classList.add('intro');
 })();
 </script>
+<link rel="stylesheet" href="styles/tokens.css">
 <style>
-/* Cleo Sans for this page's own text: the app's font files, cached with index.html, so the opening
-   never waits for the screen captures. Their embedded copies stand in if these cannot load. */
-@font-face{font-family:"Cleo Sans";src:url("assets/fonts/HelveticaNeueLight.otf") format("opentype");font-weight:300;font-style:normal;font-display:swap}
-@font-face{font-family:"Cleo Sans";src:url("assets/fonts/HelveticaNeueRoman.otf") format("opentype");font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:"Cleo Sans";src:url("assets/fonts/HelveticaNeueMedium.otf") format("opentype");font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:"Cleo Sans";src:url("assets/fonts/HelveticaNeueBold.otf") format("opentype");font-weight:700;font-style:normal;font-display:swap}
+/* Cleo Sans and the design tokens come from styles/tokens.css (Docs/design/DESIGN_GUIDELINES.md). The page
+   stays dark (data-theme on <html>) until its rebuild; the names below alias the shared tokens. */
 :root{
- --bg:#0b0b0d;--ink:#f4f3f1;--muted:#a9a8ae;--dim:#807f85;
- --line:rgb(255 255 255/.1);--line-2:rgb(255 255 255/.18);
- --glass:rgb(22 22 26/.52);--glass-2:rgb(17 17 21/.76);
+ --ink:var(--label);--muted:var(--label-2);--dim:var(--label-2);
+ --line:var(--separator);--line-2:var(--separator);
+ --glass:var(--glass-tint);--glass-2:var(--glass-tint-thick);
  --rim:rgb(255 255 255/.13);--rim-top:rgb(255 255 255/.24);--rim-light:rgb(255 255 255/.42);--rim-catch:rgb(255 255 255/.15);
- --red:#d40000;--red-ink:#ff5d52;--red-soft:rgb(212 0 0/.16);--green:#7fd3a8;
- --shadow:0 40px 90px -45px rgb(0 0 0/.95),0 12px 30px -18px rgb(0 0 0/.6);
- --ease:cubic-bezier(.23,1,.32,1);
- --font:"Cleo Sans",system-ui,"Segoe UI",Roboto,sans-serif;
+ --red:var(--accent);--red-ink:var(--accent-text);--red-soft:var(--accent-fill);--green:var(--success);
+ --shadow:var(--shadow-3);
+ --ease:var(--ease-out);
  --amb-1:rgb(212 0 0/.55);--amb-2:rgb(122 6 16/.65);--amb-3:rgb(255 112 52/.2);--amb-4:rgb(54 62 84/.45);
  --grid-ghost:#fff;--grid-accent:#d40000;--grid-hot:#ff6a52;--grid-haze:.34;
  color-scheme:dark

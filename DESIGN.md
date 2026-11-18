@@ -1,3 +1,5 @@
+> **Superseded (19 Nov 2026).** The Cleo overhaul replaces this design language with the Apple-based system in [`Docs/design/DESIGN_GUIDELINES.md`](Docs/design/DESIGN_GUIDELINES.md) (tokens in `styles/tokens.css`). The lit grid, refraction, grain and rim sections below no longer describe the code; this file is rewritten when Phase 2 finishes.
+
 # Cleo design system
 
 The system lives in the one `<style>` block of `index.html` (tokens on `:root`, materials, controls, then each mode); `landing.html` and `assets/admin/admin.css` carry their own copies. This file records the decisions behind it; the code is the authority for exact values.

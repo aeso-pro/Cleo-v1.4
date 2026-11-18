@@ -23,7 +23,7 @@ if (out === ROOT || !path.relative(ROOT, out).startsWith('apps')) {
 
 // what the app loads; assets/admin belongs to the admin console, which stays on the web
 const FILES = ['index.html', 'manifest.webmanifest', 'content/plans.md', 'legal/privacy.html', 'legal/terms.html'];
-const FOLDERS = ['assets'];
+const FOLDERS = ['assets', 'styles'];
 const SKIP = new Set([path.join('assets', 'admin')]);
 
 fs.rmSync(out, { recursive: true, force: true });

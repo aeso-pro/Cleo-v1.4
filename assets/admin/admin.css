@@ -5,48 +5,25 @@
    filled fields, hairline separators. No inline styles anywhere: the page's
    Content-Security-Policy refuses them.
    ===================================================================== */
-@font-face { font-family: "Cleo Sans"; src: url("../fonts/HelveticaNeueLight.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
-@font-face { font-family: "Cleo Sans"; src: url("../fonts/HelveticaNeueRoman.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Cleo Sans"; src: url("../fonts/HelveticaNeueMedium.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: "Cleo Sans"; src: url("../fonts/HelveticaNeueBold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
-
-:root, :root[data-theme="dark"] {
-  color-scheme: dark;
-  --font: "Cleo Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --bg: #0d0d0e; --card: #161617; --card-2: #1c1c1e;
-  --ink: #f3f1ee; --ink-2: rgb(243 241 238 / .72); --ink-3: rgb(243 241 238 / .56); --ink-4: rgb(243 241 238 / .34);
-  --line: rgb(255 255 255 / .08); --line-2: rgb(255 255 255 / .14);
-  --wash: rgb(255 255 255 / .05); --wash-2: rgb(255 255 255 / .09);
-  --accent: #d40000; --accent-hover: #e8100c; --accent-press: #b80000; --accent-ink: #ff5a4f; --accent-soft: rgb(212 0 0 / .18); --on-accent: #fff8f6;
-  --good: #30d158; --good-soft: rgb(48 209 88 / .16);
-  --warn: #ff9f0a; --warn-soft: rgb(255 159 10 / .16);
-  --bad: #ff453a; --bad-soft: rgb(255 69 58 / .16);
-  --info: #0a84ff; --info-soft: rgb(10 132 255 / .18);
-  --fill-2: rgb(120 120 128 / .32); --fill-3: rgb(118 118 128 / .24);
-  /* charts: one hue for magnitude (Cleo's first series colour), its own light step as the track */
-  --series: #3987e5; --series-track: rgb(57 135 229 / .2); --grid: rgb(255 255 255 / .08);
-  --focus: rgb(243 241 238 / .78);
-  --shadow: 0 30px 70px -18px rgb(0 0 0 / .62), 0 3px 10px rgb(0 0 0 / .28);
-  --scrim: rgb(6 6 7 / .6);
-  --ease-out: cubic-bezier(.22, 1, .36, 1);
+/* Tokens: Cleo Sans and the design tokens come from styles/tokens.css (linked before this file; spec:
+   Docs/design/DESIGN_GUIDELINES.md). The names below are this console's older names, aliased to them. */
+:root {
+  --card: var(--bg-elevated); --card-2: var(--bg);
+  --ink: var(--label); --ink-2: var(--label-2); --ink-3: var(--label-2); --ink-4: var(--label-3);
+  --line: var(--separator); --line-2: var(--separator);
+  --wash: var(--fill); --wash-2: var(--fill-strong);
+  --accent-press: var(--accent-pressed); --accent-ink: var(--accent-text); --accent-soft: var(--accent-fill);
+  --good: var(--success); --good-soft: var(--success-fill);
+  --warn: var(--warning); --warn-soft: var(--warning-fill);
+  --bad: var(--destructive); --bad-soft: var(--destructive-fill);
+  --info-soft: var(--info-fill);
+  --fill-2: var(--fill-strong); --fill-3: var(--fill);
+  /* charts: one hue for magnitude, its own light step as the track (data colours, not decoration) */
+  --series: #2a78d6; --series-track: rgb(42 120 214 / .16); --grid: var(--separator);
+  --focus: var(--accent);
+  --shadow: var(--shadow-3);
 }
-:root[data-theme="light"] {
-  color-scheme: light;
-  --bg: #f3f3f4; --card: #ffffff; --card-2: #f7f7f8;
-  --ink: #141414; --ink-2: rgb(20 20 20 / .72); --ink-3: rgb(20 20 20 / .62); --ink-4: rgb(20 20 20 / .36);
-  --line: rgb(20 20 20 / .08); --line-2: rgb(20 20 20 / .14);
-  --wash: rgb(20 20 20 / .04); --wash-2: rgb(20 20 20 / .07);
-  --accent-ink: #c20000; --accent-soft: rgb(212 0 0 / .10);
-  --good: #0a6e3a; --good-soft: rgb(15 138 74 / .12);
-  --warn: #855400; --warn-soft: rgb(154 98 0 / .12);
-  --bad: #b3241d; --bad-soft: rgb(198 42 34 / .10);
-  --info: #1f63c4; --info-soft: rgb(31 99 196 / .10);
-  --fill-2: rgb(120 120 128 / .16); --fill-3: rgb(118 118 128 / .12);
-  --series-track: rgb(57 135 229 / .16); --grid: rgb(20 20 20 / .08);
-  --focus: rgb(20 20 20 / .7);
-  --shadow: 0 26px 52px -28px rgb(28 24 32 / .26), 0 2px 6px rgb(28 24 32 / .05);
-  --scrim: rgb(16 16 20 / .32);
-}
+:root[data-theme="dark"] { --card-2: var(--bg-raised); --series: #3987e5; --series-track: rgb(57 135 229 / .2); }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
