@@ -7,7 +7,7 @@ The loop's instructions are in [`Docs/overhaul/SUPERPROMPT.md`](overhaul/SUPERPR
 | # | Phase               | Branch                                   | Status      |
 |---|---------------------|------------------------------------------|-------------|
 | 1 | System Architecture | cleo-overhaul/phase-1-architecture       | IN_PROGRESS (paused: owner prioritised the frontend) |
-| 2 | Frontend            | cleo-overhaul/phase-2-frontend           | NOT_STARTED |
+| 2 | Frontend            | cleo-overhaul/phase-2-frontend           | IN_PROGRESS |
 | 3 | Functions           | cleo-overhaul/phase-3-functions          | NOT_STARTED |
 | 4 | Backend             | cleo-overhaul/phase-4-backend            | NOT_STARTED |
 | 5 | Database            | cleo-overhaul/phase-5-database           | NOT_STARTED |
@@ -34,7 +34,19 @@ Statuses: NOT_STARTED, IN_PROGRESS, WAITING (hard gate), BLOCKED, DONE
 - **The repository is public.** GitHub Pages serves the repository's files, including `Docs/`. Exploitable security detail (live settings, specific weaknesses with file and line) goes in the git-ignored `Docs/private/` folder. Committed documents refer to those items as `S-n` with a severity and an owning phase.
 - **No build, lint or type-check exists yet.** `index.html` and `landing.html` are built files edited directly; after editing them, run `node tools/update-security.js`. Tests: `supabase/tests` (`npm test`).
 
-## CURRENT PHASE CHECKLIST (Phase 1 — System Architecture)
+## CURRENT PHASE CHECKLIST (Phase 2 — Frontend)
+Skills: Impeccable (critique, audit; then distill, quieter, typeset, layout, animate, polish, harden), Taste Skill `design-taste-frontend`, Emil Kowalski `apple-design`, `animate`, `review-animations` — installed. **Not installed:** UI/UX Pro Max (`/ui-ux-pro-max`), Emil `choreograph` and `animation-performance`; continuing without them (superprompt Phase 2 allows this).
+- [x] 1a. Inventory every gridbox pattern and the current fonts → `Docs/design/GRIDBOX_REMOVAL.md`
+- [x] 1b. Before-screenshots at 375, 768, 1024, 1440 px, light and dark (landing, sign-in, Owner, Back Office, Terminal, setup/plans) → `Docs/design/BEFORE/` (44 images, demo data only)
+- [ ] 1c. Impeccable critique (dual-agent) and audit → `Docs/design/AUDIT_BEFORE.md`
+- [ ] 2. `Docs/design/DESIGN_GUIDELINES.md` (sections A–F + route map)
+- [ ] 3. Token stylesheet; remove every gridbox pattern and its unused CSS/JS
+- [ ] 4. Rebuild `landing.html` and `index.html` (keep IDs, data attributes, form names and Supabase calls; selling screens never block on Supabase)
+- [ ] 5. Clean URLs in `.htaccess` with 301s from every `.html`; internal links, canonical, sitemap, service worker; Auth redirect URL list (staging values; production values for the owner)
+- [ ] 6. Verify DONE WHEN (search, AA pairs, 4 widths × light/dark × reduced transparency/motion, auth return paths, Impeccable re-audit); screenshots → `Docs/design/AFTER/`
+- Blocked until the owner creates them: Hostinger staging subdomain (301 tests on Apache) and a Supabase staging project (Auth redirect URLs). Local checks run on `tools/serve.js` in the meantime.
+
+## PHASE 1 CHECKLIST (paused — System Architecture)
 - [x] 0. Create the branch from `origin/main` (ffdef82), copy the architecture PDF into `Docs/architecture/`, save the superprompt as `Docs/overhaul/SUPERPROMPT.md`, ignore `Docs/private/`, create this file
 - [x] 1. Read the architecture end to end (pdftotext + pymupdf tables and page renders; all 28 pages)
 - [x] 2. Write `Docs/architecture/CLEO_ARCHITECTURE.md` (faithful Markdown + "Platform mapping")
