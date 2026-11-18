@@ -1,12 +1,12 @@
 # Cleo Overhaul — Progress
-MODE: GATED          LAST UPDATED: 2026-11-19 05:30 Asia/Manila
+MODE: GATED          LAST UPDATED: 2026-11-19 06:20 Asia/Manila
 PLATFORM: current stack · Supabase (prod: ntbkbvlsgymupjdpuvob, staging: none yet) · Hostinger (plan: see CURRENT_STATE.md)
 
 The loop's instructions are in [`Docs/overhaul/SUPERPROMPT.md`](overhaul/SUPERPROMPT.md). To resume in a new session, paste that file into Claude Code at the repository root.
 
 | # | Phase               | Branch                                   | Status      |
 |---|---------------------|------------------------------------------|-------------|
-| 1 | System Architecture | cleo-overhaul/phase-1-architecture       | IN_PROGRESS |
+| 1 | System Architecture | cleo-overhaul/phase-1-architecture       | IN_PROGRESS (paused: owner prioritised the frontend) |
 | 2 | Frontend            | cleo-overhaul/phase-2-frontend           | NOT_STARTED |
 | 3 | Functions           | cleo-overhaul/phase-3-functions          | NOT_STARTED |
 | 4 | Backend             | cleo-overhaul/phase-4-backend            | NOT_STARTED |
@@ -38,10 +38,10 @@ Statuses: NOT_STARTED, IN_PROGRESS, WAITING (hard gate), BLOCKED, DONE
 - [x] 0. Create the branch from `origin/main` (ffdef82), copy the architecture PDF into `Docs/architecture/`, save the superprompt as `Docs/overhaul/SUPERPROMPT.md`, ignore `Docs/private/`, create this file
 - [x] 1. Read the architecture end to end (pdftotext + pymupdf tables and page renders; all 28 pages)
 - [x] 2. Write `Docs/architecture/CLEO_ARCHITECTURE.md` (faithful Markdown + "Platform mapping")
-- [ ] 3. Write `Docs/architecture/CURRENT_STATE.md` (repo, Supabase and Hostinger inventories)
+- [~] 3. Write `Docs/architecture/CURRENT_STATE.md` — repository inventory, public DNS/headers and public Auth settings done; live dashboard and hPanel passes deferred (list in CURRENT_STATE §9)
 - [ ] 4. Write `Docs/architecture/GAP_ANALYSIS.md` (7 principles + 12 modules, ordered by risk)
 - [ ] 5. Write ADR-011 to ADR-015 in `Docs/architecture/adr/`
-- [ ] 6. Write `CLAUDE.md` at the repository root
+- [x] 6. Write `CLAUDE.md` at the repository root
 - [ ] 7. Verify DONE WHEN, write the phase report, push the branch
 
 ## DECISIONS AND CONFLICTS LOG
@@ -61,6 +61,7 @@ Phase 1 entries:
 - 2026-11-19 · 1 · **ADR folder** — the architecture (section 12) suggests `docs/adr/NNN-title.md`; the superprompt says `docs/architecture/adr/` — ADRs go in `Docs/architecture/adr/`, numbered from 011 to continue the architecture's 001–010.
 
 ## OWNER DECISIONS
+- 2026-11-19 · **Priority:** "Prioritize the frontend for now." Phase 1 is paused with the live inventory, the gap analysis and the ADRs still open; Phase 2 (Frontend) starts on `cleo-overhaul/phase-2-frontend`, stacked on the Phase 1 branch. Phase 1 resumes afterwards.
 - 2026-11-19 · **Loop mode:** GATED — stop after every phase for review and merge.
 - 2026-11-19 · **Git:** commit on stacked `cleo-overhaul/phase-N-*` branches and push those branches to GitHub; never push to `main` or merge. This replaces the earlier "push every change to main" rule for overhaul work.
 - 2026-11-19 · **Public repository:** push the branches, but keep live security findings out of committed files (git-ignored `Docs/private/`).
@@ -71,7 +72,17 @@ Phase 1 entries:
 - Phase 1: none. Documentation only; review and merge the branch when ready.
 
 ## PHASE REPORTS
-(written at the end of each phase)
+### Phase 1 — paused 2026-11-19 (resume notes)
+- Done: architecture PDF in the repo and converted to `Docs/architecture/CLEO_ARCHITECTURE.md`; `CURRENT_STATE.md` (repository, public DNS, headers and Auth settings); `CLAUDE.md`; this file; superprompt saved with CONFIG.
+- Open: live Supabase dashboard and hPanel read-only passes (CURRENT_STATE §9 lists each screen); `GAP_ANALYSIS.md`; ADR-011 to ADR-015.
+- Draft findings to carry into the gap analysis (evidence in CURRENT_STATE.md):
+  - Lost sales: the Terminal outbox is in memory only (`index.html:12628-12644`); invoices, e-journal and fiscal counters live only in device `localStorage`; the server keeps a sale summary with `sold_at` = upload time and no `business_date` (`202611180008_plans_branches_staff.sql:485-528`); no store hub (architecture ADR 007, fix 1).
+  - BIR: no server-side numbering continuity, grand total, Z-readings or e-journal copy; the Terminal has a **Training mode** (`TR-` series, `index.html:8870-8910,13023,15579-15586`) and an **"Open drawer without a sale"** action behind a manager PIN (`index.html:5917,15092`) — both conflict with the standing rule "no training mode and no 'no sale' mode" and architecture fix 7. Removal goes on the Phase 3 REMOVE list (gate G2).
+  - Double counting: sale upload ignores a repeat without comparing payloads; most write RPCs take no idempotency key; money is stored as `numeric(14,2)`, whole-peso `integer`, JSON numbers and JS floats rounded to 2 dp (`index.html:8813`).
+  - Data protection: security items S-1 to S-8 in the git-ignored `Docs/private/SECURITY_GAPS.md`.
+  - Platform: everything in `public` (no module schemas); no partitions, cron, queues, health function, monitoring or CI tests; no staging; production domain still parked.
+  - Card data: met — the card tender records brand, approval code and last 4 digits only (`index.html:14110-14138`).
+- Questions for the owner when Phase 1 resumes: the in-store hub (ADR 007) cannot run in a browser tab — defer it, or build hub mode into the Electron desktop app later?; at-rest encryption equivalent to SQLCipher for IndexedDB on terminals.
 
 ## FINAL ACCEPTANCE RESULTS
 (after Phase 6)
