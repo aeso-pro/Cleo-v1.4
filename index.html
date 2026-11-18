@@ -149,7 +149,7 @@ html, body { margin: 0; min-height: 100%; }
 body {
   font-family: var(--font);
   font-size: 14px; line-height: 1.45; letter-spacing: .005em;
-  color: var(--ink); background: var(--bg);
+  color: var(--ink); background: transparent; /* the wallpaper (styles/tokens.css) shows through */
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   min-height: 100dvh;
@@ -479,10 +479,10 @@ button.chip:active { transform: scale(.96); }
 .lockup img { height: var(--mark); width: auto; flex: none; }
 .lockup .word { display: block; flex: none; height: calc(var(--mark) * .449); aspect-ratio: 1890 / 746; background: currentColor; -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; }
 .lockup .app { margin-left: 8px; }
-.aeso { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-3); }
-/* ASSET: assets/brand/aeso-mark.png, used as a mask so it takes the colour below */
-.aeso .mark { width: 18px; height: 15px; background: #d9541a; -webkit-mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; }
-.aeso b { font-weight: 500; color: var(--ink-2); letter-spacing: -.01em; }
+.aeso { display: inline-flex; align-items: center; gap: 7px; font-size: 15px; color: var(--label); }
+/* ASSET: assets/brand/aeso-mark.png, used as a mask so it takes the text colour (white on dark, near-black on light) */
+.aeso .mark { width: 20px; height: 16px; background: currentColor; -webkit-mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; mask: url("assets/brand/aeso-mark.png") center / contain no-repeat; }
+.aeso b { font-weight: 500; color: inherit; letter-spacing: -.015em; }
 
 /* ---------- Boot screen ---------- */
 .boot { display: grid; place-items: center; position: relative; overflow: hidden; }
@@ -514,7 +514,36 @@ button.chip:active { transform: scale(.96); }
 .link-btn { color: var(--accent-ink); font-size: 13px; font-weight: 500; border-radius: 6px; }
 @media (hover: hover) and (pointer: fine) { .link-btn:hover { text-decoration: underline; text-underline-offset: 3px; } }
 .login-art { position: relative; overflow: hidden; display: grid; place-items: center; }
-.login-emblem { width: min(46%, 220px); height: auto; }
+.login-art { perspective: 900px; }
+/* the sign-in orb: a disc of Liquid Glass holding the emblem; it leans toward the pointer and pops on a tap */
+.login-orb { --rx: 0deg; --ry: 0deg; --tx: 0px; --ty: 0px; --lx: 50%; --ly: 30%;
+  width: min(52%, 340px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  transform: translate3d(var(--tx), var(--ty), 0) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 700ms var(--ease-spring); animation: orb-in 640ms var(--ease-out) both; cursor: pointer; touch-action: manipulation; }
+.login-orb.is-tracking { transition-duration: 180ms; transition-timing-function: var(--ease-out); }
+.login-orb::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(60% 50% at var(--lx) var(--ly), rgb(255 255 255 / .35), transparent 70%); mix-blend-mode: soft-light; }
+.login-orb.pop { animation: orb-pop 420ms var(--ease-spring); }
+.login-emblem { width: 46%; height: auto; filter: drop-shadow(0 10px 18px rgb(150 0 0 / .22)); }
+@keyframes orb-in { from { opacity: 0; scale: .92; } to { opacity: 1; scale: 1; } }
+@keyframes orb-pop { 0% { scale: 1; } 35% { scale: .95; } 100% { scale: 1; } }
+/* the card rises in once; its fields follow a beat apart */
+.login-card { animation: card-in 420ms var(--ease-out) both; }
+.login-card .step:not([aria-hidden="true"]) form > * { animation: field-in 380ms var(--ease-out) both; }
+.login-card .step:not([aria-hidden="true"]) form > :nth-child(2) { animation-delay: 40ms; }
+.login-card .step:not([aria-hidden="true"]) form > :nth-child(3) { animation-delay: 80ms; }
+.login-card .step:not([aria-hidden="true"]) form > :nth-child(4) { animation-delay: 120ms; }
+.login-card .step:not([aria-hidden="true"]) form > :nth-child(n+5) { animation-delay: 160ms; }
+@keyframes card-in { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+@keyframes field-in { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+/* fields answer focus: the field lifts a hair and its ring eases in */
+.login-card .input { transition: box-shadow var(--dur-short) var(--ease-out), background-color var(--dur-short) ease, translate var(--dur-short) var(--ease-out); }
+.login-card .input:focus, .login-card .input:focus-within { translate: 0 -1px; }
+.login-card .btn { transition: transform var(--dur-medium) var(--ease-spring), background-color var(--dur-micro) ease, box-shadow var(--dur-short) ease; }
+.login-card .btn:active { transform: scale(var(--press-scale)); transition-duration: var(--dur-micro); }
+@media (prefers-reduced-motion: reduce) {
+  .login-orb, .login-card, .login-card .step form > * { animation: none !important; transform: none !important; translate: none !important; }
+}
 .login-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .shake { animation: shake 420ms var(--ease-out); }
 @keyframes shake { 15% { transform: translateX(-9px); } 35% { transform: translateX(7px); } 55% { transform: translateX(-4px); } 75% { transform: translateX(2px); } }
@@ -1416,13 +1445,13 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .heat { display: grid; grid-template-columns: 40px repeat(var(--cols), minmax(0, 1fr)); gap: 3px; align-items: center; }
 .heat .hx { font-size: 11px; color: var(--ink-3); text-align: center; padding-bottom: 4px; white-space: nowrap; }
 .heat .hy { font-size: 11.5px; color: var(--ink-3); }
-.heat .hc { display: block; height: 24px; border-radius: 5px; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); transition: box-shadow 160ms ease; }
+.heat .hc { display: block; height: 24px; border-radius: 8px; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); transition: box-shadow 160ms ease; }
 .heat .hc.in { animation: tile-in 560ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
 @keyframes tile-in { from { opacity: 0; transform: scale(.88); } }
 @media (hover: hover) and (pointer: fine) { .heat .hc:hover { box-shadow: 0 0 0 1.5px var(--ink-2); } }
 .heat-legend { display: flex; align-items: center; gap: 3px; margin-top: 14px; font-size: 11.5px; color: var(--ink-3); justify-content: flex-end; }
 .heat-legend span:first-child { margin-right: 6px; } .heat-legend span:last-child { margin-left: 6px; }
-.heat-legend i { width: 14px; height: 10px; border-radius: 3px; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); }
+.heat-legend i { width: 14px; height: 10px; border-radius: 5px; background: color-mix(in oklab, var(--seq) var(--p), var(--wash-2)); }
 
 /* calendar: a tile per day, a column per week */
 .cal { --cg: 3px; display: grid; gap: 6px; width: 100%; max-width: calc(var(--w) * 24px); }
@@ -1430,7 +1459,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .cal-m { height: 14px; font-size: 11px; line-height: 14px; color: var(--ink-3); }
 .cal-m span { white-space: nowrap; }
 .cal-g { grid-template-rows: repeat(7, auto); grid-auto-flow: column; row-gap: var(--cg); }
-.cd { display: block; aspect-ratio: 1; border-radius: 3px; background: var(--wash-2); transition: opacity 360ms ease, box-shadow 160ms ease; }
+.cd { display: block; aspect-ratio: 1; border-radius: 30%; background: var(--wash-2); transition: opacity 360ms ease, box-shadow 160ms ease; }
 .cd.l1 { background: color-mix(in oklab, var(--seq) 30%, var(--wash-2)); }
 .cd.l2 { background: color-mix(in oklab, var(--seq) 54%, var(--wash-2)); }
 .cd.l3 { background: color-mix(in oklab, var(--seq) 78%, var(--wash-2)); }
@@ -1440,7 +1469,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .cd.in { animation: tile-in 520ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
 @media (hover: hover) and (pointer: fine) { .cal-g .cd:not(.nil):hover { box-shadow: 0 0 0 1.5px var(--ink-2); } }
 .cal-key { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
-.cal-key .cd { width: 10px; height: 10px; aspect-ratio: auto; border-radius: 2.5px; }
+.cal-key .cd { width: 10px; height: 10px; aspect-ratio: auto; border-radius: 3.5px; }
 .cal-key .cd:first-of-type { margin-left: 5px; } .cal-key .cd:last-of-type { margin-right: 5px; }
 
 .empty { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 28px 12px; color: var(--ink-3); }
@@ -3619,7 +3648,7 @@ const Cleo = (() => {
      ASSET: assets/brand/cleo-emblem.svg (the Cleo emblem), assets/brand/cleo-wordmark.svg (the wordmark, a CSS
      mask in core.css) and assets/brand/aeso-mark.png (also a mask). */
   const lockup = (app) => `<span class="lockup"><img src="assets/brand/cleo-emblem.svg" alt="" width="22" height="30"><span class="word" role="img" aria-label="Cleo"></span>${app ? `<span class="badge app">${esc(app)}</span>` : ''}</span>`;
-  const aeso = () => `<span class="aeso">Built by <span class="mark" aria-hidden="true"></span><b>Aeso</b></span>`;
+  const aeso = () => `<span class="aeso" role="img" aria-label="Aeso"><span class="mark" aria-hidden="true"></span><b aria-hidden="true">Aeso</b></span>`;
   /* ---------- one name and one icon per action ----------
      Actions that appear in more than one place (or more than one mode) take their label and icon from
      this table, so "Switch mode" or "Sign out" reads and looks the same in the Terminal, Owner Dashboard
@@ -3697,7 +3726,25 @@ const Cleo = (() => {
 
   /* the sign-in art: the static Cleo emblem beside the form on wide screens */
   function signArt(area) {
-    if (area) area.replaceChildren(el('<img class="login-emblem" src="assets/brand/cleo-emblem.svg" alt="">'));
+    if (!area) return;
+    const orb = el('<div class="login-orb glass"><img class="login-emblem" src="assets/brand/cleo-emblem.svg" alt=""></div>');
+    area.replaceChildren(orb);
+    if (reduced()) return;
+    // the orb leans toward the pointer (a few degrees, a few pixels) and springs back when it leaves
+    let frame = 0, px = 0, py = 0;
+    const apply = () => {
+      frame = 0;
+      const r = area.getBoundingClientRect();
+      const x = Math.max(-1, Math.min(1, (px - r.left - r.width / 2) / (r.width / 2)));
+      const y = Math.max(-1, Math.min(1, (py - r.top - r.height / 2) / (r.height / 2)));
+      orb.style.setProperty('--rx', `${(-y * 7).toFixed(2)}deg`); orb.style.setProperty('--ry', `${(x * 9).toFixed(2)}deg`);
+      orb.style.setProperty('--tx', `${(x * 10).toFixed(1)}px`); orb.style.setProperty('--ty', `${(y * 8).toFixed(1)}px`);
+      orb.style.setProperty('--lx', `${(50 + x * 30).toFixed(1)}%`); orb.style.setProperty('--ly', `${(30 + y * 25).toFixed(1)}%`);
+    };
+    area.addEventListener('pointermove', (e) => { px = e.clientX; py = e.clientY; orb.classList.add('is-tracking'); if (!frame) frame = requestAnimationFrame(apply); });
+    area.addEventListener('pointerleave', () => { orb.classList.remove('is-tracking'); ['--rx', '--ry', '--tx', '--ty', '--lx', '--ly'].forEach((k) => orb.style.removeProperty(k)); });
+    orb.addEventListener('pointerdown', () => { orb.classList.remove('pop'); void orb.offsetWidth; orb.classList.add('pop'); });
+    orb.addEventListener('animationend', () => orb.classList.remove('pop'));
   }
 
   /* ---------- Terms and Conditions, Privacy Policy ----------
@@ -3986,7 +4033,7 @@ const Cleo = (() => {
         <div class="login-left">
           <div class="login-meta">${lockup(app)}${themeBtn()}</div>
           ${setupGuide(5, { hidden: true })}
-          <div class="login-card" data-lg="22">
+          <div class="login-card glass-thick" data-lg="22">
             <div class="steps">
               <div class="step" data-step="1">
                 <h1>Sign in</h1>
@@ -5499,7 +5546,7 @@ const Charts = (() => {
       const bw = clamp(band * (compact ? 0.6 : 0.56), 3, compact ? 16 : 36);
       const colX = (i) => pad.l + band * i + (band - bw) / 2, centre = (i) => pad.l + band * (i + 0.5);
       const round = !!cfg.round, grow = anim && !!cfg.rise, cid = ++uid;
-      const R = round ? bw / 2 : Math.min(4, bw / 2), GAP = 2;
+      const R = bw / 2, RB = Math.min(bw / 2, Math.max(4, bw * 0.3)), GAP = 2;
 
       const svg = node('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, class: `viz cols${compact ? ' compact' : ''}`, tabindex: 0, role: 'img', 'aria-label': label });
       // the grid: hairlines at zero, half and the top, with their values on the left
@@ -5530,7 +5577,7 @@ const Charts = (() => {
         if (round && segs.length) {
           // one outline per column, a semicircle on top and square on the baseline; the parts fill it, joined
           const lo = Math.min(...segs.map((s) => s.lo)), yt = y(top), yb = y(lo), id = `cc${cid}-${i}`;
-          const clip = node('clipPath', { id }); clip.appendChild(node('path', { d: barPath(colX(i), yt, bw, Math.max(1.5, yb - yt), R, lo <= 0 ? 0 : R) }));
+          const clip = node('clipPath', { id }); clip.appendChild(node('path', { d: barPath(colX(i), yt, bw, Math.max(1.5, yb - yt), R, lo <= 0 ? RB : R) }));
           const parts = node('g', { 'clip-path': `url(#${id})` });
           segs.forEach((s) => { const a = y(s.hi), b = y(s.lo); parts.appendChild(node('rect', { x: colX(i), y: a, width: bw, height: Math.max(0, b - a) + 0.5, fill: s.color })); });
           mk.append(clip, parts);
@@ -5539,7 +5586,7 @@ const Charts = (() => {
           const isTop = s.hi === top, onBase = s.lo <= 0, above = segs.slice(k + 1).some((o) => Math.abs(o.lo - s.hi) < 1e-6);
           if (above && yb - yt > GAP + 1) yt += GAP; // a sliver of surface between stacked parts
           const h = Math.max(isTop ? 1.5 : 0, yb - yt); if (h <= 0) return;
-          mk.appendChild(node('path', { d: barPath(colX(i), yt, bw, h, isTop ? R : 0, onBase ? 0 : R), fill: s.color }));
+          mk.appendChild(node('path', { d: barPath(colX(i), yt, bw, h, isTop ? R : 0, onBase ? RB : 0), fill: s.color }));
         });
         g.appendChild(mk);
         if (c.top) { const t = node('text', { x: centre(i), y: Math.max(12, y(top) - 8), 'text-anchor': 'middle', class: `col-top${grow ? ' late' : ''}`, style: `--d:${Math.round(i * 34 + 360)}ms` }); t.textContent = c.top; g.appendChild(t); }
@@ -15047,7 +15094,7 @@ Cleo.bir = (() => {
     const e = Cleo.errors.from(error);
     await show(() => {
       const node = el(`<section class="screen login" data-surface="auth"><div class="login-left"><div class="login-meta">${Cleo.lockup()}${Cleo.themeBtn()}</div>
-        <div class="login-card"><div class="steps"><div class="step"><h1>We couldn’t load your business</h1><p class="lede">${esc(e.message)}</p>
+        <div class="login-card glass-thick"><div class="steps"><div class="step"><h1>We couldn’t load your business</h1><p class="lede">${esc(e.message)}</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="btn btn-primary btn-lg" data-retry>Try again</button><button class="btn btn-lg" data-out>${Cleo.actLabel('signOut')}</button></div>
         ${Cleo.env.demoAvailable ? '<p class="fine"><i class="ph ph-info"></i><span>Want to look around first? <a href="?demo#/">Explore the demo</a> with a sample business.</span></p>' : ''}</div></div></div>
         <div class="login-meta">${Cleo.aeso()}</div></div></section>`);

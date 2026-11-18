@@ -27,7 +27,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; min-height: 100dvh; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--font); letter-spacing: .005em; -webkit-font-smoothing: antialiased; }
+body { margin: 0; min-height: 100dvh; background: transparent; color: var(--ink); font: 400 15px/1.5 var(--font); letter-spacing: .005em; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
 ul, ol { padding: 0; list-style: none; }
 h1, h2, h3 { text-wrap: balance; }

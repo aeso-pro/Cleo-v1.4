@@ -7,6 +7,8 @@
 
 **Owner decisions this document follows** (`Docs/PROGRESS.md`, 19 Nov 2026): the signature is **the real product** shown large; **plans differ by content only**; the Owner Dashboard keeps the Activity heatmap and receipt trivia, restyled; the **Terminal follows the device** appearance.
 
+**Owner direction, 19 Nov 2026 (later the same day) — takes precedence where it differs below:** use **Liquid Glass throughout the system** (panels and cards included, not only navigation and overlays), **rounded rectangles heavily** (larger radii everywhere), **rounded ends in every chart**, and **subtle interactive motion on the sign-in page**. The **Aeso logo** appears alone (no "Built by" / "Made by"), in the text colour: white on dark, near-black on light.
+
 **Learned from (never copied):** apple.com and claude.com — restraint, generous spacing, a clear type hierarchy, product-first imagery, calm motion. No Apple or Anthropic assets, logos, icons or copy are used.
 
 ---
@@ -115,7 +117,7 @@ Status is never colour alone: every status pairs colour with an icon or a word (
 
 ### A4. Shape — concentric radii
 
-`--radius-xs` 6 · `--radius-sm` 10 · `--radius-md` 14 · `--radius-lg` 20 · `--radius-xl` 28 · `--radius-pill` 999.
+`--radius-xs` 8 · `--radius-sm` 12 · `--radius-md` 18 · `--radius-lg` 26 · `--radius-xl` 34 · `--radius-pill` 999 (raised 19 Nov per owner direction: rounded rectangles everywhere).
 
 **Inner radius = outer radius − padding** (never below `--radius-xs`): a 20 px card with 8 px padding holds 12 px items; a 28 px sheet with 16 px padding holds 12 px fields; a pill holds pills. Buttons: pill (comfortable) or `--radius-sm` (compact toolbar buttons). Fields: `--radius-sm`. Cards: `--radius-lg`. Sheets and dialogs: `--radius-xl` (top corners only for bottom sheets on phones). Product tiles: `--radius-md`.
 
@@ -139,14 +141,15 @@ One set: **Phosphor 2.1.1, Regular weight** (1.5 stroke look) for every UI icon;
 
 ## B. Liquid Glass
 
-Glass is Cleo's core **material for navigation and overlays only** — a floating layer that holds controls over content. Content stays solid.
+Glass is Cleo's core material. **Owner direction (19 Nov): Liquid Glass throughout** — navigation, overlays, and also panels and cards (`.glass-thick`). A still, soft **wallpaper** (`--wallpaper`: three blurred washes of Cleo red, blue and green on `--bg`, no motion, no pattern) sits behind everything so the glass has something to frost. Dense reading surfaces inside glass — table rows, receipts, form fields — keep solid fills so text stays AA. The original rule (glass only on navigation and overlays) is kept below for reference.
 
 ### B1. Tokens
 
 | Token | Light | Dark | Notes |
 |---|---|---|---|
-| `--glass-tint` | `rgb(250 250 252 / .80)` | `rgb(30 30 32 / .78)` | Base fill |
-| `--glass-tint-thick` | `rgb(250 250 252 / .90)` | `rgb(28 28 30 / .88)` | Sidebars and sheets (bigger surfaces read thicker) |
+| `--glass-tint` | `rgb(252 252 254 / .66)` | `rgb(36 36 40 / .62)` | Base fill |
+| `--glass-tint-thick` | `rgb(252 252 254 / .78)` | `rgb(30 30 34 / .74)` | Panels, cards, sidebars and sheets (bigger surfaces read thicker) |
+| `--glass-sheen` | white 55% → 0 over the top 62% | white 10% → 0 | Top-lit sheen layered over the tint (light from above) |
 | `--glass-blur` | `24px` | `24px` | `backdrop-filter: blur()` |
 | `--glass-blur-thick` | `40px` | `40px` | Sidebars, sheets |
 | `--glass-saturation` | `180%` | `160%` | `saturate()` in the same filter |
@@ -343,3 +346,17 @@ Plans (owner decision): plan cards are identical solid cards that differ only by
 6. Semantic HTML (`<main>`, one `h1`, landmarks), labelled icon buttons, visible focus, keyboard path, forced-colours check.
 7. Motion: transform/opacity only, durations from tokens, reduced-motion alternative.
 8. Check at 375, 768, 1024, 1440 px; light and dark; reduced transparency; reduced motion; increased contrast.
+
+---
+
+## J. Charts — rounded ends (owner direction, 19 Nov)
+
+Every column is fully round at its data end (radius = half its width) and softly round on the baseline (30% of its width, at least 4 px); stacked parts stay joined. Donut arcs keep round caps; meters and ranked bars are pills; heatmap cells use 8 px corners and calendar cells 30% corners. Lines (when used) take `stroke-linecap: round; stroke-linejoin: round`.
+
+## K. Sign-in motion (owner direction, 19 Nov)
+
+The sign-in page answers the person without moving on its own:
+- **The orb** — the static Cleo emblem inside a disc of Liquid Glass. It leans toward the pointer (up to 7° / 9° and 10 px; a soft light follows the pointer on its surface), springs back when the pointer leaves (`--ease-spring`, 700 ms), and gives a small press "pop" (0.95 → 1) on a tap.
+- **Entrance** — the card rises 14 px and fades in once (420 ms ease-out); its fields follow 40 ms apart.
+- **Fields and buttons** — a focused field lifts 1 px as its ring eases in; buttons press to 0.97 and spring back.
+- **Reduced motion** — no tilt, no entrance, no lift; the page is still.

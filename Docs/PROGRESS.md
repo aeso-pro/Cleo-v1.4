@@ -84,6 +84,7 @@ Phase 1 entries:
 - 2026-11-19 · **Public repository:** push the branches, but keep live security findings out of committed files (git-ignored `Docs/private/`).
 - 2026-11-19 · **Production:** https://cleopos.online on Hostinger. GitHub Pages (the current live site) is an interim host to retire.
 - 2026-11-19 · **Live inventory:** read the Supabase dashboard and hPanel in the built-in browser, read-only (no settings changed, no keys revealed).
+- 2026-11-19 · **Phase 2 direction, update:** "Add subtle interactable animations on the login page… incorporate heavily the rounded rectangles, rounded ends in charts, and liquid glass theme all throughout the system." Aeso: remove "Made by"/"Built by", logo wordmark only; owner chose **white in dark, black in light**. This supersedes the superprompt's "glass only on navigation and overlays" rule for Cleo (recorded in DESIGN_GUIDELINES §B, J, K).
 - 2026-11-19 · **Phase 2 design direction** (after the before-audit): (1) Cleo's signature is **the real product** — actual Terminal and dashboard screens shown large; the emblem stays a small static mark. (2) **Plans differ by content only** — identical solid cards, the recommended plan gets the one filled button and a "Recommended" label; the plan tab leaves the working sidebar. (3) **Keep both** Owner Dashboard extras (26-week Activity heatmap and the receipt trivia), restyled to the new system. (4) The **Terminal follows the device** appearance (light/dark from the system), switchable in Settings.
 
 ## OWNER PRODUCTION DEPLOY STEPS (per phase)
