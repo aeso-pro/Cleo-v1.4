@@ -1,0 +1,104 @@
+# Audit before the redesign (Phase 2, step 1)
+
+Method: dual-agent (A: design review, independent of the detector · B: Impeccable detector + browser + technical audit). Run 19 Nov 2026 on `main` at `ffdef82`, served locally by `tools/serve.js`; the app was checked in its demo (sample business "Kapé Lumen", demo data only). Screenshots: [`BEFORE/`](BEFORE/) (index at the end).
+
+## Scores
+
+**Design health (Nielsen heuristics, Impeccable `critique`)**
+
+| # | Heuristic | App | Landing | Key issue |
+|---|---|---|---|---|
+| 1 | Visibility of system status | 3 | 3 | Good sync and printer status in the Terminal; Owner sidebar "Alerts 3" vs bell "11"; landing nav doesn't show the current section |
+| 2 | Match system / real world | 3 | 3 | Fluent Philippine retail and BIR language; unexplained PTU, "E-journal", "Backend reports"; landing headline "One Phase Ahead." says nothing about what Cleo is |
+| 3 | User control and freedom | 3 | 3 | No undo on "Order cleared"; Void dialog has no Cancel |
+| 4 | Consistency and standards | 2 | 2 | Two red primaries per view; two selection styles; "Most popular" vs "Recommended"; outward ↗ on same-site CTAs |
+| 5 | Error prevention | 3 | 3 | Strong blind count and shift-before-Z guard; Void preselects a reason; quick tenders unsorted |
+| 6 | Recognition rather than recall | 3 | 3 | Low stock shown only as amber boxes, no text |
+| 7 | Flexibility and efficiency | 2 | n/a (Persuade) | No keyboard shortcuts or search in Owner/Back Office; PIN digits only register with focus inside the PIN pad |
+| 8 | Aesthetic and minimalist design | 2 | 2 | Panels in panels, glow rims, grain, a 3D voxel emblem; landing grid and trace compete with the copy |
+| 9 | Error recovery | 3 | n/a (no forms) | Inline sign-in errors with examples |
+| 10 | Help and documentation | 2 | 3 | No in-app help or support entry |
+| **Total** | | **26/40 (Acceptable)** | **22/32 (Acceptable)** | |
+
+**Technical health (Impeccable `audit`)**
+
+| # | Dimension | App | Landing | Key finding |
+|---|---|---|---|---|
+| 1 | Accessibility | 3 | 3 | 115 icon-only buttons all labelled, focus rings pass (7.0–10.6:1); `--ink-4`/`--fill-3` used for controls at 1.1–2.9:1; no forced-colours support; no `<main>` on sign-in and Terminal |
+| 2 | Performance | 2 | 2 | Landing: 25 blurred-backdrop surfaces (13 with SVG refraction) over a 30 fps canvas, 896 KB HTML, ~1.17 MB of `.otf` preloaded. App: one 1.47 MB file |
+| 3 | Responsive | 2 | 3 | The Terminal is a fixed 2048×1280 stage scaled to fit: 15.6% at 375 px, 62.5% on a 1280×800 tablet |
+| 4 | Theming | 3 | 3 | Full dark and light token sets (~1,240 `var()` uses); 143 hard-coded colours; three token copies (app, landing, admin) with different names |
+| 5 | Implementation integrity | 2 | 3 | 491 `px` font sizes across 38 sizes, bypassing the `.t-*` scale |
+| **Total** | | **12/20 (Acceptable)** | **14/20 (Good)** | |
+
+## Design specificity verdict
+
+- **App (Operate).** The *content* is Cleo's own: BIR receipts and a Z-reading replica, peso denominations in the blind count (₱20 bill and coin), SC/PWD, PTU, "On account", "Close the shift first". The *skin* is category-interchangeable "dark techy glass": floating sidebar and top-bar capsules, panels inside panels, red-ring "lit" selection, tinted icon squares, and a stock SaaS dashboard (6 boxed KPIs, donut, a GitHub-style contribution heatmap). Light mode is roughly 70% of the way to the Apple target; dark mode is far from it.
+- **Landing (Persuade).** The evidence is specific (real screen captures, peso pricing, an honest FAQ about BIR and live payments). The art direction (always dark, red LED box grid, circuit traces and ports, a lit-matrix emblem) reads as a developer-tool or AI-startup page and says nothing about a Philippine counter.
+- **Detector.** 24 findings: 17 "thin border + wide shadow" on landing glass (true, advisory — the look being replaced), 4 nested cards (false positive: device bezels holding captures), 1 marquee (false positive: skeleton shimmer), 1 side-stripe on `.ap-chip.st-done` (`index.html:2710`, true), 1 dark glow on `.pay-ok` (`index.html:1161`, true). `admin/index.html` is clean only because its UI is rendered by script.
+- **Browser overlay.** Not available: the site's own Content Security Policy (`script-src 'self'` + hashes) blocked the injected `detect.js` on all five views. That is the CSP working as designed.
+
+**Where the two assessments agree:** glass is everywhere (A: refraction on content cards; B: all 17 detector hits and 25 blurred surfaces on the landing); controls lean on low-contrast cues (A: red-tint-plus-ring selection; B: `--ink-4`, `--fill-3`, `--line-2` at 1.1–2.9:1); the Terminal's fixed device stage (A: preview chrome; B: 15.6% scale on phones).
+
+## What's working (keep in the redesign)
+
+1. **Domain-true content and flows** — receipt and Z-reading replicas, the blind drawer count, SC/PWD, "On account", "Close the shift first". This is Cleo's character once the grid is gone.
+2. **The Terminal checkout core** — one red Charge, an options sheet with sensible defaults, change shown inside the Complete button before the tap, a success screen with change and receipt, the "Kitchen printer offline" chip.
+3. **An Apple-aligned base** — iOS switch, segmented control with a grey thumb, filled fields, Apple system status colours (`index.html:105-115`), labelled icon buttons, skip links, `aria-live` regions, and existing reduced-motion, reduced-transparency and more-contrast handling.
+
+## Priority issues
+
+1. **[P1] A decorative lit-grid world and glass on everything.** Ambient grid, ripples, 2D/3D lit emblems, grain, SVG refraction on content cards (`index.html:265-323,641-655,3357-4600`); grid canvas, trace, ports and halos on the landing (`landing.html:402-447,939-1400`). *Why:* competes with the work, costs GPU and battery on Android tablets, and contradicts the brief. *Fix:* remove all of it ([`GRIDBOX_REMOVAL.md`](GRIDBOX_REMOVAL.md)); solid content, Liquid Glass only on navigation and overlays. *Commands:* distill, quieter.
+2. **[P1] The Terminal is a fixed 2048×1280 stage scaled to fit** (`index.html:2068-2077,12579-12590`). *Why:* unreadable on phones, and on a 1280×800 tablet 64 px chips shrink to 40 px — below the 44 pt floor; no reflow with zoom or larger text (WCAG 1.4.4, 1.4.10, 2.5.8). *Fix:* a fluid iPadOS layout with real breakpoints; targets stay ≥ 44 pt and primary actions ≥ 56 px at every size. *Command:* adapt.
+3. **[P1] Controls fail in high contrast and below 3:1.** No `forced-colors` handling in app or landing; focus and field edges drawn with box-shadow (`index.html:394-438,1144`); `--ink-4` (2.3–2.9:1) for PIN dots and idle status, `--fill-3` fields at 1.14:1 in light. *Why:* Windows is a target platform; fields and focus vanish in High Contrast (WCAG 2.4.7, 1.4.11). *Fix:* a UI-tier grey ≥ 3:1, a real 1 px field edge, transparent outlines that forced colours can paint. *Commands:* harden, polish.
+4. **[P1] The payment sheet asks too much at once.** About 27 targets; tip row before tender; quick tenders unsorted ("Exact, ₱500, ₱1,000, ₱300" — `quick()` at `index.html:13985` never sorts); the keypad column shifts ~11 px as the amount widens. *Why:* the most frequent high-stakes screen. *Fix:* sorted quick tenders, tabular numerals and fixed columns, tender as the first group, Complete as the only filled button (tip behaviour itself is a Phase 3 decision). *Commands:* clarify, harden.
+5. **[P2] Red everywhere and boxed chrome.** Red-tint-plus-2px-ring selection on 8 control types, two red Recall buttons, red "Adjust stock" beside a ghost "Receive delivery", red sparklines; floating sidebar card, top-bar capsule, boxed KPI strips, a masonry dashboard. *Fix:* one filled primary per view; Apple selection (tinted fill + checkmark); macOS full-height sidebar and unified toolbar; numbers grouped by spacing. *Commands:* colorize (reduce), layout.
+
+Also P2 (from the audit): 38 ad-hoc font sizes bypassing the type scale (typeset); three token copies (document → one `tokens.css`); landing payload and `.otf` fonts without WOFF2 (optimize); missing `<main>`/`h1` on sign-in and Terminal (harden).
+
+## Persona red flags
+
+- **Rushed cashier (Joanna, tablet at the counter):** tip prompt before tender; unsorted quick tenders and a sliding keypad; category chips clip ("Retai…"); 11 px tile meta; identical Reprint and Void pills side by side; PIN screen's Add clerk / End of day / Switch mode as small footer links.
+- **First-time owner (Jordan):** "One Phase Ahead." doesn't say what Cleo is; the terms box must be ticked at every sign-in; mode picker then a second branch picker; unexplained PTU and T1–T4; dashboard opens with six red ↘ arrows; no Help anywhere.
+- **Accessibility-dependent user (Sam):** animated canvas with no on-page pause; low stock shown by colour and box only; selection by red tint and ring only (no checkmark); forced-colours mode loses field edges and focus.
+
+## Minor observations
+
+Mobile Owner Dashboard shows both a hamburger and a floating bottom tab bar (and the bar overlaps content); landing captures are illegible at 375 px; "₱19.0M" grand total abbreviated next to an exact receipt; sign-in theme toggle is `type="submit"`; "Terminal preview · 2048 × 1280 · Device frame / Hide" developer bar visible to everyone (`index.html:12572-12589`); white check on `#30d158` is 2.02:1 (`.pay-ok`); primary hover `#e8100c` is 4.44:1 with white; both pages kill motion globally under reduced motion instead of keeping gentle feedback; `body { overflow-x: hidden }` masks overflow.
+
+## Questions the critique raised
+
+1. Once the grid and lit emblem are gone, what is Cleo's one signature? The BIR-true receipt is already beautifully rendered.
+2. Should a Philippine café terminal ask for a tip on every sale by default? (Phase 3 decision.)
+3. Should the landing look like the solid, light-and-dark app owners will use, so the first impression is the product?
+
+## Contrast baseline (WCAG ratios)
+
+| Surface | Pair | Ratio | Result |
+|---|---|---|---|
+| App dark | `--ink` on `--bg` | 17.23 | AA |
+| App dark | `--ink-3` on bg / glass | 5.84 / 5.76 | AA |
+| App dark | `--ink-4` on bg | 2.84 | Fail |
+| App dark | `--accent` #d40000 as text on bg | 3.51 | Large only |
+| App dark | white on accent / hover / press | 5.27 / 4.44 / 6.59 | AA / large / AA |
+| App dark | `--info` on `--info-soft` | 4.40 | Large only |
+| App dark | field fill vs bg; `--line-2` vs bg | 1.29; 1.45 | Fail 3:1 |
+| App light | `--ink-3` on bg | 4.97 | AA |
+| App light | `--ink-4` on bg | 2.28 | Fail |
+| App light | `--accent-ink` / `--accent` as text | 5.75 / 4.98 | AA |
+| App light | switch on vs bg; field fill vs bg | 2.00; 1.14 | Fail 3:1 |
+| Landing | `--dim` on glass over the lit grid (est.) | 3.98 | Fail |
+| Admin | placeholder `--ink-4` dark / light | 2.84 / 2.28 | Fail |
+
+## Screenshot index
+
+Captured with headless Edge at 375×812, 768×1024, 1024×768 and 1440×900; the app in light and dark.
+
+| View | Files |
+|---|---|
+| Landing (always dark) | `landing-{375,768,1024,1440}.jpg` |
+| Sign-in | `signin-{width}-{light,dark}.jpg` |
+| Owner Dashboard (all branches) | `owner-{width}-{light,dark}.jpg` |
+| Back Office Overview | `backoffice-{width}-{light,dark}.jpg` |
+| Terminal (Sell, after PIN and open shift) | `terminal-{width}-{light,dark}.jpg` |
+| Setup (the `#/plans` route opens setup for the demo owner) | `plans-{width}-{light,dark}.jpg` |

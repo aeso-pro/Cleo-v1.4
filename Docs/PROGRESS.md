@@ -38,7 +38,7 @@ Statuses: NOT_STARTED, IN_PROGRESS, WAITING (hard gate), BLOCKED, DONE
 Skills: Impeccable (critique, audit; then distill, quieter, typeset, layout, animate, polish, harden), Taste Skill `design-taste-frontend`, Emil Kowalski `apple-design`, `animate`, `review-animations` — installed. **Not installed:** UI/UX Pro Max (`/ui-ux-pro-max`), Emil `choreograph` and `animation-performance`; continuing without them (superprompt Phase 2 allows this).
 - [x] 1a. Inventory every gridbox pattern and the current fonts → `Docs/design/GRIDBOX_REMOVAL.md`
 - [x] 1b. Before-screenshots at 375, 768, 1024, 1440 px, light and dark (landing, sign-in, Owner, Back Office, Terminal, setup/plans) → `Docs/design/BEFORE/` (44 images, demo data only)
-- [ ] 1c. Impeccable critique (dual-agent) and audit → `Docs/design/AUDIT_BEFORE.md`
+- [x] 1c. Impeccable critique (dual-agent) and audit → `Docs/design/AUDIT_BEFORE.md` (app 26/40 + 12/20; landing 22/32 + 14/20; snapshots in `.impeccable/critique/`)
 - [ ] 2. `Docs/design/DESIGN_GUIDELINES.md` (sections A–F + route map)
 - [ ] 3. Token stylesheet; remove every gridbox pattern and its unused CSS/JS
 - [ ] 4. Rebuild `landing.html` and `index.html` (keep IDs, data attributes, form names and Supabase calls; selling screens never block on Supabase)
