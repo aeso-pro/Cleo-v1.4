@@ -1,5 +1,5 @@
 # Cleo Overhaul — Progress
-MODE: GATED          LAST UPDATED: 2026-11-19 06:20 Asia/Manila
+MODE: GATED          LAST UPDATED: 2026-11-19 07:10 Asia/Manila
 PLATFORM: current stack · Supabase (prod: ntbkbvlsgymupjdpuvob, staging: none yet) · Hostinger (plan: see CURRENT_STATE.md)
 
 The loop's instructions are in [`Docs/overhaul/SUPERPROMPT.md`](overhaul/SUPERPROMPT.md). To resume in a new session, paste that file into Claude Code at the repository root.
@@ -40,7 +40,11 @@ Skills: Impeccable (critique, audit; then distill, quieter, typeset, layout, ani
 - [x] 1b. Before-screenshots at 375, 768, 1024, 1440 px, light and dark (landing, sign-in, Owner, Back Office, Terminal, setup/plans) → `Docs/design/BEFORE/` (44 images, demo data only)
 - [x] 1c. Impeccable critique (dual-agent) and audit → `Docs/design/AUDIT_BEFORE.md` (app 26/40 + 12/20; landing 22/32 + 14/20; snapshots in `.impeccable/critique/`)
 - [x] 2. `Docs/design/DESIGN_GUIDELINES.md` (sections A–F, page structure, route map, checklist; AA pairs computed)
-- [ ] 3. Token stylesheet; remove every gridbox pattern and its unused CSS/JS
+- [~] 3. Token stylesheet; remove every gridbox pattern and its unused CSS/JS
+  - [x] 3a. `styles/tokens.css` written from the guidelines (fonts, type, space, radii, light/dark/system colours, glass with all four fallbacks, motion, browser surfaces). **Not linked into any page yet.**
+  - [ ] 3b. Link `styles/tokens.css` from `index.html`, `landing.html`, `admin/index.html`; add it to `sw.js` FILES; map the app's old tokens (`--ink*`, `--wash*`, `--glass*`, `--good/--warn/--bad/--info`, `--r-*`) to the new ones, then delete the old `:root` blocks
+  - [ ] 3c. Delete the gridbox code listed in `Docs/design/GRIDBOX_REMOVAL.md` §5 (CSS and JS), app first, then landing; run the §6 search until it returns nothing
+- **Context checkpoint (2026-11-19):** this session stopped after 3a. Resume at 3b in a new session: paste `Docs/overhaul/SUPERPROMPT.md`; read `CLAUDE.md`, `Docs/design/DESIGN_GUIDELINES.md`, `GRIDBOX_REMOVAL.md`, `AUDIT_BEFORE.md`. Before-screenshots were made with a headless-Edge CDP script (sign in to the demo with any password and any 6-digit code except 000000, pick branch `.bcard`, register terminal `[data-reg]`, staff `[data-s="c1"]`, PIN typed as keys, `[data-open]`); recreate it for the AFTER shots. Run Git Bash commands that pass `#/…` routes with `MSYS_NO_PATHCONV=1`.
 - [ ] 4. Rebuild `landing.html` and `index.html` (keep IDs, data attributes, form names and Supabase calls; selling screens never block on Supabase)
 - [ ] 5. Clean URLs in `.htaccess` with 301s from every `.html`; internal links, canonical, sitemap, service worker; Auth redirect URL list (staging values; production values for the owner)
 - [ ] 6. Verify DONE WHEN (search, AA pairs, 4 widths × light/dark × reduced transparency/motion, auth return paths, Impeccable re-audit); screenshots → `Docs/design/AFTER/`

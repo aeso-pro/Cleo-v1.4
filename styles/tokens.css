@@ -1,0 +1,245 @@
+/* =====================================================================
+   Cleo design tokens — the one source for colour, type, space, shape,
+   depth, glass and motion. Spec: Docs/design/DESIGN_GUIDELINES.md.
+   Components use these tokens only: no raw colours, radii, durations
+   or font sizes outside this file.
+
+   Theme: follows prefers-color-scheme unless the person picks one in
+   Settings (<html data-theme="light|dark">).
+   ===================================================================== */
+
+/* ---------- Fonts (unchanged: Cleo Sans = Helvetica Neue, licensed files) ---------- */
+@font-face { font-family: "Cleo Sans"; src: url("../assets/fonts/HelveticaNeueLight.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Cleo Sans"; src: url("../assets/fonts/HelveticaNeueRoman.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Cleo Sans"; src: url("../assets/fonts/HelveticaNeueMedium.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Cleo Sans"; src: url("../assets/fonts/HelveticaNeueBold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+
+/* ---------- Theme-independent tokens ---------- */
+:root {
+  /* A1 type */
+  --font: "Cleo Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  --type-display: 700 clamp(2.75rem, 6.4vw, 5.5rem) / 1.04 var(--font);
+  --type-display-2: 700 clamp(2.125rem, 4.4vw, 3.5rem) / 1.08 var(--font);
+  --type-large-title: 700 2.125rem / 2.5625rem var(--font);
+  --type-title-1: 700 1.75rem / 2.125rem var(--font);
+  --type-title-2: 700 1.375rem / 1.75rem var(--font);
+  --type-title-3: 500 1.25rem / 1.5625rem var(--font);
+  --type-headline: 500 1.0625rem / 1.375rem var(--font);
+  --type-body: 400 1.0625rem / 1.5rem var(--font);           /* comfortable: 17/24 */
+  --type-body-compact: 400 0.9375rem / 1.3125rem var(--font); /* compact: 15/21 */
+  --type-callout: 400 1rem / 1.3125rem var(--font);
+  --type-subhead: 400 0.9375rem / 1.25rem var(--font);
+  --type-footnote: 400 0.8125rem / 1.125rem var(--font);
+  --type-caption: 400 0.75rem / 1rem var(--font);
+  --type-figure-xl: 300 3.5rem / 1 var(--font);
+  --type-figure-l: 300 2.125rem / 1.05 var(--font);
+
+  --track-display: -0.035em;
+  --track-display-2: -0.03em;
+  --track-large-title: -0.022em;
+  --track-title-1: -0.02em;
+  --track-title-2: -0.016em;
+  --track-title-3: -0.012em;
+  --track-headline: -0.006em;
+  --track-body: 0em;
+  --track-footnote: 0.003em;
+  --track-caption: 0.008em;
+  --track-figure: -0.03em;
+
+  /* A3 space (4/8 pt) */
+  --space-1: 0.25rem;  --space-2: 0.5rem;  --space-3: 0.75rem; --space-4: 1rem;
+  --space-5: 1.25rem;  --space-6: 1.5rem;  --space-8: 2rem;    --space-10: 2.5rem;
+  --space-12: 3rem;    --space-16: 4rem;   --space-20: 5rem;   --space-24: 6rem;
+  --space-32: 8rem;
+  --gutter: var(--space-4);
+  --target: 2.75rem;          /* 44 pt minimum hit area */
+  --target-pos: 3.5rem;       /* 56 px primary POS actions */
+
+  /* A4 shape (concentric: inner = outer − padding) */
+  --radius-xs: 6px; --radius-sm: 10px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 28px; --radius-pill: 999px;
+
+  /* C motion */
+  --dur-micro: 140ms;
+  --dur-short: 220ms;
+  --dur-medium: 280ms;
+  --dur-max: 360ms;
+  --ease-out: cubic-bezier(.32, .72, 0, 1);
+  --ease-in: cubic-bezier(.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --ease-spring: linear(0, .006, .025 2.8%, .101 6.1%, .539 18.9%, .721 25.3%, .849 31.5%, .937 38.1%, .968 41.8%, .991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001 85.6%, 1);
+  --press-scale: .97;
+
+  /* B glass geometry */
+  --glass-blur: 24px;
+  --glass-blur-thick: 40px;
+}
+
+@media (min-width: 768px) { :root { --gutter: var(--space-6); } }
+@media (min-width: 1024px) { :root { --gutter: var(--space-8); } }
+
+/* ---------- Light (default) ---------- */
+:root, :root[data-theme="light"] {
+  color-scheme: light;
+  /* A2.1 neutrals */
+  --bg: #f2f2f7;
+  --bg-elevated: #ffffff;
+  --bg-raised: #ffffff;
+  --fill: rgb(120 120 128 / .12);
+  --fill-strong: rgb(120 120 128 / .20);
+  --label: #1d1d1f;
+  --label-2: #6e6e73;
+  --label-3: #8e8e93;
+  --separator: rgb(60 60 67 / .18);
+  --control-border: #86868b;
+  /* A2.2 accent (Cleo red) */
+  --accent: #d40000;
+  --accent-hover: #bb0000;
+  --accent-pressed: #a00000;
+  --accent-text: #d40000;
+  --accent-fill: rgb(212 0 0 / .10);
+  --on-accent: #ffffff;
+  /* A2.3 semantic */
+  --success: #0a6e3a;     --success-fill: rgb(36 138 61 / .12);
+  --warning: #855400;     --warning-fill: rgb(154 98 0 / .12);
+  --destructive: #b3241d; --destructive-fill: rgb(198 42 34 / .10);
+  --info: #1f63c4;        --info-fill: rgb(31 99 196 / .10);
+  --switch-on: #248a3d;
+  --success-badge: #1f7a35;
+  /* A5 depth (one light source from above) */
+  --shadow-1: 0 1px 2px rgb(0 0 0 / .06), 0 1px 1px rgb(0 0 0 / .04);
+  --shadow-2: 0 8px 24px -6px rgb(0 0 0 / .16), 0 2px 6px rgb(0 0 0 / .06);
+  --shadow-3: 0 24px 60px -12px rgb(0 0 0 / .24), 0 4px 12px rgb(0 0 0 / .08);
+  /* B glass */
+  --glass-tint: rgb(250 250 252 / .80);
+  --glass-tint-thick: rgb(250 250 252 / .90);
+  --glass-saturation: 180%;
+  --glass-border: rgb(0 0 0 / .08);
+  --glass-specular: rgb(255 255 255 / .85);
+  --glass-label: #1d1d1f;
+  --glass-label-2: #3a3a3c;
+  --glass-solid: #f9f9fb;
+  --scrim: rgb(0 0 0 / .20);
+  /* receipts stay on paper in both themes */
+  --paper: #ffffff;
+  --paper-ink: #1d1d1f;
+}
+
+/* ---------- Dark ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #000000;
+  --bg-elevated: #1c1c1e;
+  --bg-raised: #2c2c2e;
+  --fill: rgb(120 120 128 / .24);
+  --fill-strong: rgb(120 120 128 / .36);
+  --label: #f5f5f7;
+  --label-2: #a1a1a6;
+  --label-3: #8e8e93;
+  --separator: rgb(84 84 88 / .55);
+  --control-border: #7c7c80;
+  --accent: #d40000;
+  --accent-hover: #e01414;
+  --accent-pressed: #b00000;
+  --accent-text: #ff6b61;
+  --accent-fill: rgb(255 107 97 / .18);
+  --on-accent: #ffffff;
+  --success: #30d158;     --success-fill: rgb(48 209 88 / .16);
+  --warning: #ff9f0a;     --warning-fill: rgb(255 159 10 / .16);
+  --destructive: #ff6961; --destructive-fill: rgb(255 69 58 / .16);
+  --info: #409cff;        --info-fill: rgb(64 156 255 / .18);
+  --switch-on: #30d158;
+  --success-badge: #1f7a35;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / .5);
+  --shadow-2: 0 8px 24px -6px rgb(0 0 0 / .6), 0 2px 6px rgb(0 0 0 / .4);
+  --shadow-3: 0 24px 60px -12px rgb(0 0 0 / .7);
+  --glass-tint: rgb(30 30 32 / .78);
+  --glass-tint-thick: rgb(28 28 30 / .88);
+  --glass-saturation: 160%;
+  --glass-border: rgb(255 255 255 / .10);
+  --glass-specular: rgb(255 255 255 / .14);
+  --glass-label: #f5f5f7;
+  --glass-label-2: #d1d1d6;
+  --glass-solid: #1c1c1e;
+  --scrim: rgb(0 0 0 / .48);
+  --paper: #ffffff;
+  --paper-ink: #1d1d1f;
+}
+
+/* System dark when no explicit choice was made: same values as [data-theme="dark"] */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #000000; --bg-elevated: #1c1c1e; --bg-raised: #2c2c2e;
+    --fill: rgb(120 120 128 / .24); --fill-strong: rgb(120 120 128 / .36);
+    --label: #f5f5f7; --label-2: #a1a1a6; --label-3: #8e8e93;
+    --separator: rgb(84 84 88 / .55); --control-border: #7c7c80;
+    --accent-hover: #e01414; --accent-pressed: #b00000; --accent-text: #ff6b61; --accent-fill: rgb(255 107 97 / .18);
+    --success: #30d158; --success-fill: rgb(48 209 88 / .16);
+    --warning: #ff9f0a; --warning-fill: rgb(255 159 10 / .16);
+    --destructive: #ff6961; --destructive-fill: rgb(255 69 58 / .16);
+    --info: #409cff; --info-fill: rgb(64 156 255 / .18);
+    --switch-on: #30d158;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / .5);
+    --shadow-2: 0 8px 24px -6px rgb(0 0 0 / .6), 0 2px 6px rgb(0 0 0 / .4);
+    --shadow-3: 0 24px 60px -12px rgb(0 0 0 / .7);
+    --glass-tint: rgb(30 30 32 / .78); --glass-tint-thick: rgb(28 28 30 / .88); --glass-saturation: 160%;
+    --glass-border: rgb(255 255 255 / .10); --glass-specular: rgb(255 255 255 / .14);
+    --glass-label: #f5f5f7; --glass-label-2: #d1d1d6; --glass-solid: #1c1c1e;
+    --scrim: rgb(0 0 0 / .48);
+  }
+}
+
+/* ---------- Base: browser surfaces carry the design too ---------- */
+html { font-family: var(--font); font-size: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--label); font: var(--type-body); letter-spacing: var(--track-body); -webkit-font-smoothing: antialiased; }
+::selection { background: var(--accent-fill); color: var(--label); }
+:root { caret-color: var(--accent); accent-color: var(--accent); scrollbar-color: var(--label-3) transparent; }
+a { color: var(--accent-text); text-underline-offset: .18em; text-decoration-thickness: 1px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num, [data-num] { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+/* ---------- B Liquid Glass (navigation and overlays only) ---------- */
+.glass {
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-specular), var(--shadow-2);
+  color: var(--glass-label);
+}
+.glass-thick {
+  background: var(--glass-tint-thick);
+  -webkit-backdrop-filter: blur(var(--glass-blur-thick)) saturate(var(--glass-saturation));
+  backdrop-filter: blur(var(--glass-blur-thick)) saturate(var(--glass-saturation));
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-specular), var(--shadow-3);
+  color: var(--glass-label);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass, .glass-thick { background: var(--glass-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .glass-thick { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  :root { --label-2: var(--label); --separator: var(--control-border); }
+  .glass, .glass-thick { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; border-color: var(--control-border); }
+}
+@media (forced-colors: active) {
+  .glass, .glass-thick { background: Canvas; color: CanvasText; border: 1px solid CanvasText; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  :focus-visible { outline: 2px solid Highlight; }
+}
+
+/* ---------- C motion: press feedback and reduced motion ---------- */
+.pressable { transition: transform var(--dur-medium) var(--ease-spring); }
+.pressable:active { transform: scale(var(--press-scale)); transition: transform var(--dur-micro) var(--ease-out); }
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-medium: var(--dur-short); --ease-spring: var(--ease-out); }
+  .pressable, .pressable:active { transform: none; transition: none; }
+  * { scroll-behavior: auto !important; }
+}
