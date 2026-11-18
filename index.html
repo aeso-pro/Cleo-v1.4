@@ -50,7 +50,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cleo POS</title>
 <meta name="description" content="Cleo POS: Terminal, Owner Dashboard and Back Office for Philippine businesses.">
-<meta name="theme-color" content="#0d0d0e">
+<meta name="theme-color" content="#161618">
 <!-- ASSET: favicon, home-screen icon and install manifest -->
 <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/cleo-icon-32.png">
 <link rel="icon" type="image/svg+xml" href="assets/brand/cleo-emblem.svg">
@@ -496,14 +496,14 @@ button.chip:active { transform: scale(.96); }
    it; the step underneath crossfades. Later waits draw the app as skeleton blocks instead. */
 .boot { display: grid; place-items: center; position: relative; overflow: hidden; min-height: 100dvh; }
 .boot-center { display: grid; justify-items: center; gap: 18px; translate: 0 -4vh; }
-.boot-stage { position: relative; width: 200px; height: 150px; display: grid; place-items: center; }
-.boot-emblem { width: 76px; height: auto; fill: var(--accent); filter: drop-shadow(0 14px 22px rgb(150 0 0 / .22)); animation: boot-emblem-in 760ms var(--ease-spring) both; }
+.boot-stage { position: relative; width: 230px; height: 176px; display: grid; place-items: center; }
+.boot-emblem { width: 92px; height: auto; fill: var(--accent); filter: drop-shadow(0 14px 22px rgb(150 0 0 / .22)); animation: boot-emblem-in 760ms var(--ease-spring) both; }
 .boot-pane { position: absolute; --lg-tint: rgb(255 255 255 / .10); --lg-blur: 1px; box-shadow: 0 18px 34px -14px rgb(0 0 0 / .32); animation: boot-rise 600ms var(--ease-out) both; }
 :root[data-theme="dark"] .boot-pane { --lg-tint: rgb(255 255 255 / .05); }
 .boot-pane.p1 { width: 78px; height: 78px; border-radius: 50%; left: 18px; top: 10px; animation: boot-rise 600ms var(--ease-out) 260ms both, float-a 6.4s var(--ease-in-out) 860ms infinite; }
 .boot-pane.p2 { width: 92px; height: 34px; border-radius: 999px; right: 6px; top: 70px; animation: boot-rise 600ms var(--ease-out) 380ms both, float-b 7.6s var(--ease-in-out) 980ms infinite; }
 .boot-pane.p3 { width: 42px; height: 42px; border-radius: 14px; left: 64px; bottom: 4px; animation: boot-rise 600ms var(--ease-out) 500ms both, float-c 5.8s var(--ease-in-out) 1100ms infinite; }
-.boot-word { display: block; height: 28px; aspect-ratio: 1890 / 746; background: var(--label); -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat;
+.boot-word { display: block; height: 34px; aspect-ratio: 1890 / 746; background: var(--label); -webkit-mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat; mask: url("assets/brand/cleo-wordmark.svg") center / contain no-repeat;
   animation: boot-rise 520ms var(--ease-out) 220ms both; }
 @keyframes float-a { 0%, 100% { translate: 0 0; } 50% { translate: 44px 16px; } }
 @keyframes float-b { 0%, 100% { translate: 0 0; } 50% { translate: -52px -10px; } }
@@ -555,12 +555,13 @@ button.chip:active { transform: scale(.96); }
 :root[data-theme="dark"] .login-art { --lens-tint: rgb(255 255 255 / .05); }
 .login-lens { --lg-blur: 1.5px; }
 .login-scene { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; animation: orb-in 640ms var(--ease-out) both; }
-.login-emblem { position: relative; width: clamp(150px, 15vw, 230px); height: auto; filter: drop-shadow(0 18px 30px rgb(150 0 0 / .25)); }
+.login-emblem { position: relative; width: clamp(176px, 18vw, 270px); height: auto; filter: drop-shadow(0 18px 30px rgb(150 0 0 / .25)); }
 .login-lens { position: absolute; left: 0; top: 0; touch-action: none; cursor: grab; will-change: transform;
   box-shadow: 0 30px 60px -20px rgb(0 0 0 / .35), 0 6px 16px -6px rgb(0 0 0 / .18); transition: scale var(--dur-short) var(--ease-spring); }
 .login-lens.is-held { cursor: grabbing; scale: 1.04; }
 .lens-round { width: clamp(180px, 22vw, 280px); aspect-ratio: 1; border-radius: 50%; }
 .lens-pill { width: clamp(180px, 18vw, 250px); height: 76px; border-radius: 999px; }
+.lens-rect { width: clamp(170px, 15vw, 220px); aspect-ratio: 3 / 2; border-radius: var(--r-lg); }
 @keyframes orb-in { from { opacity: 0; scale: .96; } to { opacity: 1; scale: 1; } }
 /* the card rises in once; its fields follow a beat apart */
 .login-card { animation: card-in 420ms var(--ease-out) both; }
@@ -580,7 +581,7 @@ button.chip:active { transform: scale(.96); }
   .login-scene, .login-card, .login-card .step form > * { animation: none !important; translate: none !important; }
 }
 .login-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-.login-meta .lockup { --mark: 36px; }
+.login-meta .lockup { --mark: 42px; }
 .shake { animation: shake 420ms var(--ease-out); }
 @keyframes shake { 15% { transform: translateX(-9px); } 35% { transform: translateX(7px); } 55% { transform: translateX(-4px); } 75% { transform: translateX(2px); } }
 
@@ -3118,7 +3119,7 @@ const Cleo = (() => {
   /* ---------- theme ----------
      The first visit follows the device's light or dark setting; after that the person's own
      choice (the theme button) is remembered on this device. */
-  const paintMeta = (t) => document.querySelector('meta[name="theme-color"]')?.setAttribute('content', t === 'light' ? '#f3f3f4' : '#0d0d0e');
+  const paintMeta = (t) => document.querySelector('meta[name="theme-color"]')?.setAttribute('content', t === 'light' ? '#f2f2f7' : '#161618');
   const theme = {
     get() { return document.documentElement.dataset.theme || 'dark'; },
     init() {
@@ -3967,18 +3968,21 @@ const Cleo = (() => {
     const lenses = [
       el('<div class="login-lens lens-round" role="presentation"></div>'),
       el('<div class="login-lens lens-pill" role="presentation"></div>'),
+      el('<div class="login-lens lens-rect" role="presentation"></div>'),
     ];
     area.replaceChildren(scene, ...lenses);
     // strong refraction: the whole lens bends what is behind it, like a thick piece of glass
     requestAnimationFrame(() => {
       LiquidGlass.attach(lenses[0], { bezel: 92, scale: 150, tint: 'var(--lens-tint)' });
       LiquidGlass.attach(lenses[1], { bezel: 46, scale: 96, tint: 'var(--lens-tint)' });
+      LiquidGlass.attach(lenses[2], { bezel: 34, scale: 84, tint: 'var(--lens-tint)' });
     });
     const still = reduced();
     // each lens: a resting place (fraction of the area), a slow drift around it, and drag with momentum
     const state = [
       { rx: 0.58, ry: 0.42, ax: 46, ay: 34, px: 11.5, py: 8.7, ph: 0.4 },
       { rx: 0.36, ry: 0.70, ax: 38, ay: 22, px: 9.3, py: 13.1, ph: 2.1 },
+      { rx: 0.76, ry: 0.74, ax: 30, ay: 28, px: 12.7, py: 10.3, ph: 4.0 },
     ].map((s) => ({ ...s, x: 0, y: 0, ox: 0, oy: 0, drag: null, vx: 0, vy: 0, glide: null }));
     let W = 0, H = 0, raf = 0, last = performance.now();
     const measure = () => { const r = area.getBoundingClientRect(); W = r.width; H = r.height; };

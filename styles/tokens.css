@@ -135,9 +135,9 @@
 /* ---------- Dark ---------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #000000;
-  --bg-elevated: #1c1c1e;
-  --bg-raised: #2c2c2e;
+  --bg: #161618;        /* dark grey, not black (owner direction, 19 Nov) */
+  --bg-elevated: #232326;
+  --bg-raised: #2e2e32;
   --fill: rgb(120 120 128 / .24);
   --fill-strong: rgb(120 120 128 / .36);
   --label: #f5f5f7;
@@ -171,7 +171,7 @@
   --glass-depth: rgb(0 0 0 / .45);
   --glass-label: #f5f5f7;
   --glass-label-2: #d1d1d6;
-  --glass-solid: #1c1c1e;
+  --glass-solid: #232326;
   --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / .10), rgb(255 255 255 / .03) 38%, rgb(255 255 255 / 0) 62%);
   --wallpaper: radial-gradient(70% 42% at 50% -8%, rgb(212 0 0 / .30), rgb(212 0 0 / .08) 45%, transparent 75%);
   --scrim: rgb(0 0 0 / .48);
@@ -183,7 +183,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #000000; --bg-elevated: #1c1c1e; --bg-raised: #2c2c2e;
+    --bg: #161618; --bg-elevated: #232326; --bg-raised: #2e2e32;
     --fill: rgb(120 120 128 / .24); --fill-strong: rgb(120 120 128 / .36);
     --label: #f5f5f7; --label-2: #a1a1a6; --label-3: #8e8e93;
     --separator: rgb(84 84 88 / .55); --control-border: #7c7c80;
@@ -199,7 +199,7 @@
     --glass-tint: rgb(36 36 40 / .62); --glass-tint-thick: rgb(30 30 34 / .74); --glass-saturation: 160%;
     --glass-border: rgb(255 255 255 / .10); --glass-specular: rgb(255 255 255 / .14);
     --glass-edge: rgb(255 255 255 / .12); --glass-rim-light: rgb(255 255 255 / .42); --glass-rim-catch: rgb(255 255 255 / .16); --glass-depth: rgb(0 0 0 / .45);
-    --glass-label: #f5f5f7; --glass-label-2: #d1d1d6; --glass-solid: #1c1c1e;
+    --glass-label: #f5f5f7; --glass-label-2: #d1d1d6; --glass-solid: #232326;
     --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / .10), rgb(255 255 255 / .03) 38%, rgb(255 255 255 / 0) 62%);
     --wallpaper: radial-gradient(70% 42% at 50% -8%, rgb(212 0 0 / .30), rgb(212 0 0 / .08) 45%, transparent 75%);
     --scrim: rgb(0 0 0 / .48);

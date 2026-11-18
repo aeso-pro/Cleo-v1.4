@@ -56,9 +56,9 @@ One accent (Cleo red), neutral greys, four semantic colours. Light and dark are 
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--bg` | `#f2f2f7` | `#000000` | Grouped background (page, behind cards) |
-| `--bg-elevated` | `#ffffff` | `#1c1c1e` | Cards, solid content surfaces, sheets' content |
-| `--bg-raised` | `#ffffff` | `#2c2c2e` | Popovers, menus (solid fallback), alerts |
+| `--bg` | `#f2f2f7` | `#161618` (dark grey, not black — owner, 19 Nov) | Grouped background (page, behind cards) |
+| `--bg-elevated` | `#ffffff` | `#232326` | Cards, solid content surfaces, sheets' content |
+| `--bg-raised` | `#ffffff` | `#2e2e32` | Popovers, menus (solid fallback), alerts |
 | `--fill` | `rgb(120 120 128 / .12)` | `rgb(120 120 128 / .24)` | Segmented track, search field, quiet button |
 | `--fill-strong` | `rgb(120 120 128 / .20)` | `rgb(120 120 128 / .36)` | Pressed quiet button, switch off track |
 | `--label` | `#1d1d1f` | `#f5f5f7` | Primary text and icons |
@@ -95,12 +95,12 @@ Status is never colour alone: every status pairs colour with an icon or a word (
 
 | Pair | Light | Dark | Needs |
 |---|---|---|---|
-| `--label` on `--bg` / `--bg-elevated` / `--bg-raised` | 15.08 / 16.83 / 16.83 | 19.29 / 15.63 / 12.80 | 4.5 |
-| `--label-2` on `--bg` / `--bg-elevated` / `--bg-raised` | 4.54 / 5.07 / 5.07 | 8.16 / 6.61 / 5.42 | 4.5 |
-| `--accent-text` on `--bg` / `--bg-elevated` / `--bg-raised` | 4.95 / 5.53 / 5.53 | 7.53 / 6.10 / 5.00 | 4.5 |
+| `--label` on `--bg` / `--bg-elevated` / `--bg-raised` | 15.08 / 16.83 / 16.83 | 16.60 / 14.39 / 12.42 | 4.5 |
+| `--label-2` on `--bg` / `--bg-elevated` / `--bg-raised` | 4.54 / 5.07 / 5.07 | 7.03 / 6.09 / 5.26 | 4.5 |
+| `--accent-text` on `--bg` / `--bg-elevated` / `--bg-raised` | 4.95 / 5.53 / 5.53 | 6.48 / 5.62 / 4.85 | 4.5 |
 | `--on-accent` on `--accent` / hover / pressed | 5.53 / 6.75 / 8.42 | 5.53 / — / — | 4.5 |
 | `--accent` as a UI boundary on `--bg-elevated` | 5.53 | 3.08 | 3.0 |
-| `--control-border` on `--bg` / `--bg-elevated` / `--bg-raised` | 3.25 / 3.62 / 3.62 | 5.05 / 4.09 / 3.35 | 3.0 |
+| `--control-border` on `--bg` / `--bg-elevated` / `--bg-raised` | 3.25 / 3.62 / 3.62 | 4.35 / 3.77 / 3.25 | 3.0 |
 | `--success` / `--warning` / `--destructive` / `--info` text on `--bg-elevated` | 6.36 / 6.43 / 6.59 / 5.77 | 8.42 / 8.28 / ≥ 4.9 / 6.01 | 4.5 |
 | `--switch-on` vs `--bg-elevated` | 4.40 | 8.42 | 3.0 |
 | White check on success badge fill `#1f7a35` | 5.39 | 5.39 | 3.0 |
