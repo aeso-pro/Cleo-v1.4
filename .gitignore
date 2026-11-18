@@ -10,3 +10,6 @@ apps/desktop/dist/
 apps/android/www/
 apps/android/android/
 apps/android/*.apk
+
+# Local-only security findings (the repo and its GitHub Pages site are public)
+/Docs/private/
