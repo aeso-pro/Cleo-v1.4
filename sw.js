@@ -9,7 +9,7 @@
    BACKEND: never cache API responses here; the terminal's offline sales
    queue belongs in IndexedDB, uploaded by the app when the connection returns.
    ===================================================================== */
-const CACHE = 'cleo-9f5ccf584b';
+const CACHE = 'cleo-3cfa252738';
 const FILES = [
   "landing.html",
   "index.html",
