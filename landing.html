@@ -1442,6 +1442,7 @@ main { overflow-x: clip; }
   const dpr = Math.min(2, devicePixelRatio || 1);
   S = Math.max(1, Math.round(CELL * dpr) / CELL);
   W = zone.clientWidth; H = zone.clientHeight; cols = Math.ceil(W / CELL); rows = Math.ceil(H / CELL);
+  if (!cols || !rows) { img = null; return; }   // not laid out yet (a background tab); the ResizeObserver sizes it later
   canvas.width = Math.round(cols * CELL * S); canvas.height = Math.round(rows * CELL * S);
   canvas.style.width = cols * CELL + 'px'; canvas.style.height = rows * CELL + 'px';
   field.width = cols; field.height = rows; img = fctx.createImageData(cols, rows); direct = new Float32Array(cols * rows);
