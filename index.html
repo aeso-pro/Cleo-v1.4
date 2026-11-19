@@ -794,6 +794,12 @@ a.plan-tab:active { transform: scale(.98); }
 /* ---------- Plan logo (Cleo.planLogo): the plan's tree as a plain line drawing in ink ---------- */
 .plan-mark { --pm-size: 56px; flex: none; display: inline-grid; place-items: center; width: var(--pm-size); height: var(--pm-size); color: var(--ink); }
 .plan-mark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* refined (owner, 19 Nov): finer strokes and smaller nodes, so the trees sit with the rest of the line work */
+.plan-mark g[fill="none"] { stroke-width: 1.5; }
+.plan-mark g[fill="none"] circle { stroke-width: 1; }
+.plan-mark g[fill="none"] path[stroke-width="4.2"] { stroke-width: 2.6; }
+.plan-mark g[fill="currentColor"] circle { r: 1.8px; }
+.plan-opt .plan-mark { box-shadow: inset 0 0 0 1px var(--separator); border-radius: 16px; }
 
 /* ---------- Plan cards (Cleo.planCard): the plan page and Owner Dashboard › Plan and billing ----------
    Seven rows that line up across the cards (subgrid): logo, name and tagline, price, status, action, the
