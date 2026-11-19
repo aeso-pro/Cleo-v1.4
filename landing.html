@@ -472,29 +472,47 @@ dialog[open] { animation: dlg-in var(--dur-medium) var(--ease-out); }
 
 /* ---------- v6: the original page's bottom (closing and footer) inside the lit box grid ---------- */
 .gridzone .closing { display: block; border-top: 0; text-align: center; padding-block: clamp(110px, 15vh, 170px) clamp(96px, 12vh, 140px); }
-.gridzone .closing-slot { width: 324px; height: 432px; max-width: 100%; margin: 0 auto 46px; display: grid; place-items: center; }
+.gridzone .closing-slot { width: var(--mark-w, 324px); height: var(--mark-h, 432px); max-width: 100%; margin: 0 auto 46px; display: grid; place-items: center; }
 .gridzone .closing-slot img { width: 60%; height: auto; transition: opacity .6s var(--ease-out); }
-.gridzone:has(> .grid-bg) .closing-slot img { opacity: 0; }
+.gridzone.mark-on .closing-slot img { opacity: 0; }
 .gridzone .closing h2 { font: 300 clamp(46px, 5.6vw, 84px) / 1 var(--font); letter-spacing: -.04em; max-width: none; }
 .gridzone .closing p { font-size: 18px; color: var(--label-2); margin-top: 22px; }
 .gridzone .closing .btn { margin-top: 34px; min-height: 54px; padding-inline: 30px; }
-.gridzone .footer .wrap { display: block; padding-block: 40px 30px; }
-.footer-top { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.footer-top .brand { gap: 4px; }
-.footer-top .brand img { width: 23px; height: 31px; }
-.footer-top .brand .pos { font-size: 11px; letter-spacing: .06em; color: var(--label-2); border-left: 1px solid var(--line); margin-left: 6px; padding-left: 10px; }
-.footer-top .aeso { margin-top: 0; }
-.footer-links { display: flex; gap: 26px; font-size: 13px; }
-.footer-links a { color: var(--label-2); transition: color var(--dur-short) ease; }
-@media (hover: hover) { .footer-links a:hover { color: var(--label); } }
-.footer-bottom { display: flex; justify-content: space-between; gap: 24px; margin-top: 30px; font-size: 12px; color: var(--label-2); }
-.gridzone .closing p, .gridzone .footer-bottom { text-shadow: 0 0 14px var(--bg), 0 0 3px var(--bg); }
+.gridzone .closing p { text-shadow: 0 0 14px var(--bg), 0 0 3px var(--bg); }
 @media (max-width: 899px) {
-  .gridzone .closing-slot { width: 240px; height: 320px; margin-bottom: 36px; }
+  .gridzone .closing-slot { margin-bottom: 36px; }
   .gridzone .closing h2 { font-size: 44px; }
   .gridzone .closing p { font-size: 16px; }
-  .footer-top, .footer-bottom { flex-direction: column; align-items: flex-start; gap: 18px; }
-  .footer-links { flex-wrap: wrap; gap: 18px; }
+}
+
+/* ---------- v7: the last page on the original grid, and the column footer ---------- */
+.gridzone { --amb-1: rgb(212 0 0 / .55); --amb-2: rgb(122 6 16 / .65); --amb-3: rgb(255 112 52 / .2); --amb-4: rgb(54 62 84 / .45);
+  --grid-ghost: var(--label); --grid-accent: #d40000; --grid-hot: #ff6a52; --grid-haze: .34; }
+:root[data-theme="light"] .gridzone, :root:not([data-theme]) .gridzone { --amb-1: rgb(212 0 0 / .42); --amb-2: rgb(160 20 30 / .4); --amb-3: rgb(255 112 52 / .22); --amb-4: rgb(90 100 130 / .3); --grid-haze: .22; }
+/* the fading gradient: the wine glow of the original ground, settling into the bottom corner (dark only) */
+:root[data-theme="dark"] .gridzone { background: radial-gradient(45% 45% at 100% 100%, rgb(122 6 16 / .18), transparent 70%), radial-gradient(60% 40% at 50% 38%, rgb(212 0 0 / .07), transparent 70%); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .gridzone { --amb-1: rgb(212 0 0 / .55); --amb-2: rgb(122 6 16 / .65); --amb-3: rgb(255 112 52 / .2); --amb-4: rgb(54 62 84 / .45); --grid-haze: .34;
+    background: radial-gradient(45% 45% at 100% 100%, rgb(122 6 16 / .18), transparent 70%), radial-gradient(60% 40% at 50% 38%, rgb(212 0 0 / .07), transparent 70%); }
+}
+.gridzone .footer { border-top: 0; }
+.gridzone .footer .wrap { display: block; padding-block: 56px 40px; }
+.foot-cols { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 40px 32px; align-items: start; }
+.foot-logo { display: inline-flex; width: max-content; color: var(--label); }
+.foot-logo img { width: 18px; height: 24px; }
+.foot-cols h2 { font: 500 .875rem / 1.4 var(--font); letter-spacing: -.005em; color: var(--label); margin: 0 0 22px; }
+.foot-cols ul { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.foot-cols ul a, .foot-cols ul button { font: 400 .875rem / 1.4 var(--font); color: var(--label-2); text-decoration: none; background: none; border: 0; padding: 0; cursor: pointer; transition: color var(--dur-short) ease; }
+@media (hover: hover) { .foot-cols ul a:hover, .foot-cols ul button:hover, .foot-legal a:hover { color: var(--label); } }
+.foot-cols ul a:focus-visible, .foot-cols ul button:focus-visible, .foot-legal a:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; border-radius: 4px; }
+.foot-legal { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 88px; padding-left: calc((100% - 4 * 32px) / 5 + 32px); font-size: .8125rem; color: var(--label-3, var(--label-2)); }
+.foot-legal a { color: inherit; text-decoration: none; transition: color var(--dur-short) ease; }
+.foot-legal .aeso { margin: 0 0 0 auto; font-size: 14px; color: var(--label-2); }
+.gridzone .footer a, .gridzone .footer button, .gridzone .footer h2, .foot-legal { text-shadow: 0 0 14px var(--bg), 0 0 3px var(--bg); }
+@media (max-width: 899px) {
+  .foot-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 24px; }
+  .foot-logo { grid-column: 1 / -1; }
+  .foot-legal { padding-left: 0; margin-top: 56px; gap: 14px 20px; }
 }
 </style>
 </head>
@@ -739,8 +757,14 @@ dialog[open] { animation: dlg-in var(--dur-medium) var(--ease-out); }
  </section>
 <footer class="footer">
  <div class="wrap">
-  <div class="footer-top"><a href="#main" class="brand" aria-label="Cleo POS, back to top"><img src="assets/brand/cleo-emblem.svg" alt="" width="23" height="31"><span class="word" aria-hidden="true"></span><span class="pos" aria-hidden="true">POS</span></a><div class="footer-links"><a href="#terminal">Product</a><a href="#pricing">Pricing</a><a href="#download">Download</a><a href="index.html?demo#/">Demo</a><a href="legal/privacy.html">Privacy</a><a href="legal/terms.html">Terms</a></div><span class="aeso" role="img" aria-label="Aeso"><span class="mark" aria-hidden="true"></span><span aria-hidden="true">Aeso</span></span></div>
-  <div class="footer-bottom"><span>© 2026 Aeso Technologies. Cleo POS.</span><span>Thoughtfully made for the everyday business.</span></div>
+  <nav class="foot-cols" aria-label="Site">
+   <a href="#main" class="foot-logo" aria-label="Cleo POS, back to top"><img src="assets/brand/cleo-emblem.svg" alt="" width="18" height="24"></a>
+   <div><h2>Product</h2><ul><li><a href="#terminal">Terminal</a></li><li><a href="#owner">Owner Dashboard</a></li><li><a href="#backoffice">Back Office</a></li><li><a href="#local">Offline selling</a></li><li><a href="#pricing">Pricing</a></li></ul></div>
+   <div><h2>Get Cleo</h2><ul><li><a href="index.html#/setup">Get started</a></li><li><a href="index.html?demo#/">Try the demo</a></li><li><a href="index.html#/">Sign in</a></li><li><a href="index.html#/plans/enterprise">Enterprise</a></li></ul></div>
+   <div><h2>Download</h2><ul><li><a href="https://github.com/aeso-pro/Cleo-v1.4/releases/latest/download/Cleo-Setup.exe">Windows</a></li><li><a href="https://github.com/aeso-pro/Cleo-v1.4/releases/latest/download/Cleo.apk">Android</a></li><li><a href="https://github.com/aeso-pro/Cleo-v1.4/releases">All releases</a></li></ul></div>
+   <div><h2>Help</h2><ul><li><a href="#questions">Questions</a></li><li><button type="button" data-open-comparison>Compare plans</button></li></ul></div>
+  </nav>
+  <div class="foot-legal"><a href="legal/privacy.html">Privacy</a><a href="legal/terms.html">Terms</a><span>© 2026 Aeso Technologies</span><span class="aeso" role="img" aria-label="Aeso"><span class="mark" aria-hidden="true"></span><span aria-hidden="true">Aeso</span></span></div>
  </div>
 </footer>
 </div>
@@ -1110,6 +1134,7 @@ dialog[open] { animation: dlg-in var(--dur-medium) var(--ease-out); }
  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
  /* ---------- detail cards: a small parallax ---------- */
+ $$('[data-open-comparison]').forEach((b) => b.addEventListener('click', () => $('#comparison-open')?.click()));
  const floats = $$('.float');
  const shots = $$('.ws-shot');
  if ('IntersectionObserver' in window) {
@@ -1122,93 +1147,233 @@ dialog[open] { animation: dlg-in var(--dur-medium) var(--ease-out); }
   addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(move); }, { passive: true }); move();
  }
 
- /* ---------- the lit box grid ---------- */
+ /* ---------- the last page: the original lit box grid ----------
+    Ported from the original landing (Docs/design/GRIDBOX_REMOVAL.md keeps the history): 18px rounded boxes
+    lit by four drifting lights in the ambient colours, a shimmer per box, a breathing unlit grid, a pointer
+    light, organic ripples on a tap, the Cleo mark lit box by box when the closing arrives, and a three-strand
+    wave through the footer. The field fades in from the top of the closing. Drawn about 30 fps, only while
+    the zone is on screen; one still frame under reduced motion. */
  const zone = $('[data-grid]');
  if (!zone || matchMedia('(prefers-reduced-transparency: reduce)').matches) return;
- const canvas = document.createElement('canvas'); canvas.className = 'grid-bg'; canvas.setAttribute('aria-hidden', 'true'); zone.prepend(canvas);
- const ctx = canvas.getContext('2d');
- const CELL = 18, BOX = 13, RAD = 3.5, OFF = (CELL - BOX) / 2;
- const emblemImg = new Image(); emblemImg.src = 'assets/brand/cleo-emblem.svg';
- let W = 0, H = 0, dpr = 1, cols = 0, rows = 0, dark = true, base = null, sprites = {}, mark = null, footTop = Infinity;
- const pointer = { x: -1e4, y: -1e4, a: 0, target: 0 }, ripples = [];
- const scheme = matchMedia('(prefers-color-scheme: dark)');
- const sprite = (color) => {
-  const s = document.createElement('canvas'), n = Math.ceil(BOX * dpr); s.width = s.height = n;
-  const c = s.getContext('2d'); c.fillStyle = color; c.beginPath(); c.roundRect(0, 0, n, n, RAD * dpr); c.fill(); return s;
- };
- function sampleMark() {
-  const slot = $('[data-mark-slot]', zone); if (!slot || !emblemImg.complete || !emblemImg.naturalWidth) return;
-  const zr = zone.getBoundingClientRect(), sr = slot.getBoundingClientRect();
-  const mrows = Math.max(8, Math.round(sr.height / CELL)), mcols = Math.max(6, Math.round(mrows * 980.27 / 1330.77));
-  const c0 = Math.round((sr.left - zr.left + sr.width / 2) / CELL - mcols / 2), r0 = Math.round((sr.top - zr.top) / CELL);
-  const off = document.createElement('canvas'); off.width = mcols; off.height = mrows;
-  const o = off.getContext('2d'); o.drawImage(emblemImg, 0, 0, mcols, mrows);
-  let d; try { d = o.getImageData(0, 0, mcols, mrows).data; } catch { return; }
-  const a = new Float32Array(mcols * mrows); for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3] / 255;
-  mark = { c0, r0, mcols, mrows, a, born: performance.now() };
+ const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); if (!ctx) return;
+ canvas.className = 'grid-bg'; canvas.setAttribute('aria-hidden', 'true'); zone.prepend(canvas);
+ const fine = matchMedia('(hover: hover) and (pointer: fine)'), scheme = matchMedia('(prefers-color-scheme: dark)');
+ const clamp = (n, a, b) => Math.max(a, Math.min(b, n)), smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+ const CELL = 18, GAP = 5, RAD = 3.5;
+
+ /* ripples: organic wavefronts (the app's Ripple) */
+ const Ripple = (() => {
+  const TAU = Math.PI * 2, BINS = 96, rnd = Math.random;
+  const one = (x, y, t0, speed, life, band, k) => ({
+   x, y, t0, speed: speed * (.82 + rnd() * .36), life, band, k,
+   harm: [2, 3, 4, 6].map((n, i) => [n, (.05 + rnd() * .1) / (1 + i * .45), rnd() * TAU, (rnd() - .5) * 2.4]),
+   dir: rnd() * TAU, skew: .06 + rnd() * .2, lobes: 2 + Math.floor(rnd() * 3), lp: [rnd() * TAU, rnd() * TAU],
+   echo: .48 + rnd() * .2, sh: new Float32Array(BINS), pa: new Float32Array(BINS),
+  });
+  function make(x, y, t0, { speed = 620, life = 1.9, band = 20, splash = true } = {}) {
+   const out = [one(x, y, t0, speed, life, band, 1)];
+   if (splash && rnd() < .75) for (let i = 0, n = 1 + Math.floor(rnd() * 3); i < n; i++) {
+    const a = rnd() * TAU, d = band * (2.5 + rnd() * 5);
+    out.push(one(x + Math.cos(a) * d, y + Math.sin(a) * d, t0 + .1 + rnd() * .35, speed * (.4 + rnd() * .3), life * (.5 + rnd() * .2), band * .7, .5 + rnd() * .25));
+   }
+   return out;
+  }
+  function prepare(r, t) {
+   const age = t - r.t0; r.age = age;
+   if (age <= 0 || age >= r.life) return false;
+   let hi = 0, lo = 9;
+   for (let b = 0; b < BINS; b++) {
+    const th = (b / BINS) * TAU - Math.PI;
+    let s = 1 + r.skew * Math.cos(th - r.dir);
+    for (const [n, a, p, w] of r.harm) s += a * Math.sin(n * th + p + w * age);
+    r.sh[b] = s; if (s > hi) hi = s; if (s < lo) lo = s;
+    r.pa[b] = .3 + .7 * (.5 + .5 * Math.sin(r.lobes * th + r.lp[0] + age * 1.4)) * (.6 + .4 * Math.sin((r.lobes + 3) * th + r.lp[1] - age * .9));
+   }
+   r.reach = r.speed * age; r.sig = r.band * (1 + age * .35); r.fade = (1 - age / r.life) ** 1.5 * r.k;
+   r.max = r.reach * hi + r.sig * 3; r.min = Math.max(0, r.reach * lo * Math.min(r.echo, .45) - r.sig * 3);
+   return true;
+  }
+  function at(r, dx, dy, ph = 0) {
+   let dist = Math.hypot(dx, dy);
+   if (dist > r.max || dist < r.min) return 0;
+   dist += Math.sin(ph * 3.7) * r.band * .35;
+   const f = ((Math.atan2(dy, dx) + Math.PI) / TAU) * BINS, i0 = Math.floor(f) % BINS, i1 = (i0 + 1) % BINS, u = f - Math.floor(f);
+   const R = r.reach * (r.sh[i0] + (r.sh[i1] - r.sh[i0]) * u), pa = r.pa[i0] + (r.pa[i1] - r.pa[i0]) * u, s2 = 2 * r.sig * r.sig;
+   let v = Math.exp(-((dist - R) ** 2) / s2) + .38 * Math.exp(-((dist - R * r.echo) ** 2) / (s2 * .7));
+   if (dist < R && dist > R * .45) v += .32 * (.5 + .5 * Math.sin(ph * 5.3 + r.age * 21)) ** 6 * ((dist - R * .45) / (R * .55));
+   return Math.min(1, v * pa * r.fade);
+  }
+  return { make, prepare, at };
+ })();
+
+ /* colours: the original ambient set; the unlit grid takes the label colour, so it works in both themes */
+ const probe = document.createElement('i');
+ const rgba = (v) => { probe.style.color = ''; probe.style.color = v; if (!probe.isConnected) zone.appendChild(probe); const m = getComputedStyle(probe).color.match(/[\d.]+/g) || [0, 0, 0, 0]; return [+m[0], +m[1], +m[2], m[3] == null ? 1 : +m[3]]; };
+ let colours = [], ghostRGB = [255, 255, 255], accent = [212, 0, 0, 1], hot = [255, 106, 82, 1], haze = .34, dark = true;
+ function readColours() {
+  const s = getComputedStyle(zone), get = (n, d) => s.getPropertyValue(n).trim() || d;
+  colours = [1, 2, 3, 4].map((i) => rgba(get(`--amb-${i}`, 'transparent')));
+  ghostRGB = rgba(get('--grid-ghost', '#fff')); accent = rgba(get('--grid-accent', '#d40000')); hot = rgba(get('--grid-hot', '#ff6a52'));
+  haze = parseFloat(get('--grid-haze', '.34')) || .34; probe.remove();
+  dark = ghostRGB[0] + ghostRGB[1] + ghostRGB[2] > 380;
  }
+ // [light gain, brightest box, unlit grid]: the original's closing levels
+ const LEVELS = { dark: [.4, .3, .03], light: [.42, .3, .05] };
+ // [colour, centre x, sway x, period x (s), centre y, sway y, period y (s), radius (share of the long side), strength]
+ const LIGHTS = [[0, .16, .16, 23, .22, .12, 29, .44, .95], [1, .84, .14, 31, .86, .12, 37, .48, 1], [2, .70, .20, 19, .3, .16, 26, .30, .9], [3, .38, .22, 34, .92, .10, 24, .42, .85]];
+
+ const field = document.createElement('canvas'), fctx = field.getContext('2d'), tile = document.createElement('canvas'), lightPool = [];
+ let W = 0, H = 0, S = 1, cols = 0, rows = 0, img = null, direct = null, phase = null, pattern = null, fadeEnd = 1, foot = null;
  function size() {
-  dpr = Math.min(2, devicePixelRatio || 1); dark = scheme.matches;
-  W = zone.clientWidth; H = zone.clientHeight;
-  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-  cols = Math.ceil(W / CELL) + 1; rows = Math.ceil(H / CELL) + 1;
-  sprites = { ink: sprite(dark ? '#ffffff' : '#141418'), red: sprite('#d40000'), hot: sprite('#ff6a52'), wine: sprite('#7a0610') };
-  base = document.createElement('canvas'); base.width = canvas.width; base.height = canvas.height;
-  const b = base.getContext('2d'); b.globalAlpha = dark ? .05 : .055;
-  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) b.drawImage(sprites.ink, (c * CELL + OFF) * dpr, (r * CELL + OFF) * dpr);
-  const foot = $('.footer', zone); footTop = foot ? foot.offsetTop : Infinity;
-  sampleMark();
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  S = Math.max(1, Math.round(CELL * dpr) / CELL);
+  W = zone.clientWidth; H = zone.clientHeight; cols = Math.ceil(W / CELL); rows = Math.ceil(H / CELL);
+  canvas.width = Math.round(cols * CELL * S); canvas.height = Math.round(rows * CELL * S);
+  canvas.style.width = cols * CELL + 'px'; canvas.style.height = rows * CELL + 'px';
+  field.width = cols; field.height = rows; img = fctx.createImageData(cols, rows); direct = new Float32Array(cols * rows);
+  phase = Float32Array.from({ length: cols * rows }, () => Math.random() * Math.PI * 2);
+  const c = Math.round(CELL * S), g = (GAP / 2) * S, s = c - g * 2, r = RAD * S;
+  tile.width = tile.height = c;
+  const t = tile.getContext('2d'); t.clearRect(0, 0, c, c); t.beginPath();
+  t.moveTo(g + r, g); t.arcTo(g + s, g, g + s, g + s, r); t.arcTo(g + s, g + s, g, g + s, r); t.arcTo(g, g + s, g, g, r); t.arcTo(g, g, g + s, g, r); t.closePath(); t.fillStyle = '#000'; t.fill();
+  pattern = ctx.createPattern(tile, 'repeat');
+  const closing = $('.closing', zone), f = $('.footer', zone);
+  fadeEnd = closing ? closing.offsetTop + closing.offsetHeight * .42 : H * .4;   // the fading gradient: none at the top, full by the headline
+  foot = f ? { y: f.offsetTop, h: f.offsetHeight, w: W } : null;
+  readColours();
  }
- // slow lights that drift through the grid: [colour, x, sway x, period x, y, sway y, period y, radius, strength]
- const LIGHTS = [['red', .78, .14, 23, .32, .14, 29, .34, .55], ['wine', .55, .2, 31, .72, .12, 37, .42, .5], ['hot', .9, .1, 19, .12, .1, 26, .22, .35], ['red', .2, .16, 41, .85, .08, 33, .3, .28]];
- const hash = (c, r) => { const s = Math.sin(c * 127.1 + r * 311.7) * 43758.5453; return s - Math.floor(s); };
- let visible = false, raf = 0, last = 0;
- function frame(now) {
-  raf = 0;
-  if (!visible || document.hidden) return;
-  if (now - last < 32 && !still) { raf = requestAnimationFrame(frame); return; }  // about 30 fps
-  last = now;
-  const t = still ? 12 : now / 1000;
-  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(base, 0, 0);
-  pointer.a += (pointer.target - pointer.a) * .12;
-  const lights = LIGHTS.map(([k, x, sx, px, y, sy, py, rad, s]) => ({ k, x: (x + Math.sin(t * 2 * Math.PI / px) * sx) * W, y: (y + Math.sin(t * 2 * Math.PI / py) * sy) * Math.min(H, footTop + 120), r2: (rad * Math.max(W, 700)) ** 2, s }));
-  for (let i = ripples.length - 1; i >= 0; i--) if (t - ripples[i].t0 > 1.8) ripples.splice(i, 1);
-  const gain = dark ? 1 : .8;
-  for (let r = 0; r < rows; r++) {
-   const cy = r * CELL + CELL / 2, quiet = cy > footTop ? .45 : 1;
-   for (let c = 0; c < cols; c++) {
-    const cx = c * CELL + CELL / 2;
-    let v = 0, best = 'red', bestV = 0;
-    for (const L of lights) {
-     const d2 = (cx - L.x) ** 2 + (cy - L.y) ** 2; if (d2 > L.r2 * 2.2) continue;
-     const k = Math.exp(-d2 / L.r2) * L.s; v += k; if (k > bestV) { bestV = k; best = L.k; }
+
+ /* the Cleo mark, lit box by box */
+ const slot = $('.closing-slot', zone);
+ const markCols = () => Math.round((innerWidth >= 900 ? 24 : 16) * 980.27 / 1330.77);
+ const fit = () => { if (!slot) return; slot.style.setProperty('--mark-w', markCols() * CELL + 'px'); slot.style.setProperty('--mark-h', Math.round(markCols() * 1330.77 / 980.27) * CELL + 'px'); };
+ let mark = null;
+ const emblem = new Image(); emblem.src = $('link[rel="icon"][type="image/svg+xml"]')?.href || 'assets/brand/cleo-emblem.svg';
+ const ready = (emblem.decode ? emblem.decode() : new Promise((r, j) => { emblem.onload = r; emblem.onerror = j; })).then(() => true, () => false);
+ function raster(mc) {
+  const mr = Math.round(mc * emblem.naturalHeight / emblem.naturalWidth);
+  const c = document.createElement('canvas'); c.width = mc; c.height = mr;
+  const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(emblem, 0, 0, mc, mr);
+  const a = x.getImageData(0, 0, mc, mr).data, cov = new Float32Array(mc * mr);
+  for (let i = 0; i < cov.length; i++) { const v = a[i * 4 + 3] / 255; cov[i] = v < .22 ? 0 : Math.min(1, (v - .22) / .4); }
+  const delays = new Float32Array(mc * mr);
+  for (let j = 0; j < mr; j++) for (let i = 0; i < mc; i++) delays[j * mc + i] = Math.hypot((i + .5) / mc - .5, (j + .5) / mr - .5) * .85 + Math.random() * .16;
+  return { mc, mr, cov, delays };
+ }
+ const slotCentre = () => { let x = 0, y = 0, e = slot; while (e && e !== zone) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; } return [x + slot.offsetWidth / 2, y + slot.offsetHeight / 2]; };
+
+ /* frame */
+ const ripples = [], pointer = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4, a: 0, seen: 0 };
+ let motionTime = 40, visible = false, raf = 0, last = 0;
+ function render(t, now) {
+  if (!img) return;
+  direct.fill(0);
+  const plot = (x, y, v) => { const c = (x / CELL) | 0, r = (y / CELL) | 0; if (c < 0 || c >= cols || r < 0 || r >= rows) return; const i = r * cols + c; if (v > direct[i]) direct[i] = v; };
+  const extra = [];
+  // the mark
+  if (mark) {
+   const s = now / 1000, [cx, cy] = slotCentre(), { mc, mr, cov, delays } = mark.r;
+   const c0 = Math.round(cx / CELL - mc / 2), r0 = Math.round(cy / CELL - mr / 2); let sum = 0;
+   for (let j = 0; j < mr; j++) for (let i = 0; i < mc; i++) {
+    const k = j * mc + i, c = cov[k]; if (!c) continue;
+    let v;
+    if (still) v = mark.hold;
+    else { const since = s - mark.born - delays[k]; if (since <= 0) continue; const rise = 1 - (1 - Math.min(1, since / .42)) ** 3; v = rise * (mark.hold + (1 - mark.hold) * Math.exp(-Math.max(0, since - .42) * 2.5)); }
+    v *= c; if (v < .01) continue; sum += v; plot((c0 + i + .5) * CELL, (r0 + j + .5) * CELL, v);
+   }
+   if (sum > 0) extra.push([cx, cy, (Math.max(mc, mr) * CELL * .75) ** 2, accent[0], accent[1], accent[2], Math.min(.85, (sum / (mc * mr)) * 2.4)]);
+  }
+  // the footer's three-strand wave
+  if (foot) {
+   const count = Math.ceil(foot.w / CELL), tau = Math.PI * 2, firstRow = Math.ceil(foot.y / CELL), lastRow = Math.floor((foot.y + foot.h) / CELL) - 1;
+   for (let c = 0; c < count; c++) {
+    const x = (c + .5) * CELL, u = x / foot.w, edge = Math.min(1, u * 9, (1 - u) * 9);
+    for (let band = 0; band < 3; band++) {
+     const ph = u * tau * (1.15 + band * .15) - t * .38 + band * .9;
+     const y = foot.y + foot.h * .5 + (band - 1) * CELL * 1.2 + Math.sin(ph) * CELL * 1.15;
+     const row = y / CELL - .5, base = Math.floor(row), blend = row - base;
+     const pulse = (.5 + .5 * Math.cos(u * tau - t * .6 + band * 1.1)) ** 6, strength = edge * (.13 + .48 * pulse) * (dark ? 1 : .8);
+     for (let off = -1; off <= 2; off++) { const r = base + off; if (r < firstRow || r > lastRow) continue; const dd = Math.abs(off - blend), w = Math.max(0, 1 - dd / 1.6); plot(x, (r + .5) * CELL, strength * w * w); }
     }
-    v *= .55 + .45 * Math.sin(t * 1.1 + hash(c, r) * 6.28) ** 2;          // every box on its own beat
-    if (pointer.a > .01) { const d2 = (cx - pointer.x) ** 2 + (cy - pointer.y) ** 2; v += Math.exp(-d2 / (110 * 110)) * .45 * pointer.a; }
-    for (const R of ripples) { const age = t - R.t0, rad = age * 460, d = Math.hypot(cx - R.x, cy - R.y); v += Math.exp(-((d - rad) ** 2) / (2 * 18 * 18)) * (1 - age / 1.8) * .6; }
-    v = Math.min(.5, v * quiet * gain);
-    let m = 0;
-    if (mark) { const mc = c - mark.c0, mr = r - mark.r0; if (mc >= 0 && mr >= 0 && mc < mark.mcols && mr < mark.mrows) { m = mark.a[mr * mark.mcols + mc]; if (m > .05) { const born = Math.min(1, Math.max(0, ((performance.now() - mark.born) / 1000 - (Math.abs(mc - mark.mcols / 2) + Math.abs(mr - mark.mrows / 2)) * .03) * 2.5)); m = m * (still ? 1 : born) * (.78 + .22 * Math.sin(t * 1.7 + hash(c, r) * 6.28)); } else m = 0; } }
-    if (m > .05) { ctx.globalAlpha = Math.min(1, .35 + m * .65); ctx.drawImage(m > .85 && hash(r, c) > .82 ? sprites.hot : sprites.red, (c * CELL + OFF) * dpr, (r * CELL + OFF) * dpr); continue; }
-    if (v < .02) continue;
-    ctx.globalAlpha = v; ctx.drawImage(sprites[best] || sprites.red, (c * CELL + OFF) * dpr, (r * CELL + OFF) * dpr);
    }
   }
-  ctx.globalAlpha = 1;
-  if (!still) raf = requestAnimationFrame(frame);
+  const [gain, cap, ghost] = LEVELS[dark ? 'dark' : 'light'], L = Math.max(W, Math.min(H, 1100));
+  const lights = LIGHTS.map(([ci, cx, sx, px, cy, syw, py, rr, k]) => { const c = colours[ci] || [0, 0, 0, 0]; return [(cx + sx * Math.sin((t / px) * Math.PI * 2 + ci)) * W, (cy + syw * Math.cos((t / py) * Math.PI * 2 + ci * 1.7)) * H, (rr * L) ** 2, c[0], c[1], c[2], c[3] * k * (.85 + .15 * Math.sin(t * .35 + ci))]; });
+  if (pointer.a > .01) { const c = colours[2] || [0, 0, 0, 0]; lights.push([pointer.x, pointer.y, 200 ** 2, c[0], c[1], c[2], Math.min(1, c[3] * 2.4) * pointer.a]); }
+  for (const e of extra) lights.push(e);
+  const rings = still ? [] : ripples.filter((r) => Ripple.prepare(r, t));
+  const d = img.data, nl = lights.length, nr = rings.length;
+  for (let l = 0; l < nl; l++) {
+   let pool = lightPool[l];
+   if (!pool || pool.x.length !== cols || pool.y.length !== rows) pool = lightPool[l] = { x: new Float32Array(cols), y: new Float32Array(rows) };
+   const s = lights[l], factor = -2.4 / s[2];
+   for (let c = 0; c < cols; c++) pool.x[c] = Math.exp(((c + .5) * CELL - s[0]) ** 2 * factor) * s[6];
+   for (let r = 0; r < rows; r++) pool.y[r] = Math.exp(((r + .5) * CELL - s[1]) ** 2 * factor);
+  }
+  for (let r = 0, i = 0; r < rows; r++) {
+   const py = (r + .5) * CELL, visibility = smooth(py / fadeEnd);
+   for (let c = 0; c < cols; c++, i++) {
+    const v = direct[i], o = i * 4;
+    if (visibility < .001 && v < .003) { d[o] = d[o + 1] = d[o + 2] = d[o + 3] = 0; continue; }
+    const px = (c + .5) * CELL; let R = 0, G = 0, B = 0, Wt = 0;
+    for (let l = 0; l < nl; l++) { const s = lights[l], w = lightPool[l].x[c] * lightPool[l].y[r]; if (w < .002) continue; R += s[3] * w; G += s[4] * w; B += s[5] * w; Wt += w; }
+    const ph = phase[i], tw = .82 + .18 * Math.sin(t * 1.1 + ph);
+    let cr = Wt ? R / Wt : 0, cg = Wt ? G / Wt : 0, cb = Wt ? B / Wt : 0, lit = Math.min(cap, Wt * tw * gain) * visibility;
+    for (let k = 0; k < nr; k++) {
+     const rg = rings[k], s = Ripple.at(rg, px - rg.x, py - rg.y, ph); if (s < .01) continue;
+     const a = Math.min(.55, s * .5) * Math.max(visibility, .35); if (a < .004) continue;
+     const sum = lit + a; cr = (cr * lit + accent[0] * a) / sum; cg = (cg * lit + accent[1] * a) / sum; cb = (cb * lit + accent[2] * a) / sum; lit = Math.min(.8, sum);
+    }
+    if (v > .003) { const h = clamp((v - .55) / .45, 0, 1), a = v * (.7 + .3 * tw), sum = lit + a; cr = (cr * lit + (accent[0] + (hot[0] - accent[0]) * h) * a) / sum; cg = (cg * lit + (accent[1] + (hot[1] - accent[1]) * h) * a) / sum; cb = (cb * lit + (accent[2] + (hot[2] - accent[2]) * h) * a) / sum; lit = Math.min(.95, sum); }
+    const gh = ghost * (1 + .32 * Math.sin(t * .8 + ph * 1.7)) * visibility, tot = lit + gh || 1e-9;
+    d[o] = (cr * lit + ghostRGB[0] * gh) / tot; d[o + 1] = (cg * lit + ghostRGB[1] * gh) / tot; d[o + 2] = (cb * lit + ghostRGB[2] * gh) / tot; d[o + 3] = Math.min(255, tot * 255);
+   }
+  }
+  fctx.putImageData(img, 0, 0);
+  const cw = canvas.width, ch = canvas.height;
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.clearRect(0, 0, cw, ch);
+  ctx.imageSmoothingEnabled = false; ctx.drawImage(field, 0, 0, cols, rows, 0, 0, cw, ch);
+  ctx.globalCompositeOperation = 'destination-in'; ctx.fillStyle = pattern; ctx.fillRect(0, 0, cw, ch);
+  ctx.globalCompositeOperation = 'destination-over'; ctx.globalAlpha = haze; ctx.imageSmoothingEnabled = true; ctx.drawImage(field, 0, 0, cols, rows, 0, 0, cw, ch);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
  }
- const kick = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); };
- new IntersectionObserver(([e]) => { visible = e.isIntersecting; kick(); }).observe(zone);
- new ResizeObserver(() => { size(); kick(); }).observe(zone);
- scheme.addEventListener('change', () => { size(); kick(); });
- emblemImg.addEventListener('load', () => { sampleMark(); kick(); });
- document.addEventListener('visibilitychange', kick);
- if (!still) {
-  zone.addEventListener('pointermove', (e) => { const r = zone.getBoundingClientRect(); pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top; pointer.target = e.pointerType === 'mouse' ? 1 : 0; });
-  zone.addEventListener('pointerleave', () => { pointer.target = 0; });
-  zone.addEventListener('pointerdown', (e) => { if (e.target.closest('a,button,input,label')) return; const r = zone.getBoundingClientRect(); ripples.push({ x: e.clientX - r.left, y: e.clientY - r.top, t0: performance.now() / 1000 }); if (ripples.length > 6) ripples.shift(); });
+ let urgent = true;
+ function frame(now) {
+  raf = 0;
+  if (document.hidden || !visible) return;
+  if (!urgent && last && now - last < 30) { raf = requestAnimationFrame(frame); return; }
+  urgent = false;
+  const dt = Math.min(.05, last ? (now - last) / 1000 : .016); last = now;
+  if (!still) {
+   const ease = (tau) => 1 - Math.exp(-dt / tau);
+   pointer.x += (pointer.tx - pointer.x) * ease(.12); pointer.y += (pointer.ty - pointer.y) * ease(.12);
+   pointer.a += ((now - pointer.seen < 2000 ? 1 : 0) - pointer.a) * ease(.5);
+   motionTime += dt;
+  }
+  for (let k = ripples.length - 1; k >= 0; k--) if (motionTime - ripples[k].t0 > ripples[k].life) ripples.splice(k, 1);
+  render(motionTime, now);
+  if (!still && !raf) raf = requestAnimationFrame(frame);
  }
- size();
+ const request = () => { urgent = true; if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); };
+ const pulse = (x, y) => { if (still) return; ripples.push(...Ripple.make(x, y, motionTime)); if (ripples.length > 18) ripples.splice(0, ripples.length - 18); request(); };
+ fit(); size();
+ new ResizeObserver(() => { fit(); size(); if (mark && mark.r.mc !== markCols()) mark = { ...mark, r: raster(markCols()) }; request(); }).observe(zone);
+ scheme.addEventListener('change', () => { readColours(); request(); });
+ new IntersectionObserver(([e]) => { visible = e.isIntersecting; last = 0; request(); }).observe(zone);
+ document.addEventListener('visibilitychange', () => { last = 0; request(); });
+ zone.addEventListener('pointermove', (e) => { if (still || !fine.matches) return; const b = canvas.getBoundingClientRect(); pointer.tx = e.clientX - b.left; pointer.ty = e.clientY - b.top; pointer.seen = performance.now(); if (pointer.x < -1000) { pointer.x = pointer.tx; pointer.y = pointer.ty; } }, { passive: true });
+ // a tap on the open ground sends a ripple through the boxes
+ zone.addEventListener('pointerdown', (e) => { if (e.button !== 0 || e.target.closest('a,button,input,label,summary,details,dialog,.glass')) return; const b = canvas.getBoundingClientRect(); pulse(e.clientX - b.left, e.clientY - b.top); });
+ // the mark lights when the closing arrives, then a ripple runs out from it
+ if (slot) new IntersectionObserver((entries, io) => {
+  if (!entries[0].isIntersecting || mark) return;
+  ready.then((ok) => {
+   if (!ok || mark) return;
+   try { mark = { r: raster(markCols()), born: performance.now() / 1000, hold: .78 }; } catch { return; }
+   zone.classList.add('mark-on'); io.disconnect(); request();
+   setTimeout(() => { const [x, y] = slotCentre(); pulse(x, y); }, 600);
+  });
+ }, { threshold: .35 }).observe(slot);
 })();
 </script>
 </body>
