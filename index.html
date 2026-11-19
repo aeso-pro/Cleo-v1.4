@@ -888,6 +888,23 @@ a.plan-tab:active { transform: scale(.98); }
 @media (prefers-contrast: more) {
   :root { --glass: var(--glass-solid); --glass-thick: var(--glass-solid); --glass-rim: var(--ink-3); --ink-3: var(--ink-2); }
 }
+/* Windows High Contrast (forced colours): fills, tints and box-shadow edges are dropped there, so controls,
+   panels and the current choice get real edges in system colours, and focus is always visible. */
+@media (forced-colors: active) {
+  .btn, .chip, .seg, .input, .select, .textarea, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea,
+  .bcard, .card, .glass, .glass-thick, .lg, dialog, [role="dialog"], .pm-chip { border: 1px solid CanvasText; }
+  .btn, .chip, .seg button { border-color: ButtonText; }
+  .glass, .glass-thick, .lg { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  .lg::before, .lg::after { display: none; }
+  :focus-visible, .qty-stepper input:focus-visible { outline: 2px solid Highlight !important; outline-offset: 2px; box-shadow: none; }
+  [aria-pressed="true"], [aria-selected="true"], [aria-checked="true"], [aria-current]:not([aria-current="false"]), .selected, .is-on { outline: 2px solid Highlight; outline-offset: -2px; }
+  .pin-dots i, .sdot { border: 1.5px solid CanvasText; }
+  .switch { border: 1px solid ButtonText; }
+  /* Cleo's drawn checkboxes become the system's own, which forced colours render properly */
+  .check input, input[type="checkbox"], input[type="radio"] { appearance: auto !important; -webkit-appearance: auto !important; box-shadow: none !important; }
+  /* charts keep their data colours (the series are told apart by colour and labelled in their legends) */
+  .viz, .viz-key, .hbars, [data-mix-legend] { forced-color-adjust: none; }
+}
 
 /* ---------- subscription payment methods (Cleo.billing in core.js): the plan pages, Owner Dashboard ›
    Plan and billing and the Terminal's Plan and billing. A card, or a GCash, Maya or GoTyme Bank account
