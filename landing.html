@@ -1742,7 +1742,9 @@ main { overflow-x: clip; }
   function colours() { const s = getComputedStyle(host); ink = rgb(s.color); dark = ink[0] + ink[1] + ink[2] > 380; accent = dark ? [255, 77, 64] : [212, 0, 0]; }
   function size() { dpr = Math.min(2, devicePixelRatio || 1); W = host.clientWidth; H = host.clientHeight; canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); canvas.style.width = W + 'px'; canvas.style.height = H + 'px'; colours(); }
   // where the field shows: strongest a little above the middle, fading out to every edge
-  const mask = (x, y) => { const nx = (x / W - .5) / .62, ny = (y / H - .36) / .5; const r = nx * nx + ny * ny; return r >= 1 ? 0 : (1 - r) * (1 - r); };
+  // on a phone the headline fills the width, so the field sits lower, behind the product, and stays fainter
+  const narrow = () => W < 700;
+  const mask = (x, y) => { const nx = (x / W - .5) / (narrow() ? .75 : .62), ny = (y / H - (narrow() ? .8 : .36)) / (narrow() ? .3 : .5); const r = nx * nx + ny * ny; return r >= 1 ? 0 : (1 - r) * (1 - r) * (narrow() ? .7 : 1); };
   function draw(now) {
    const t = still ? 6 : (now - t0) / 1000;
    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); ctx.lineWidth = 1;
@@ -1761,11 +1763,11 @@ main { overflow-x: clip; }
      if (p.a > .01) { const dx = x - p.x, dy = y - p.y, d2 = dx * dx + dy * dy, f = Math.exp(-d2 / (2 * 90 * 90)) * p.a; y += (dy >= 0 ? 1 : -1) * 26 * f; }
      path.push([x, y]); px = x; py = y;
      if (k % 6 === 5) {
-      const m = mask(px, py), u = px / W, hot = still ? 0 : Math.exp(-(((u - band) / .06) ** 2)) * (1 - Math.abs(py / H - .36));
-      flush(m * (dark ? .16 : .13) + hot * m * (dark ? .45 : .32), hot);
+      const m = mask(px, py), u = px / W, hot = still ? 0 : Math.exp(-(((u - band) / .06) ** 2)) * (1 - Math.abs(py / H - (narrow() ? .8 : .36)));
+      flush(m * (dark ? .16 : .1) + hot * m * (dark ? .45 : .2), hot);
      }
     }
-    flush(mask(px, py) * (dark ? .16 : .13), 0);
+    flush(mask(px, py) * (dark ? .16 : .1), 0);
    }
   }
   const frame = (now) => {
