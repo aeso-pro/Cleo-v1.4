@@ -427,7 +427,7 @@ dialog[open] { animation: dlg-in var(--dur-medium) var(--ease-out); }
 .receipt-card .foot { margin-top: 8px; text-align: center; text-transform: uppercase; opacity: .7; }
 /* payment mix: rounded bars, the same data as the screen behind it */
 .mix-card { left: -1.5%; bottom: 12%; width: clamp(230px, 22vw, 290px); padding: 18px; display: grid; gap: 12px; }
-.mix-card h4 { font: 500 .9375rem / 1.3 var(--font); }
+.mix-card h3 { font: 500 .9375rem / 1.3 var(--font); }
 .mix { display: grid; gap: 9px; }
 .mix-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: .8125rem; }
 .mix-row span:last-of-type { color: var(--label-2); font-variant-numeric: tabular-nums; }
@@ -745,8 +745,9 @@ main { overflow-x: clip; }
   </ul>
  </section>
 
- <section class="band" aria-label="Why Cleo">
+ <section class="band" aria-labelledby="why-title">
   <div class="wrap">
+   <h2 id="why-title" class="vh">Why Cleo</h2>
    <p class="statement reveal"><b>A point of sale made for the Philippines.</b> Cleo keeps the counter selling through brownouts and dead signal, prints receipts the way BIR expects, and brings every branch into one view.</p>
    <div class="figs">
     <article class="fig reveal"><p class="note">Fig. 1 · Offline</p><div class="art"><svg viewBox="0 0 300 260" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" role="img" aria-label="A terminal drawn as a stack of layers, each sale kept on the device"><g class="ly" style="--k:0" opacity="0.25"><path class="face" pathLength="1" d="M46.1 150.0 L46.1 155.0 L167.3 225.0 L167.3 220.0 Z"/><path class="face" pathLength="1" d="M167.3 220.0 L167.3 225.0 L253.9 175.0 L253.9 170.0 Z"/><path class="face top" pathLength="1" d="M132.7 100.0 L253.9 170.0 L167.3 220.0 L46.1 150.0 Z"/></g><g class="ly" style="--k:1" opacity="0.35"><path class="face" pathLength="1" d="M46.1 138.0 L46.1 143.0 L167.3 213.0 L167.3 208.0 Z"/><path class="face" pathLength="1" d="M167.3 208.0 L167.3 213.0 L253.9 163.0 L253.9 158.0 Z"/><path class="face top" pathLength="1" d="M132.7 88.0 L253.9 158.0 L167.3 208.0 L46.1 138.0 Z"/></g><g class="ly" style="--k:2" opacity="0.45"><path class="face" pathLength="1" d="M46.1 126.0 L46.1 131.0 L167.3 201.0 L167.3 196.0 Z"/><path class="face" pathLength="1" d="M167.3 196.0 L167.3 201.0 L253.9 151.0 L253.9 146.0 Z"/><path class="face top" pathLength="1" d="M132.7 76.0 L253.9 146.0 L167.3 196.0 L46.1 126.0 Z"/></g><g class="ly" style="--k:3" opacity="0.55"><path class="face" pathLength="1" d="M46.1 114.0 L46.1 119.0 L167.3 189.0 L167.3 184.0 Z"/><path class="face" pathLength="1" d="M167.3 184.0 L167.3 189.0 L253.9 139.0 L253.9 134.0 Z"/><path class="face top" pathLength="1" d="M132.7 64.0 L253.9 134.0 L167.3 184.0 L46.1 114.0 Z"/></g><g class="ly" style="--k:4" opacity="0.65"><path class="face" pathLength="1" d="M46.1 102.0 L46.1 107.0 L167.3 177.0 L167.3 172.0 Z"/><path class="face" pathLength="1" d="M167.3 172.0 L167.3 177.0 L253.9 127.0 L253.9 122.0 Z"/><path class="face top" pathLength="1" d="M132.7 52.0 L253.9 122.0 L167.3 172.0 L46.1 102.0 Z"/></g><g class="ly" style="--k:5" opacity="0.75"><path class="face" pathLength="1" d="M46.1 90.0 L46.1 95.0 L167.3 165.0 L167.3 160.0 Z"/><path class="face" pathLength="1" d="M167.3 160.0 L167.3 165.0 L253.9 115.0 L253.9 110.0 Z"/><path class="face top" pathLength="1" d="M132.7 40.0 L253.9 110.0 L167.3 160.0 L46.1 90.0 Z"/></g><g class="ly" style="--k:6" opacity="0.85"><path class="face" pathLength="1" d="M46.1 78.0 L46.1 83.0 L167.3 153.0 L167.3 148.0 Z"/><path class="face" pathLength="1" d="M167.3 148.0 L167.3 153.0 L253.9 103.0 L253.9 98.0 Z"/><path class="face top" pathLength="1" d="M132.7 28.0 L253.9 98.0 L167.3 148.0 L46.1 78.0 Z"/></g><path class="tl acc tile" pathLength="1" d="M132.7 36.0 L163.9 54.0 L130.9 73.0 L99.8 55.0 Z" opacity=".9"/><path class="tl" pathLength="1" d="M170.8 58.0 L202.0 76.0 L169.1 95.0 L137.9 77.0 Z" opacity=".9"/><path class="tl" pathLength="1" d="M208.9 80.0 L240.1 98.0 L207.2 117.0 L176.0 99.0 Z" opacity=".9"/><path class="tl" pathLength="1" d="M94.6 58.0 L125.8 76.0 L92.8 95.0 L61.7 77.0 Z" opacity=".9"/><path class="tl" pathLength="1" d="M132.7 80.0 L163.9 98.0 L130.9 117.0 L99.8 99.0 Z" opacity=".9"/><path class="tl" pathLength="1" d="M170.8 102.0 L202.0 120.0 L169.1 139.0 L137.9 121.0 Z" opacity=".9"/></svg></div><h3>The sale never waits</h3><p>Every sale is kept on the device first and syncs when the connection returns.</p></article>
@@ -832,7 +833,7 @@ main { overflow-x: clip; }
     </figure>
     <div class="float mix-card" role="group" aria-label="Payment mix today, sample data">
      <span class="note">Today · all branches</span>
-     <h4>Payment mix</h4>
+     <h3>Payment mix</h3>
      <div class="mix">
       <div class="mix-row c-cash"><span>Cash</span><span>40.5%</span><i style="--w:40.5%"></i></div>
       <div class="mix-row c-wallet"><span>E-wallet (QR Ph)</span><span>37.6%</span><i style="--w:37.6%"></i></div>
