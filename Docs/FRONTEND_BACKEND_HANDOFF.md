@@ -21,6 +21,10 @@ The README describes building from `Frontend/source/` with `node source/build.js
 
 ## Log
 
+### 2026-11-19 · Claude Code (overhaul Phase 2), `cleo-overhaul/phase-2-frontend`
+
+**Clean URLs: the website's sign-in callbacks move to `/app`.** `.htaccess` now serves `/app`, `/login`, `/signup`, `/plans`, `/privacy` and `/terms`, and 301s the old file names to them (query kept). On the website, `redirectUrl()` in the `backend/supabase.js` section now returns `…/app` (and `…/app?auth=recovery` for password resets) instead of `…/index.html`; the Windows and Android apps and GitHub Pages keep `…/index.html` because they are opened by file name. **Backend action when this branch is deployed:** add `https://<host>/app**` to Supabase › Authentication › URL Configuration and keep the `index.html**` entries until old emails expire. Full list and checks: `Docs/design/CLEAN_URLS.md`. Nothing was changed in the dashboard.
+
 ### 2026-11-18 (late night) · Claude Code (owner's laptop session), `main`
 
 **Admin Google sign-in fixed (Supabase settings).** Supabase's request log showed the cause: the admin page on GitHub Pages asked Google to return to `https://aeso-pro.github.io/Cleo-v1.4/admin/`, which wasn't an allowed redirect, so Supabase sent the result to the Site URL (`http://127.0.0.1:5500`). Live Server opened from the Downloads folder had the same problem. Redirect URLs now include `https://aeso-pro.github.io/Cleo-v1.4/**`, `http://127.0.0.1:5500/**` and `http://localhost:5500/**`; the Site URL is the GitHub Pages site. `assets/admin/admin.js` and the app's `socialAuth` refuse Google sign-in from a page opened as a file, with a message that says why. Details: `Docs/ADMIN_AND_SECURITY.md` 1.4.
