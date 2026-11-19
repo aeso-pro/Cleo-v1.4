@@ -17,7 +17,8 @@
     const callback = authKeys.some((key) => url.searchParams.has(key) || fragment.has(key));
     const operational = callback || url.hash.startsWith('#/') || url.searchParams.has('offline') || url.searchParams.has('online') || url.searchParams.has('demo');
     let file = null;
-    if (page === 'landing' && operational) file = 'index.html';
+    // the app: its clean address where the host has them (Hostinger), the file elsewhere
+    if (page === 'landing' && operational) file = /\.html$/.test(url.pathname) ? 'index.html' : 'app';
     else if (page === 'operations' && url.pathname.endsWith('/')) file = operational ? 'index.html' : 'landing.html';
     if (!file) return null;
     const next = new URL(file, url);
@@ -51,6 +52,7 @@
 <title>Cleo POS · The point of sale that keeps selling offline · Aeso</title>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/cleo-icon-32.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 980.27 1330.77' width='980.27' height='1330.77'%3E%3Cpath fill='%23d40000' d='M697.19 488.06A179.45 179.45 0 1 0 697.19 842.72A245.48 245.48 0 1 1 489.31 1085.36A179.45 179.45 0 0 0 282.68 908.03A245.48 245.48 0 1 1 282.68 422.74A179.45 179.45 0 0 0 489.31 245.42A245.48 245.48 0 1 1 697.19 488.06Z'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://cleopos.online/">
 <link rel="apple-touch-icon" href="assets/brand/cleo-touch-icon.png">
 <link rel="stylesheet" href="styles/tokens.css">
 <style>
@@ -692,14 +694,14 @@ main { overflow-x: clip; }
    <a href="#main" class="brand" aria-label="Cleo POS home"><img src="assets/brand/cleo-emblem.svg" alt="" width="16" height="22"><span class="word" aria-hidden="true"></span></a>
    <div class="nav-links"><a href="#terminal">Terminal</a><a href="#owner">Owner</a><a href="#backoffice">Back Office</a><a href="#pricing">Pricing</a><a href="#download">Download</a></div>
    <div class="nav-actions">
-    <a class="signin" href="index.html#/">Sign in</a>
-    <a class="btn red small" href="index.html#/setup">Get started</a>
+    <a class="signin" href="login">Sign in</a>
+    <a class="btn red small" href="signup">Get started</a>
     <button class="icon-btn menu-btn" id="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation"><i class="ci ci-list" aria-hidden="true"></i></button>
    </div>
   </nav>
  </div>
  <nav class="mobile-nav glass-thick" id="mobile-menu" aria-label="Mobile navigation" hidden>
-  <a href="#terminal">Terminal</a><a href="#owner">Owner Dashboard</a><a href="#backoffice">Back Office</a><a href="#pricing">Pricing</a><a href="#download">Download</a><a href="#questions">Questions</a><a href="index.html?demo#/">Try the demo</a><a href="index.html#/">Sign in</a>
+  <a href="#terminal">Terminal</a><a href="#owner">Owner Dashboard</a><a href="#backoffice">Back Office</a><a href="#pricing">Pricing</a><a href="#download">Download</a><a href="#questions">Questions</a><a href="app?demo#/">Try the demo</a><a href="login">Sign in</a>
  </nav>
 </header>
 
@@ -711,7 +713,7 @@ main { overflow-x: clip; }
    <p>For Philippine cafés, shops and service businesses. Sell at the counter, print the receipt, and see every sale, shift and branch in one place.</p>
    <a class="hero-new" href="#download"><b>New</b> Windows and Android apps <i class="ci ci-arrow-right" aria-hidden="true"></i></a>
   </div>
-  <div class="hero-actions"><a class="btn red" href="index.html#/setup">Get started</a><a class="btn line" href="index.html?demo#/">Try the demo</a></div>
+  <div class="hero-actions"><a class="btn red" href="signup">Get started</a><a class="btn line" href="app?demo#/">Try the demo</a></div>
   <div class="scene-wrap" data-lens-stage>
    <div class="scene" data-scene>
     <figure class="shot back">
@@ -774,7 +776,7 @@ main { overflow-x: clip; }
    <p class="kicker reveal"><i aria-hidden="true"></i><span>2.0</span>Terminal</p>
    <div class="ws-head reveal">
     <h2 id="t-title">Sell at<br>the counter</h2>
-    <div><p>Products, orders and checkout where the cashier needs them. Split tender, SC and PWD discounts, kitchen tickets and the shift, built for a line that won’t wait.</p><a class="arrow-link" href="index.html?demo#/terminal">Try the Terminal <i class="ci ci-arrow-right" aria-hidden="true"></i></a></div>
+    <div><p>Products, orders and checkout where the cashier needs them. Split tender, SC and PWD discounts, kitchen tickets and the shift, built for a line that won’t wait.</p><a class="arrow-link" href="app?demo#/terminal">Try the Terminal <i class="ci ci-arrow-right" aria-hidden="true"></i></a></div>
    </div>
    <div class="ws-shot reveal">
     <figure class="shot">
@@ -812,7 +814,7 @@ main { overflow-x: clip; }
    <p class="kicker reveal"><i aria-hidden="true"></i><span>3.0</span>Owner Dashboard</p>
    <div class="ws-head reveal">
     <h2 id="o-title">See the day<br>as it happens</h2>
-    <div><p>Net sales, margins, payment mix and branch ranking, live through the day. A clearer view of the business you’re building.</p><a class="arrow-link" href="index.html?demo#/owner/dashboard">Open the Owner Dashboard <i class="ci ci-arrow-right" aria-hidden="true"></i></a></div>
+    <div><p>Net sales, margins, payment mix and branch ranking, live through the day. A clearer view of the business you’re building.</p><a class="arrow-link" href="app?demo#/owner/dashboard">Open the Owner Dashboard <i class="ci ci-arrow-right" aria-hidden="true"></i></a></div>
    </div>
    <div class="ws-shot right reveal">
     <figure class="shot">
@@ -843,7 +845,7 @@ main { overflow-x: clip; }
    <p class="kicker reveal"><i aria-hidden="true"></i><span>4.0</span>Back Office</p>
    <div class="ws-head reveal">
     <h2 id="b-title">Give every<br>detail a home</h2>
-    <div><p>Catalog, stock, transfers, BIR reports and your team, each in its own place. Run the office without slowing the counter.</p><a class="arrow-link" href="index.html?demo#/backoffice/overview">Open the Back Office <i class="ci ci-arrow-right" aria-hidden="true"></i></a></div>
+    <div><p>Catalog, stock, transfers, BIR reports and your team, each in its own place. Run the office without slowing the counter.</p><a class="arrow-link" href="app?demo#/backoffice/overview">Open the Back Office <i class="ci ci-arrow-right" aria-hidden="true"></i></a></div>
    </div>
    <div class="ws-shot reveal">
     <figure class="shot">
@@ -937,7 +939,7 @@ main { overflow-x: clip; }
     <details><summary>Can I use just the Terminal?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>Yes. Free and Basic open directly into a standalone Terminal, with no mode switcher. Its staff, business settings and billing live there too. Pro and Max add the Owner Dashboard and Back Office.</p></details>
     <details><summary>How do annual payments work?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>You pay the first-terminal annual price upfront, plus 12 monthly fees for each additional terminal. Each new branch starts at its own first-terminal rate. Use the calculator above to see the total for one branch.</p></details>
     <details><summary>Can Cleo work without internet?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>The Terminal is designed for offline selling, with synchronization when the connection returns. Online payment authorization and cloud services still depend on their providers and connectivity. The interactive preview uses sample data and simulated services.</p></details>
-    <details><summary>Can I try Cleo before creating an account?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>Yes. <a class="text-link" href="index.html?demo#/">Try the demo</a> with a sample business. The demo keeps its data separate from your account and simulates sales and payments.</p></details>
+    <details><summary>Can I try Cleo before creating an account?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>Yes. <a class="text-link" href="app?demo#/">Try the demo</a> with a sample business. The demo keeps its data separate from your account and simulates sales and payments.</p></details>
     <details><summary>Is this a live payment service?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>Accounts use secure sign-in through Cleo’s cloud service. Payment checkout is still a preview: provider payments, server-side licensing and production sales services need to be connected before commercial use. No real payment is taken here.</p></details>
     <details><summary>Does Cleo claim BIR accreditation?<i class="ci ci-plus" aria-hidden="true"></i></summary><p>No accreditation claim is made here. Cleo is designed to support Philippine invoicing workflows, but BIR functionality, applicable accreditation and your tax configuration must be validated before commercial use.</p></details>
    </div>
@@ -950,18 +952,18 @@ main { overflow-x: clip; }
   <div class="closing-slot" data-mark-slot aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 980.27 1330.77' width='980.27' height='1330.77'%3E%3Cpath fill='%23d40000' d='M697.19 488.06A179.45 179.45 0 1 0 697.19 842.72A245.48 245.48 0 1 1 489.31 1085.36A179.45 179.45 0 0 0 282.68 908.03A245.48 245.48 0 1 1 282.68 422.74A179.45 179.45 0 0 0 489.31 245.42A245.48 245.48 0 1 1 697.19 488.06Z'/%3E%3C/svg%3E" alt="" width="192" height="260" loading="lazy"></div>
   <h2 id="closing-title">Here’s to what<br>you’re building.</h2>
   <p>Let Cleo take care of the counter.</p>
-  <a class="btn red" href="index.html#/setup">Make it yours<i class="ci ci-arrow-up-right" aria-hidden="true"></i></a>
+  <a class="btn red" href="signup">Make it yours<i class="ci ci-arrow-up-right" aria-hidden="true"></i></a>
  </section>
 <footer class="footer">
  <div class="wrap">
   <nav class="foot-cols" aria-label="Site">
    <a href="#main" class="foot-logo" aria-label="Cleo POS, back to top"><img src="assets/brand/cleo-emblem.svg" alt="" width="18" height="24"></a>
    <div><h2>Product</h2><ul><li><a href="#terminal">Terminal</a></li><li><a href="#owner">Owner Dashboard</a></li><li><a href="#backoffice">Back Office</a></li><li><a href="#local">Offline selling</a></li><li><a href="#pricing">Pricing</a></li></ul></div>
-   <div><h2>Get Cleo</h2><ul><li><a href="index.html#/setup">Get started</a></li><li><a href="index.html?demo#/">Try the demo</a></li><li><a href="index.html#/">Sign in</a></li><li><a href="index.html#/plans/enterprise">Enterprise</a></li></ul></div>
+   <div><h2>Get Cleo</h2><ul><li><a href="signup">Get started</a></li><li><a href="app?demo#/">Try the demo</a></li><li><a href="login">Sign in</a></li><li><a href="app#/plans/enterprise">Enterprise</a></li></ul></div>
    <div><h2>Download</h2><ul><li><a href="https://github.com/aeso-pro/Cleo-v1.4/releases/latest/download/Cleo-Setup.exe">Windows</a></li><li><a href="https://github.com/aeso-pro/Cleo-v1.4/releases/latest/download/Cleo.apk">Android</a></li><li><a href="https://github.com/aeso-pro/Cleo-v1.4/releases">All releases</a></li></ul></div>
    <div><h2>Help</h2><ul><li><a href="#questions">Questions</a></li><li><button type="button" data-open-comparison>Compare plans</button></li></ul></div>
   </nav>
-  <div class="foot-legal"><a href="legal/privacy.html">Privacy</a><a href="legal/terms.html">Terms</a><span>© 2026 Aeso Technologies</span><span class="aeso" role="img" aria-label="Aeso"><span class="mark" aria-hidden="true"></span><span aria-hidden="true">Aeso</span></span></div>
+  <div class="foot-legal"><a href="privacy">Privacy</a><a href="terms">Terms</a><span>© 2026 Aeso Technologies</span><span class="aeso" role="img" aria-label="Aeso"><span class="mark" aria-hidden="true"></span><span aria-hidden="true">Aeso</span></span></div>
  </div>
 </footer>
 </div>
@@ -1041,7 +1043,7 @@ main { overflow-x: clip; }
    <h3 id="plan-${esc(p.id)}">${esc(p.name)}</h3><p class="pc-blurb">${esc(p.blurb)}</p>
    <p class="pc-price"><b class="num" data-pm></b><span>per branch<br>a month</span></p>
    <p class="pc-bill num" data-pb></p><p class="pc-total num" data-pt hidden></p><p class="pc-extra num" data-px></p>
-   <a class="btn ${p.badge ? 'red' : 'ghost'}" data-plan="${esc(p.id)}" href="index.html#/plans/${esc(p.id)}">Choose ${esc(p.name)}</a>
+   <a class="btn ${p.badge ? 'red' : 'ghost'}" data-plan="${esc(p.id)}" href="app#/plans/${esc(p.id)}">Choose ${esc(p.name)}</a>
    ${p.summary ? `<p class="pc-sum">${esc(p.summary)}</p>` : ''}
    <p class="pc-lead">${below ? `Everything in ${esc(below.name)}, plus:` : 'Includes:'}</p>
    <ul>${p.adds.map((a) => `<li><i class="ci ci-check" aria-hidden="true"></i>${esc(a)}</li>`).join('')}</ul>
@@ -1068,10 +1070,10 @@ main { overflow-x: clip; }
  price(false);
  // Free: one terminal on one device, below the paid plans
  const free = plans.find((p) => p.price === 0);
- if (free) $('#free-plan').innerHTML = `${free.logo}<div class="free-copy"><h3>${esc(free.name)}. One counter, at no cost.</h3><p>${esc(free.summary)}</p></div><a class="btn ghost" href="index.html#/plans/${esc(free.id)}">Start free</a>`;
+ if (free) $('#free-plan').innerHTML = `${free.logo}<div class="free-copy"><h3>${esc(free.name)}. One counter, at no cost.</h3><p>${esc(free.summary)}</p></div><a class="btn ghost" href="app#/plans/${esc(free.id)}">Start free</a>`;
  else $('#free-plan').hidden = true;
  const enterprise = plans.find((p) => p.id === 'enterprise');
- if (enterprise) $('#enterprise').innerHTML = `${enterprise.logo}<div class="enterprise-copy"><h3>Enterprise. Your own way.</h3><p>Custom workflows, scope and pricing. Let’s talk about what you have in mind.</p></div><a class="btn ghost" href="index.html#/plans/enterprise">Talk to sales</a>`;
+ if (enterprise) $('#enterprise').innerHTML = `${enterprise.logo}<div class="enterprise-copy"><h3>Enterprise. Your own way.</h3><p>Custom workflows, scope and pricing. Let’s talk about what you have in mind.</p></div><a class="btn ghost" href="app#/plans/enterprise">Talk to sales</a>`;
  else $('#enterprise').hidden = true;
  $('#plans').addEventListener('click', (e) => {
   const a = e.target.closest('[data-plan]'); if (!a) return;

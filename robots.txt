@@ -1,0 +1,8 @@
+# Cleo POS. The public pages are the landing and the legal pages; the app and the admin console are not for search.
+User-agent: *
+Disallow: /app
+Disallow: /login
+Disallow: /signup
+Disallow: /plans
+Disallow: /admin/
+Sitemap: https://cleopos.online/sitemap.xml

@@ -62,14 +62,26 @@ function send(res, status, body, headers = {}) {
   res.end(body);
 }
 
+// Clean addresses, as .htaccess serves them (Docs/design/DESIGN_GUIDELINES.md §H). Only the website preview
+// turns them on: the Windows app serves the same files with their file names (its sign-in allow list names them).
+const CLEAN = { '/app': '/index.html', '/login': '/index.html', '/signup': '/index.html', '/plans': '/index.html', '/privacy': '/legal/privacy.html', '/terms': '/legal/terms.html' };
+const MOVED = { '/landing.html': '/', '/index.html': '/app', '/admin.html': '/admin/', '/legal/privacy.html': '/privacy', '/legal/terms.html': '/terms' };
+
 /** Serve one static file request. `rewrite(html, pathname)` lets a test server adjust a page as it goes out. */
-function serveStatic(req, res, { rewrite = null, headers: extra = {} } = {}) {
+function serveStatic(req, res, { rewrite = null, headers: extra = {}, cleanUrls = false } = {}) {
   if (!['GET', 'HEAD'].includes(req.method)) return send(res, 405, 'Method not allowed', { Allow: 'GET, HEAD' });
   let pathname;
   try { pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname); }
   catch { return send(res, 400, 'Bad request'); }
   if (pathname.includes('\0') || pathname.includes('\\')) return send(res, 400, 'Bad request');
   if (refused(pathname)) return send(res, 403, 'Forbidden');
+  const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+  if (cleanUrls) {
+    const slashless = pathname.length > 1 && pathname.endsWith('/') && CLEAN[pathname.slice(0, -1)] ? pathname.slice(0, -1) : null;
+    const moved = MOVED[pathname] || slashless;
+    if (moved) { res.writeHead(301, { ...securityHeaders(), Location: moved + query }); return res.end(); }
+    if (CLEAN[pathname]) pathname = CLEAN[pathname];
+  }
   // The public landing answers the bare address; index.html is the app itself.
   // A folder answers with its own index.html (/admin/), the root with the public landing.
   // A folder named without its slash is sent to it, as Apache does, so relative links resolve.
@@ -81,7 +93,11 @@ function serveStatic(req, res, { rewrite = null, headers: extra = {} } = {}) {
   const file = path.resolve(ROOT, '.' + pathname);
   if (file !== ROOT && !file.startsWith(ROOT + path.sep)) return send(res, 403, 'Forbidden');
   fs.stat(file, (error, stat) => {
-    if (error || !stat.isFile()) return send(res, 404, 'Not found');
+    if (error || !stat.isFile()) {
+      // like the website's ErrorDocument
+      if (cleanUrls && fs.existsSync(path.join(ROOT, '404.html'))) { res.writeHead(404, { ...securityHeaders(), 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-cache' }); return res.end(req.method === 'HEAD' ? undefined : fs.readFileSync(path.join(ROOT, '404.html'))); }
+      return send(res, 404, 'Not found');
+    }
     const ext = path.extname(file).toLowerCase();
     const fresh = ext === '.html' || ext === '.webmanifest' || ext === '.md' || path.basename(file) === 'sw.js';
     if (rewrite && ext === '.html') {
@@ -106,7 +122,7 @@ function serveStatic(req, res, { rewrite = null, headers: extra = {} } = {}) {
 module.exports = { ROOT, serveStatic, securityHeaders, send };
 if (require.main !== module) return;
 
-const server = http.createServer((req, res) => serveStatic(req, res));
+const server = http.createServer((req, res) => serveStatic(req, res, { cleanUrls: true }));
 
 server.on('error', (error) => {
   console.error(error.code === 'EADDRINUSE' ? `Port ${PORT} is already in use. Close the other server, or run with PORT=5176.` : error.message);
@@ -114,5 +130,5 @@ server.on('error', (error) => {
 });
 server.listen(PORT, HOST, () => {
   const shown = HOST === '127.0.0.1' || HOST === '0.0.0.0' ? 'localhost' : HOST;
-  console.log(`Cleo preview: http://${shown}:${PORT}/  (app: /index.html · admin: /admin.html)`);
+  console.log(`Cleo preview: http://${shown}:${PORT}/  (app: /app · sign-in: /login · admin: /admin/)`);
 });

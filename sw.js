@@ -9,7 +9,7 @@
    BACKEND: never cache API responses here; the terminal's offline sales
    queue belongs in IndexedDB, uploaded by the app when the connection returns.
    ===================================================================== */
-const CACHE = 'cleo-21e9c558bd';
+const CACHE = 'cleo-1982ed5aa8';
 const FILES = [
   "landing.html",
   "index.html",
@@ -46,7 +46,15 @@ const FILES = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
+  // A host with clean addresses answers index.html, landing.html and legal/*.html with a 301. A redirected
+  // response must never be stored for a page (a browser refuses to show one for a navigation), so the
+  // final copy is stored as a fresh response under the file's own name.
+  const keep = async (c, file) => {
+    const res = await fetch(file, { cache: 'reload' });
+    if (!res.ok) throw new Error(`${file}: ${res.status}`);
+    return c.put(file, res.redirected ? new Response(await res.blob(), { status: res.status, statusText: res.statusText, headers: res.headers }) : res);
+  };
+  e.waitUntil(caches.open(CACHE).then((c) => Promise.all(FILES.map((f) => keep(c, f)))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k.startsWith('cleo-') && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
@@ -74,7 +82,11 @@ self.addEventListener('fetch', (e) => {
     // response must not overwrite either explicit page in the offline cache.
     const path = new URL(req.url).pathname;
     const home = path === new URL(self.registration.scope).pathname;
-    const key = path.endsWith('/index.html') ? 'index.html' : path.endsWith('/landing.html') ? 'landing.html' : req;
+    // every address of a page shares the page's one cache entry (clean addresses included)
+    const rel = path.slice(new URL(self.registration.scope).pathname.length);
+    const PAGES = { '': 'landing.html', 'landing.html': 'landing.html', 'index.html': 'index.html', app: 'index.html', login: 'index.html', signup: 'index.html', plans: 'index.html',
+      privacy: 'legal/privacy.html', 'legal/privacy.html': 'legal/privacy.html', terms: 'legal/terms.html', 'legal/terms.html': 'legal/terms.html' };
+    const key = PAGES[rel] || req;
     e.respondWith(fetch(req).then((res) => { if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(key, copy)); } return res; }).catch(async () => {
       const hit = await caches.match(key, { ignoreSearch: true });
       if (hit) return hit;

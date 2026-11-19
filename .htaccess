@@ -3,6 +3,8 @@
 
 # The public landing answers the bare address; index.html is the app itself.
 DirectoryIndex landing.html index.html
+# An address that does not exist gets a short page (it also sends the old GitHub Pages clean links home).
+ErrorDocument 404 /404.html
 
 # No folder listings, and no guessing a file from a similar name.
 Options -Indexes -MultiViews
@@ -26,6 +28,24 @@ Options -Indexes -MultiViews
   # content/plans.md is the one Markdown file the app reads.
   RewriteCond %{REQUEST_URI} !/content/plans\.md$
   RewriteRule \.md$ - [F,L,NC]
+
+  # ---------- Clean addresses (Docs/design/DESIGN_GUIDELINES.md §H) ----------
+  # The old file names move permanently to the clean ones. Each rule tests THE_REQUEST (what the browser
+  # asked for), never the rewritten path, so the rewrites below cannot loop. The query string carries over
+  # (sign-in callbacks keep their code); the browser keeps the #fragment.
+  RewriteCond %{THE_REQUEST} \s/+landing\.html[\s?] [NC]
+  RewriteRule ^landing\.html$ / [R=301,L]
+  RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+  RewriteRule ^index\.html$ /app [R=301,L]
+  RewriteCond %{THE_REQUEST} \s/+admin\.html[\s?] [NC]
+  RewriteRule ^admin\.html$ /admin/ [R=301,L]
+  RewriteCond %{THE_REQUEST} \s/+legal/(privacy|terms)\.html[\s?] [NC]
+  RewriteRule ^legal/(privacy|terms)\.html$ /$1 [R=301,L]
+  # One spelling per page: no trailing slash (relative links in the pages depend on it).
+  RewriteRule ^(app|login|signup|plans|privacy|terms)/$ /$1 [R=301,L,NC]
+  # The clean addresses serve the files. /login, /signup and /plans open the app on that screen.
+  RewriteRule ^(app|login|signup|plans)$ index.html [L]
+  RewriteRule ^(privacy|terms)$ legal/$1.html [L]
 </IfModule>
 
 # Where mod_rewrite is missing, still refuse dotfiles (for example a local .env).
@@ -57,7 +77,7 @@ Options -Indexes -MultiViews
   # script-src lists the fingerprint of each inline script the pages contain, so injected markup
   # cannot run. After ANY edit to index.html or landing.html, run:  node tools/update-security.js
   # (it rewrites this line). A page that shows blank with a policy error in the console needs that.
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-2gRn/LngG5ScXLD0ucwqkgavumK8KdQLfbyUdqtJmp8=' 'sha256-5h4Q9JTk2P9TfG+uEHEJVoXnbfsSF2QKkIZbeWLBrW8=' 'sha256-76WXo1vM/iMo5updzyUJ8+91ZpOen7/gi/ixN0axWpU=' 'sha256-DHNogkMKyaKYt2dSEEjnv3kTvKM+J0i4d9EymcE0X14=' 'sha256-fcaM5N1PtW8SNjXrTCgiKas8cSvlasAQAHJ3IV/japY=' 'sha256-iszBhy287myRsNRas1WctEpVnRgkCQ1P8Hzn+lVn0tY=' 'sha256-n/rIluhrGHtePSKhrXSA/e+19fr7LUFzC285SaJhwQU=' 'sha256-yMOLZZMFSImZIF8asxb7AHo6S+CfGgYJIZ589MW3+2g='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://ntbkbvlsgymupjdpuvob.supabase.co wss://ntbkbvlsgymupjdpuvob.supabase.co https://api.github.com; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-0hxYDxLxGI7JOzLDFgK89Dz9pCzJFIngVM0ZTN8PQYU=' 'sha256-2qHDW24pibUG6x0Zyp2g0ygtjpvQa1npdsw/AONoZjs=' 'sha256-4XQ3G9Y/ScpIs8StGRJnXXMiFnhcFdwBGnHz0BPzhOs=' 'sha256-5h4Q9JTk2P9TfG+uEHEJVoXnbfsSF2QKkIZbeWLBrW8=' 'sha256-76WXo1vM/iMo5updzyUJ8+91ZpOen7/gi/ixN0axWpU=' 'sha256-DHNogkMKyaKYt2dSEEjnv3kTvKM+J0i4d9EymcE0X14=' 'sha256-MWj8cG4fUM8mR1lg3MjiSuE/GT5ZHY3IUYxhUUbVQF4=' 'sha256-iszBhy287myRsNRas1WctEpVnRgkCQ1P8Hzn+lVn0tY=' 'sha256-n/rIluhrGHtePSKhrXSA/e+19fr7LUFzC285SaJhwQU=' 'sha256-xcdZGFiRg++qsk1H5HgizqsHIgX70XFFmlx9wsX6qxw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://ntbkbvlsgymupjdpuvob.supabase.co wss://ntbkbvlsgymupjdpuvob.supabase.co https://api.github.com; worker-src 'self' blob:; manifest-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
   Header always unset X-Powered-By
   Header unset X-Powered-By
 </IfModule>

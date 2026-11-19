@@ -23,7 +23,8 @@
     const callback = authKeys.some((key) => url.searchParams.has(key) || fragment.has(key));
     const operational = callback || url.hash.startsWith('#/') || url.searchParams.has('offline') || url.searchParams.has('online') || url.searchParams.has('demo');
     let file = null;
-    if (page === 'landing' && operational) file = 'index.html';
+    // the app: its clean address where the host has them (Hostinger), the file elsewhere
+    if (page === 'landing' && operational) file = /\.html$/.test(url.pathname) ? 'index.html' : 'app';
     else if (page === 'operations' && url.pathname.endsWith('/')) file = operational ? 'index.html' : 'landing.html';
     if (!file) return null;
     const next = new URL(file, url);
@@ -44,7 +45,11 @@
     }
   }
   const next = destination(document.documentElement.dataset.page, location.href);
-  if (next) location.replace(next);
+  if (next) { location.replace(next); return; }
+  // Clean addresses (.htaccess): /login, /signup and /plans are the app opened on that screen; the address
+  // becomes /app with the screen's route, so reloads and shared links stay on one spelling.
+  const screen = { login: '#/', signup: '#/setup', plans: '#/plans' }[location.pathname.split('/').pop()];
+  if (screen && document.documentElement.dataset.page === 'operations') history.replaceState(history.state, '', `app${location.search}${location.hash.startsWith('#/') ? location.hash : screen}`);
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -4039,13 +4044,15 @@ const Cleo = (() => {
      legal/terms.html and legal/privacy.html as public pages. legal.version names both documents' versions;
      accepting at sign-in records it (Cleo.api.acceptLegal). */
   const legal = (() => { try { return JSON.parse(document.getElementById('cleo-legal')?.textContent || '{}'); } catch { return {}; } })();
+  /* the public legal pages: clean addresses on the website (Hostinger), the files in the apps and elsewhere */
+  const legalHref = (kind) => (/\/(app|login|signup|plans)$/.test(location.pathname) ? kind : `legal/${kind}.html`);
   function legalDoc(kind) {
     const d = legal.docs?.[kind];
-    if (!d) { window.open(`legal/${kind}.html`, '_blank', 'noopener'); return; }
+    if (!d) { window.open(legalHref(kind), '_blank', 'noopener'); return; }
     const o = overlay({ kind: 'drawer', label: d.title, className: 'legal-drawer', html: `
       <div class="drawer-head"><div><p class="t-cap">Aeso Technologies Inc.</p><h2 class="t-title" style="margin-top:2px">${esc(d.title)}</h2><p class="t-cap" style="margin-top:4px">Effective ${esc(d.effective)} · Version ${esc(d.version)}</p></div><button class="icon-btn" data-close aria-label="${actLabel('close')}">${actIcon('close')}</button></div>
       <div class="drawer-body legal-body">${d.html}</div>
-      <div class="drawer-foot"><a class="btn btn-ghost" href="legal/${kind}.html" target="_blank" rel="noopener" style="margin-right:auto">${actIcon('openElsewhere')}Open in a new tab</a><button class="btn btn-primary" data-close>Done</button></div>` });
+      <div class="drawer-foot"><a class="btn btn-ghost" href="${legalHref(kind)}" target="_blank" rel="noopener" style="margin-right:auto">${actIcon('openElsewhere')}Open in a new tab</a><button class="btn btn-primary" data-close>Done</button></div>` });
     // links between the two documents open in this reader; other links open normally
     o.panel.addEventListener('click', (e) => {
       const a = e.target.closest('.legal-body a[href="terms.html"], .legal-body a[href="privacy.html"]'); if (!a) return;
@@ -4053,7 +4060,7 @@ const Cleo = (() => {
     });
   }
   // links to both documents, e.g. for the mode picker and Terminal › About
-  const legalLinks = () => `<span class="legal-links"><a href="legal/privacy.html" data-legal="privacy">Privacy Policy</a><a href="legal/terms.html" data-legal="terms">Terms and Conditions</a></span>`;
+  const legalLinks = () => `<span class="legal-links"><a href="${legalHref('privacy')}" data-legal="privacy">Privacy Policy</a><a href="${legalHref('terms')}" data-legal="terms">Terms and Conditions</a></span>`;
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[data-legal]'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
     e.preventDefault(); e.stopPropagation(); legalDoc(a.dataset.legal);
@@ -4313,7 +4320,7 @@ const Cleo = (() => {
     const social = (intent) => `<div class="social">${Object.entries(SOCIAL).map(([k, s]) => `<button type="button" class="btn btn-lg btn-block btn-social soc-${k}" data-social="${k}" data-intent="${intent}">${s.svg}<span>Continue with ${s.name}</span></button>`).join('')}</div>`;
     const or = (t) => `<div class="or" role="separator"><span>${t}</span></div>`;
     const terms = (id) => `<div class="agree" data-terms-box="${id}">
-        <label class="check"><input type="checkbox" id="lg-${id}" data-terms aria-describedby="lg-${id}-err"><span>I agree to the <a href="legal/terms.html" data-legal="terms">Terms and Conditions</a> and the <a href="legal/privacy.html" data-legal="privacy">Privacy Policy</a>.</span></label>
+        <label class="check"><input type="checkbox" id="lg-${id}" data-terms aria-describedby="lg-${id}-err"><span>I agree to the <a href="${legalHref('terms')}" data-legal="terms">Terms and Conditions</a> and the <a href="${legalHref('privacy')}" data-legal="privacy">Privacy Policy</a>.</span></label>
         <p class="err" id="lg-${id}-err"><i class="ph-fill ph-warning-circle"></i><span>Tick the box to agree before you continue.</span></p>
       </div>`;
     const otpBoxes = (name, length) => `<div class="otp" data-otp="${name}" data-digits="${length}" role="group" aria-label="${length}-digit code" style="--otp-digits:${length}">${Array.from({ length }, (_, i) => `<input inputmode="numeric" autocomplete="${i === 0 ? 'one-time-code' : 'off'}" aria-label="Digit ${i + 1} of ${length}">`).join('')}</div>`;
@@ -7137,7 +7144,8 @@ const Charts = (() => {
     location.replace(`${location.origin}/index.html${back.search}${back.hash}`);
   });
   function redirectUrl(kind) {
-    const url = new URL('index.html', location.href);
+    // the clean address on the website (Hostinger), the file in the apps and on other hosts
+    const url = new URL(/\/(app|login|signup|plans)$/.test(location.pathname) ? 'app' : 'index.html', location.href);
     url.search = kind === 'recovery' ? '?auth=recovery' : '';
     url.hash = '';
     return url.href;
