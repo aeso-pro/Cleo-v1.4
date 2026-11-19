@@ -790,23 +790,6 @@ a.plan-tab:active { transform: scale(.98); }
 .plan-tab.compact { width: 66px; height: 58px; min-height: 0; padding: 0; justify-content: center; }
 @media (hover: hover) and (pointer: fine) { a.plan-tab:hover { background: var(--wash-2); } }
 
-/* quiet (Free): no glass, a dashed outline and quieter ink */
-.plan-tab.t-quiet { background: none; box-shadow: none; outline: 1.5px dashed var(--line-2); outline-offset: -1.5px; color: var(--ink-2); }
-@media (hover: hover) and (pointer: fine) { a.plan-tab.t-quiet:hover { background: var(--wash); } }
-/* animated (Pro): a faint brand tint and a red edge */
-.plan-tab.t-animated { --pt-edge: color-mix(in srgb, var(--accent-ink) 42%, var(--line-2)); background: color-mix(in srgb, var(--accent) 7%, var(--glass-thin)); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--pt-edge); }
-/* premium (Max): the same tint, with a gold edge */
-.plan-tab.t-premium { --pt-gold: #d6ad57; --pt-edge: color-mix(in srgb, var(--pt-gold) 55%, var(--line-2)); background: color-mix(in srgb, var(--pt-gold) 8%, color-mix(in srgb, var(--accent) 6%, var(--glass-thin))); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--pt-edge); }
-/* elite (Enterprise): a dark panel in both themes, with a gold edge */
-.plan-tab.t-elite { color: #f6efe0; background: linear-gradient(160deg, #2a2418, #121013 62%); box-shadow: inset 0 1px 0 rgb(255 236 190 / .2), inset 0 0 0 1px rgb(214 173 87 / .5), var(--shadow-sm); }
-/* light mode: a fainter tint and a deeper gold that reads on white */
-:root[data-theme="light"] .plan-tab.t-animated { background: color-mix(in srgb, var(--accent) 4%, var(--glass-thin)); }
-:root[data-theme="light"] .plan-tab.t-premium { --pt-gold: #b5862c; background: color-mix(in srgb, var(--pt-gold) 7%, color-mix(in srgb, var(--accent) 3%, var(--glass-thin))); }
-@media (hover: hover) and (pointer: fine) {
-  a.plan-tab.t-animated:hover { background: color-mix(in srgb, var(--accent) 11%, var(--glass-thin)); }
-  a.plan-tab.t-premium:hover { background: color-mix(in srgb, var(--pt-gold) 12%, var(--glass-thin)); }
-  a.plan-tab.t-elite:hover { background: linear-gradient(160deg, #332b1c, #17141a 62%); }
-}
 
 /* ---------- Plan logo (Cleo.planLogo): the plan's tree as a plain line drawing in ink ---------- */
 .plan-mark { --pm-size: 56px; flex: none; display: inline-grid; place-items: center; width: var(--pm-size); height: var(--pm-size); color: var(--ink); }
@@ -820,23 +803,8 @@ a.plan-tab:active { transform: scale(.98); }
 .plan-opt { grid-row: span 7; display: grid; grid-template-rows: subgrid; row-gap: 0; padding: 28px 28px 30px; border-radius: var(--r-xl); transition: transform 320ms var(--ease-out); }
 @media (hover: hover) and (pointer: fine) { .plan-opt:hover { transform: translateY(-3px); } }
 .plan-opt.current { box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1.5px var(--ink-3), var(--shadow-md); }
-/* each plan is a step up from the one before (its "Tab" in content/plans.md): Free is drawn on the page itself,
-   Basic is clear glass, Pro carries the brand colour, Max a hint of gold, and Enterprise is a dark panel with
-   gold in both themes. The tints sit on ::after, under the content, so the featured card's glass keeps them. */
-.plan-opt.tier-quiet { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; outline: 1.5px dashed var(--line-2); outline-offset: -1.5px; }
-.plan-opt.tier-quiet::before { display: none; }
-.plan-opt.tier-animated, .plan-opt.tier-premium { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tier) 50%, transparent), var(--shadow-md); }
-.plan-opt.tier-animated { --tier: var(--accent); }
-.plan-opt.tier-premium { --tier: #d6ad57; }
-:root[data-theme="light"] .plan-opt.tier-premium { --tier: #b5862c; }
-.plan-opt.tier-animated::after, .plan-opt.tier-premium::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: radial-gradient(130% 55% at 50% 0%, color-mix(in srgb, var(--tier) 13%, transparent), transparent 70%); }
-.plan-opt.tier-elite, .ent.glass {
-  --ink: #f6efe0; --ink-2: rgb(246 239 224 / .74); --ink-3: rgb(246 239 224 / .52); --line: rgb(255 255 255 / .1); --line-2: rgb(255 255 255 / .16);
-  --wash: rgb(255 255 255 / .05); --wash-2: rgb(255 255 255 / .09); --glass-hi: rgb(255 236 190 / .2);
-  color: var(--ink); background: radial-gradient(120% 90% at 0% 0%, #2c2518, #121013 58%); -webkit-backdrop-filter: none; backdrop-filter: none;
-  box-shadow: inset 0 0 0 1.5px rgb(214 173 87 / .42), 0 30px 60px -32px rgb(0 0 0 / .55);
-}
-.plan-opt.tier-elite.current { box-shadow: inset 0 0 0 1.5px rgb(246 223 160 / .8), 0 30px 60px -32px rgb(0 0 0 / .55); }
+/* plans differ by content only (owner decision, 19 Nov): every card is the same material; the recommended plan
+   carries the view's one filled button. */
 .po-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
 .po-head h2 { font-size: 30px; font-weight: 500; line-height: 1.1; letter-spacing: -.025em; }
 .po-head p { margin-top: 6px; font-size: 14.5px; line-height: 1.4; color: var(--ink-2); }
@@ -1084,7 +1052,7 @@ a.plan-tab:active { transform: scale(.98); }
 .pay-state .pm-chip { width: 64px; height: 46px; border-radius: 12px; font-size: 14px; margin-bottom: 4px; }
 .pay-state .pm-chip.maya { font-size: 16px; } .pay-state .pm-chip.gotyme { font-size: 12.5px; } .pay-state .pm-chip.card { font-size: 26px; }
 .ps-wait { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
-.pay-ok { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; font-size: 26px; color: #fff; background: var(--good); box-shadow: 0 12px 26px -14px var(--good); animation: pay-pop 460ms var(--ease-out) backwards; }
+.pay-ok { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; font-size: 26px; color: #fff; background: var(--success-badge); box-shadow: var(--shadow-1); animation: pay-pop 460ms var(--ease-out) backwards; }
 @keyframes pay-pop { from { opacity: 0; transform: scale(.6); } }
 
 @media (max-width: 1100px) {
@@ -1793,7 +1761,7 @@ body:not(.is-terminal) .filters { display: flex; align-items: center; gap: 10px;
 .stepper li.done::before, .stepper li.now::before { background: var(--accent-ink); }
 .stepper .dot { position: relative; z-index: 1; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 12.5px; font-weight: 500; background: var(--glass-solid); box-shadow: inset 0 0 0 1.5px var(--line-2); color: var(--ink-3); transition: background-color 300ms ease, box-shadow 300ms ease, color 300ms ease; }
 .stepper li.done .dot { background: var(--accent); color: var(--on-accent); box-shadow: none; }
-.stepper li.now .dot { color: var(--accent-ink); background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent-ink); }
+.stepper li.now .dot { color: var(--on-accent); background: var(--accent); box-shadow: none; }
 .stepper li.flag .dot { background: var(--warn); color: #1d1300; }
 .stepper .lbl { font-size: 12px; color: var(--ink-3); }
 .stepper li.done .lbl, .stepper li.now .lbl { color: var(--ink); }
@@ -1990,22 +1958,21 @@ input[type="checkbox"].cell-changed { box-shadow: 0 0 0 3px color-mix(in srgb, v
 .tbl .unit-in > span { min-width: 2.4em; text-align: left; }
 
 
-/* ===================== terminal.css · Terminal only (everything sits inside the 2048 x 1280 stage) ===================== */
+/* ===================== terminal.css · Terminal only (everything sits inside the stage, which fills the window) ===================== */
 /* =====================================================================
    Cleo Terminal. Physical canvas 2048 x 1280 px. Everything inside .dp is
    laid out on a 1280 x 800 logical grid scaled 1.6x (about xhdpi), so a
    48-unit touch target is 77 px on the panel.
    ===================================================================== */
-body.is-terminal { overflow: hidden; background: #050506; }
-.stage-wrap { position: fixed; inset: 0; overflow: hidden; background: radial-gradient(120% 80% at 50% 0%, #19191b, #060607 70%); }
-.stage { position: absolute; left: 0; top: 0; width: 2048px; height: 1280px; transform-origin: 0 0; overflow: hidden; background: var(--bg); isolation: isolate; }
-.stage.framed { border-radius: 34px; box-shadow: 0 0 0 12px #0e0e0f, 0 0 0 13px #2b2b2e, 0 50px 140px rgb(0 0 0 / .65); }
+body.is-terminal { overflow: hidden; }
+.stage-wrap { position: fixed; inset: 0; overflow: hidden; }
+/* the Terminal fills the window: a canvas of --dp-w x --dp-h logical px (at least 1024 x 640), scaled so the
+   1280 x 800 design shows at 94-150%: Charge stays at least 56px tall and every target at least 44px */
+.stage { position: absolute; left: 0; top: 0; width: var(--dp-w, 1280px); height: var(--dp-h, 800px); transform-origin: 0 0; overflow: hidden; background: transparent; isolation: isolate; }
 /* light mode: a plain desk colour around the tablet, the bezel stays dark like the real device */
-:root[data-theme="light"] body.is-terminal, :root[data-theme="light"] .stage-wrap { background: #e4e4e6; }
-:root[data-theme="light"] .stage.framed { box-shadow: 0 0 0 12px #141416, 0 0 0 13px #2b2b2e, 0 40px 100px -30px rgb(16 16 20 / .35); }
-.dp { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; transform: scale(1.6); transform-origin: 0 0; font-size: 15px; }
-.dp #app { position: relative; z-index: 1; width: 1280px; height: 800px; min-height: 0; overflow: hidden; }
-.dp .screen { width: 1280px; height: 800px; min-height: 0; overflow: hidden; position: relative; }
+.dp { position: absolute; left: 0; top: 0; width: var(--dp-w, 1280px); height: var(--dp-h, 800px); font-size: 15px; }
+.dp #app { position: relative; z-index: 1; width: var(--dp-w, 1280px); height: var(--dp-h, 800px); min-height: 0; overflow: hidden; }
+.dp .screen { width: var(--dp-w, 1280px); height: var(--dp-h, 800px); min-height: 0; overflow: hidden; position: relative; }
 .dp #layer { position: absolute; inset: 0; z-index: 50; pointer-events: none; }
 .dp #layer > * { pointer-events: auto; }
 .dp .overlay { position: absolute; }
@@ -2019,7 +1986,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .dp .chip { height: 36px; font-size: 13.5px; padding: 0 14px; }
 
 /* ---------- status bar ---------- */
-.t-shell { display: grid; grid-template-rows: 46px 1fr; height: 800px; }
+.t-shell { display: grid; grid-template-rows: 46px 1fr; height: var(--dp-h, 800px); }
 .t-status { display: flex; align-items: center; gap: 10px; padding: 0 14px 0 18px; font-size: 13px; color: var(--ink-2); position: relative; z-index: 5; }
 .t-status .lockup { --mark: 23px; }
 .t-status .where { display: flex; align-items: center; gap: 8px; margin-left: 6px; padding-left: 12px; border-left: 1px solid var(--line-2); }
@@ -2086,7 +2053,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .tile .cat-dot { flex: none; width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; font-size: 15px; color: var(--tc); background: color-mix(in srgb, var(--tc) 12%, transparent); }
 .tile.low .tm { color: var(--warn); }
 .tile.out { opacity: .5; cursor: not-allowed; }
-.tile.added { background: color-mix(in srgb, var(--terminal-tile-surface) 72%, var(--accent-soft)); box-shadow: inset 0 0 0 2px var(--accent-ink); transition: none; }
+.tile.added { background: color-mix(in srgb, var(--terminal-tile-surface) 72%, var(--accent-soft)); transition: none; }
 @media (hover: hover) and (pointer: fine) {
   .tile:not(:disabled):not(.preview):not(.edit):not(.added):hover { background: color-mix(in srgb, var(--terminal-tile-surface) 70%, var(--wash-2)); }
 }
@@ -2154,7 +2121,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .opt { min-height: 50px; padding: 8px 16px; border-radius: 16px; display: grid; align-content: center; text-align: left; background: var(--wash); box-shadow: inset 0 0 0 1px var(--line-2); font-size: 14.5px; font-weight: 500; transition: transform var(--t-press) var(--ease-out), background-color 160ms ease, box-shadow 160ms ease; }
 .opt small { font-size: 12px; color: var(--ink-3); font-weight: 400; }
 .opt:active { transform: scale(.96); }
-.opt[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent-ink); }
+.opt[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); box-shadow: none; }
 .opt[aria-pressed="true"] small { color: var(--ink-2); }
 .opt:disabled { opacity: .4; }
 .sheet-foot { display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 22px; }
@@ -2167,7 +2134,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .keypad.compact button { height: 56px; font-size: 22px; }
 
 /* ---------- PIN screen ---------- */
-.pin-screen { display: grid; grid-template-columns: 1fr 430px; gap: 20px; padding: 26px 30px 24px; height: 800px; }
+.pin-screen { display: grid; grid-template-columns: 1fr 430px; gap: 20px; padding: 26px 30px 24px; height: var(--dp-h, 800px); }
 .pin-left { display: grid; grid-template-rows: auto 1fr auto; gap: 18px; min-height: 0; }
 .staff-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-content: start; }
 .staff {
@@ -2176,7 +2143,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
   transition: transform var(--t-press) var(--ease-out), box-shadow 200ms ease, background-color 200ms ease;
 }
 .staff:active { transform: scale(.97); }
-.staff[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent-ink); }
+.staff[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); box-shadow: none; }
 .staff .avatar { width: 66px; height: 66px; font-size: 21px; }
 .staff b { font-weight: 500; font-size: 14px; line-height: 1.2; }
 .staff span { font-size: 12px; color: var(--ink-3); margin-top: -6px; }
@@ -2189,7 +2156,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .pin-msg.bad { color: var(--bad); }
 
 /* ---------- open shift / denominations ---------- */
-.center-screen { display: grid; place-items: center; height: 800px; }
+.center-screen { display: grid; place-items: center; height: var(--dp-h, 800px); }
 .float-card { width: 720px; border-radius: 32px; padding: 30px; display: grid; gap: 18px; box-shadow: var(--shadow-lg); }
 .amount-big { font-size: 56px; font-weight: 300; letter-spacing: -.04em; text-align: center; font-variant-numeric: tabular-nums; }
 .denoms { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 40px; }
@@ -2209,7 +2176,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .method { height: 72px; border-radius: 18px; display: grid; place-items: center; align-content: center; gap: 4px; font-size: 13px; font-weight: 500; background: var(--wash); box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink-2); transition: transform var(--t-press) var(--ease-out), background-color 160ms ease, box-shadow 160ms ease, color 160ms ease; }
 .method i { font-size: 24px; }
 .method:active { transform: scale(.96); }
-.method[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent-ink); color: var(--ink); }
+.method[aria-pressed="true"] { background: var(--accent-soft); box-shadow: none; color: var(--accent-ink); }
 .method:disabled { opacity: .4; }
 .pm-pane { margin-top: 14px; min-height: 360px; }
 .quick-tenders { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
@@ -2285,7 +2252,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .more-tile i { font-size: 26px; color: var(--accent-ink); margin-bottom: 6px; }
 .more-tile b { font-weight: 500; }
 .more-tile span { font-size: 12.5px; color: var(--ink-3); }
-.more-tile[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent-ink); }
+.more-tile[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); box-shadow: none; }
 
 /* ---------- settings: hardware and this terminal ---------- */
 .sb-pill.warn { background: var(--warn-soft); color: var(--warn); }
@@ -2544,7 +2511,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .tip-opts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .tip-opts button { height: 42px; border-radius: 12px; font-size: 13.5px; font-weight: 500; background: var(--wash); box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink-2); transition: transform var(--t-press) var(--ease-out), background-color 160ms ease; }
 .tip-opts button:active { transform: scale(.95); }
-.tip-opts button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); box-shadow: inset 0 0 0 2px var(--accent-ink); }
+.tip-opts button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); box-shadow: none; }
 .meter-row { display: flex; align-items: center; gap: 12px; }
 .meter-row .meter { flex: 1; }
 
@@ -2571,7 +2538,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .sec-h { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink-2); margin: 4px 0 10px; }
 .sec-h span { font-weight: 400; color: var(--ink-3); font-size: 12.5px; }
 .del-cards { margin-bottom: 18px; }
-.ocard.del.new { box-shadow: inset 0 0 0 2px var(--accent-ink); }
+.ocard.del.new { background: var(--accent-soft); }
 .plat { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--pc); }
 .plat::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--pc); }
 .del-acts { display: grid; gap: 8px; }
@@ -2631,7 +2598,7 @@ body.is-terminal { overflow: hidden; background: #050506; }
 .ap-chip { text-align: left; display: grid; padding: 8px; border-radius: 12px; background: var(--glass-thick); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-ink) 35%, transparent); font-size: 12.5px; }
 .ap-chip b { font-weight: 500; }
 .ap-chip small { color: var(--ink-3); font-size: 11.5px; }
-.ap-chip.st-done { box-shadow: inset 3px 0 0 var(--good); }
+.ap-chip.st-done { background: var(--good-soft); }
 .ap-chip.st-noshow { opacity: .6; }
 
 /* ---------- returns ---------- */
@@ -4176,7 +4143,9 @@ const Cleo = (() => {
        elite     a dark panel with gold: two gold lights run around a gold edge (Enterprise)
      tag and attrs make it a link or a plain element; compact is the Terminal rail version, the mark alone
      (the plan's name stays in its label and tooltip). */
+  // the plan tab is no longer drawn in working chrome (owner decision, 19 Nov): the plan lives in Settings › Plan and billing
   function planTab({ tag = 'a', attrs = '', compact = false, hint = '' } = {}) {
+    if (!planTab.show) return '';
     const p = plans.current();
     return `<${tag} class="plan-tab t-${p.tab}${compact ? ' compact' : ''}" ${attrs} aria-label="${esc(p.name)} plan${hint ? `. ${esc(hint)}` : ''}" title="${esc(p.name)} plan${hint ? ` · ${esc(hint)}` : ''}">${compact ? '' : `<span class="pt-name">${esc(p.name)}</span>`}${planLogo(p, compact ? 36 : 32)}</${tag}>`;
   }
@@ -4257,7 +4226,7 @@ const Cleo = (() => {
     const list = plans.list(), below = list[list.indexOf(p) - 1], pr = planPrice(p, cycle);
     const lead = below ? `Everything in ${esc(below.name)}, plus:` : 'Includes:';
     const items = `<ul>${p.adds.map((a) => `<li><i class="ph ph-check" aria-hidden="true"></i>${esc(a)}</li>`).join('')}</ul>`;
-    return `<article class="plan-opt ${surface} tier-${esc(p.tab)}${featured ? ' featured' : ''}${current ? ' current' : ''}" style="--i:${i}" role="listitem" data-plan-card="${esc(p.id)}" aria-labelledby="po-${esc(p.id)}">
+    return `<article class="plan-opt ${surface}${featured ? ' featured' : ''}${current ? ' current' : ''}" style="--i:${i}" role="listitem" data-plan-card="${esc(p.id)}" aria-labelledby="po-${esc(p.id)}">
       <div class="po-top">${planLogo(p, logo)}${p.badge ? `<span class="badge">${esc(p.badge)}</span>` : ''}</div>
       <div class="po-head"><h2 id="po-${esc(p.id)}">${esc(p.name)}</h2>${p.blurb ? `<p>${esc(p.blurb)}</p>` : ''}</div>
       <div class="po-price-group"><p class="po-price"><b class="num" data-pm>${pr.main}</b><span>${pr.unit.map(esc).join('<br>')}</span></p>${pr.bill ? `<p class="po-bill" data-pb>${pr.bill}</p>` : ''}${pr.extra ? `<p class="po-extra" data-px>${pr.extra}</p>` : ''}</div>
@@ -11757,7 +11726,7 @@ Cleo.bir = (() => {
   const TF = DEMO ? Cleo.demo.fixtures.terminal : null;
   const P = (n) => fmt.peso(n);
 
-  /* ---------------- stage: 2048 x 1280 scaled to the window ----------------
+  /* ---------------- stage: fills the window (see fit) ----------------
      NOTE: the page holds all three modes, so the Terminal builds its device stage only when it
      opens: body.is-terminal, then .stage-wrap > #stage > #dp > #app + #layer. #app (shared with
      the loading screen) moves inside the stage, and dialogs and toasts go to #layer. */
@@ -11769,25 +11738,26 @@ Cleo.bir = (() => {
     document.body.prepend(el('<div class="stage-wrap"><div class="stage" id="stage"><div class="dp" id="dp"><div id="layer"></div></div></div></div>'));
     $('#dp').prepend(app);
     stage = $('#stage');
-    document.body.insertAdjacentHTML('beforeend', `<div class="preview-bar" data-pbar><span data-pscale></span><button data-frame>Device frame</button><button data-phide aria-label="Hide preview bar">Hide</button></div>`);
+    document.body.insertAdjacentHTML('beforeend', `<div class="preview-bar" data-pbar><span data-pscale></span><button data-phide aria-label="Hide preview bar">Hide</button></div>`);
     addEventListener('resize', fit); fit();
     if ('ResizeObserver' in window) new ResizeObserver(() => fit()).observe(document.documentElement);
-    $('[data-frame]').addEventListener('click', () => { framed = !framed; Cleo.store.set('t-frame', framed); fit(); });
     $('[data-phide]').addEventListener('click', () => { Cleo.store.set('t-pbar-hidden', true); fit(); });
   }
-  let framed = Cleo.store.get('t-frame', true);
+  // the developer preview bar (and its frame button) only with ?dev in the address
+  const devPreview = /[?&]dev\b/.test(location.search);
+  let framed = false;
   function fit() {
-    // At 2048 x 1280 or larger (the real panel) render 1:1 with no chrome.
-    const full = Math.min(innerWidth / 2048, innerHeight / 1280);
-    const device = full >= 0.999;
-    const frame = framed && !device;
-    const pad = frame ? 28 : 0;
-    const s = device ? 1 : Math.min((innerWidth - pad * 2) / 2048, (innerHeight - pad * 2 - (frame ? 24 : 0)) / 1280);
-    const x = (innerWidth - 2048 * s) / 2, y = (innerHeight - 1280 * s) / 2 - (frame ? 12 : 0);
-    stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
-    stage.classList.toggle('framed', frame);
-    $('[data-pscale]').textContent = `Terminal preview · 2048 × 1280 at ${Math.round(s * 100)}%`;
-    $('[data-pbar]').hidden = device || Cleo.store.get('t-pbar-hidden', false);
+    // the canvas follows the window: the 1280 x 800 design at 94-150% (so Charge stays at least 56px tall and
+    // targets at least 44px), never narrower than 1024 x 640 logical
+    const W = innerWidth, H = innerHeight;
+    const s0 = Math.min(1.5, Math.max(0.94, Math.min(W / 1280, H / 800)));
+    const dw = Math.round(Math.max(1024, W / s0)), dh = Math.round(Math.max(640, H / s0));
+    const s = Math.min(W / dw, H / dh);
+    const root = document.documentElement.style;
+    root.setProperty('--dp-w', `${dw}px`); root.setProperty('--dp-h', `${dh}px`);
+    stage.style.transform = `translate(${((W - dw * s) / 2).toFixed(1)}px, ${((H - dh * s) / 2).toFixed(1)}px) scale(${s})`;
+    $('[data-pscale]').textContent = `Terminal · ${dw} x ${dh} at ${Math.round(s * 100)}%`;
+    $('[data-pbar]').hidden = !devPreview || Cleo.store.get('t-pbar-hidden', false);
   }
 
   /* ---------------- sound: short, causal feedback only ---------------- */
@@ -13179,7 +13149,7 @@ Cleo.bir = (() => {
     const o = overlay({ label: 'Payment', className: 'wide', dismissable: true, html: `<div data-paybody></div>`, onClose: () => { if (settled) renderView(); else broadcastDisplay(); } });
     const body = $('[data-paybody]', o.panel);
     // Exact first, then the business's quick cash amounts (Settings, Payment methods), then round-ups
-    const quick = (r) => { const s = new Set([r, ...(CFG('payments.quick') || []).filter((v) => v > r), Math.ceil(r / 100) * 100, Math.ceil(r / 500) * 500, Math.ceil(r / 1000) * 1000]); return [...s].filter((v) => v >= r).slice(0, 4); };
+    const quick = (r) => { const s = new Set([...(CFG('payments.quick') || []).filter((v) => v > r), Math.ceil(r / 100) * 100, Math.ceil(r / 500) * 500, Math.ceil(r / 1000) * 1000]); return [r, ...[...s].filter((v) => v > r).sort((a, b) => a - b)].slice(0, 4); };
     const cust = () => (ord.customer?.id ? Cleo.db.get('customers', ord.customer.id) || ord.customer : ord.customer);
     // methods switched off in Settings never show; cash is always available
     const METHODS = () => [['cash', 'Cash', 'money'], ['qr', 'QR Ph', 'qr-code', 'qrph'], ['ewallet', 'E-wallet ref', 'device-mobile', 'ewallet'], ['card', 'Card', 'credit-card', 'card'], ['charge', 'Charge', 'notebook', 'charge'], ['points', 'Points', 'gift', 'points']]
