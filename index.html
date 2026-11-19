@@ -4053,10 +4053,14 @@ const Cleo = (() => {
       <div class="drawer-head"><div><p class="t-cap">Aeso Technologies Inc.</p><h2 class="t-title" style="margin-top:2px">${esc(d.title)}</h2><p class="t-cap" style="margin-top:4px">Effective ${esc(d.effective)} · Version ${esc(d.version)}</p></div><button class="icon-btn" data-close aria-label="${actLabel('close')}">${actIcon('close')}</button></div>
       <div class="drawer-body legal-body">${d.html}</div>
       <div class="drawer-foot"><a class="btn btn-ghost" href="${legalHref(kind)}" target="_blank" rel="noopener" style="margin-right:auto">${actIcon('openElsewhere')}Open in a new tab</a><button class="btn btn-primary" data-close>Done</button></div>` });
-    // links between the two documents open in this reader; other links open normally
+    // links between the two documents open in this reader; other links open normally. Their addresses
+    // follow this copy of Cleo (clean on the website, file names elsewhere), so a new tab opens the right page.
+    o.panel.querySelectorAll('.legal-body a[href="terms.html"], .legal-body a[href="privacy.html"]').forEach((a) => {
+      a.dataset.doc = a.getAttribute('href').startsWith('privacy') ? 'privacy' : 'terms'; a.setAttribute('href', legalHref(a.dataset.doc));
+    });
     o.panel.addEventListener('click', (e) => {
-      const a = e.target.closest('.legal-body a[href="terms.html"], .legal-body a[href="privacy.html"]'); if (!a) return;
-      e.preventDefault(); o.close(); setTimeout(() => legalDoc(a.getAttribute('href').startsWith('privacy') ? 'privacy' : 'terms'), 220);
+      const a = e.target.closest('.legal-body a[data-doc]'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      e.preventDefault(); o.close(); setTimeout(() => legalDoc(a.dataset.doc), 220);
     });
   }
   // links to both documents, e.g. for the mode picker and Terminal › About
