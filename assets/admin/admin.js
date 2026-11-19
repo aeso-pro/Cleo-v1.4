@@ -193,7 +193,7 @@
     mount(card);
     return { card, heading };
   }
-  const appLink = () => h('a', { href: '../index.html', text: 'Back to Cleo' });
+  const appLink = () => h('a', { href: '../app', text: 'Back to Cleo' });
   const signOutButton = (label = 'Sign out') => h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: () => leave() }, icon('sign-out'), label);
 
   async function forget() {
@@ -829,7 +829,7 @@
   /* ---------- Security ---------- */
   // What the server cannot see for itself. Each line says where the setting lives.
   const REVIEW = [
-    ['globe', 'Only your real site may receive sign-ins', 'Supabase › Authentication › URL Configuration. Site URL is your live address; Redirect URLs lists only https://your-domain/index.html**. Remove the localhost entries before launch.'],
+    ['globe', 'Only your real site may receive sign-ins', 'Supabase › Authentication › URL Configuration. Site URL is your live address; Redirect URLs lists https://your-domain/app** (and https://your-domain/index.html** until emails sent before the move to clean addresses expire). Remove the localhost entries before launch.'],
     ['facebook-logo', 'The Facebook app is live and locked to Supabase', 'Meta for Developers › your app. Mode: Live. Facebook Login › Settings › Valid OAuth Redirect URIs holds only the Supabase callback address. The email permission has Advanced Access, or people outside your team sign in without an email and are turned away.'],
     ['password', 'Passwords are checked against known leaks', 'Supabase › Authentication › Sign In / Providers › Email. Turn on leaked-password protection, keep the minimum length at 8 or more, and keep "require current password" on.'],
     ['envelope-simple', 'Email comes from your own sender', 'Supabase › Authentication › Emails › SMTP Settings. The built-in mailer sends only a few emails an hour, so confirmations stop arriving on a busy day.'],
@@ -1009,7 +1009,7 @@
     formDialog({ title: `Send a password reset to ${email}?`, reason: false, confirm: 'Send email',
       lede: 'They get an email with a link to choose a new password. You never see or set it. Supabase limits how many emails it sends an hour.',
       run: async () => {
-        const result = await client().auth.resetPasswordForEmail(email, { redirectTo: new URL('../index.html?auth=recovery', location.href).href });
+        const result = await client().auth.resetPasswordForEmail(email, { redirectTo: new URL('../app?auth=recovery', location.href).href });
         if (result?.error) throw result.error;
         return { ok: true };
       },
