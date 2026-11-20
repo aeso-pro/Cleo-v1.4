@@ -3014,7 +3014,7 @@ const CleoEnv = (() => {
    ===================================================================== */
 const CleoDemoConfig = {
   business: { name: 'Kapé Lumen', legal: 'Kapé Lumen Food Corp.', tin: '010-482-337-000', style: 'Café and coffee roaster', receiptHeader: 'Welcome to Kapé Lumen', website: 'kapelumen.ph' },
-  notify: { recipients: 'maricel@kapelumen.ph' },
+  notify: { recipients: 'venice@kapelumen.ph' },
 };
 
 ;
@@ -6103,7 +6103,7 @@ const Charts = (() => {
   ];
 
   const people = {
-    owner: { name: 'Maricel Dizon', initials: 'MD', role: 'Owner', email: 'maricel@kapelumen.ph', color: '#8a1c1c' },
+    owner: { name: 'Venice Dizon', initials: 'VD', role: 'Owner', email: 'venice@kapelumen.ph', color: '#8a1c1c' },
     hq: { name: 'Paolo Villanueva', initials: 'PV', role: 'HQ Manager', email: 'paolo.v@kapelumen.ph', color: '#3b4a7a' },
     accountant: { name: 'Grace Tan', initials: 'GT', role: 'Accountant', email: 'grace.tan@kapelumen.ph', color: '#2f6a55' },
     clerk: { name: 'Ramon Aquino', initials: 'RA', role: 'Inventory Clerk', email: 'ramon.a@kapelumen.ph', color: '#7a5a1e' },
@@ -6275,7 +6275,7 @@ const Charts = (() => {
     ['2026-10-01', 'mag', 'rent', 'Maginhawa, October', 72000, 'bank', true, 'Grace Tan'], ['2026-10-01', 'ceb', 'rent', 'i2 Building, October', 94000, 'bank', true, 'Grace Tan'],
     ['2026-09-30', 'ceb', 'misc', 'Aircon cleaning', 1850, 'drawer', false, 'Nico Ramos'], ['2026-09-30', 'bgc', 'sal', 'Payroll, Sep 16 to 30', 142300, 'bank', true, 'Grace Tan'],
     ['2026-09-30', 'sal', 'sal', 'Payroll, Sep 16 to 30', 118600, 'bank', true, 'Grace Tan'], ['2026-09-29', 'mag', 'util', 'Maynilad, September', 2940, 'bank', true, 'Grace Tan'],
-    ['2026-09-28', 'bgc', 'mkt', 'Instagram ads, week 39', 3500, 'bank', true, 'Maricel Dizon'], ['2026-09-27', 'sal', 'sup', 'Cleaning supplies', 980, 'drawer', true, 'Rhea Mendoza'],
+    ['2026-09-28', 'bgc', 'mkt', 'Instagram ads, week 39', 3500, 'bank', true, 'Venice Dizon'], ['2026-09-27', 'sal', 'sup', 'Cleaning supplies', 980, 'drawer', true, 'Rhea Mendoza'],
   ].map(([date, b, cat, what, amount, paid, receipt, by], i) => ({ id: `ex${String(i + 1).padStart(3, '0')}`, date, b, cat, what, amount, paid, receipt, by }));
 
   /* ---------- promos (POS-03, BR-03) ---------- */
@@ -6360,7 +6360,7 @@ const Charts = (() => {
     { t: '12:30 PM', who: 'Grace Tan', role: 'Accountant', type: 'export', act: 'Exported sales journal', ent: 'September 2026 · all branches', before: '', after: 'CSV, 31 days', dev: 'Back Office · 49.145.2.88' },
     { t: '11:46 AM', who: 'Paolo Villanueva', role: 'HQ Manager', type: 'settings', act: 'Changed void approval limit', ent: 'Exception rules', before: '₱1,500.00', after: '₱1,000.00', dev: 'Back Office · 112.198.84.20' },
     { t: '11:02 AM', who: 'Rhea Mendoza', role: 'Cashier', type: 'refund', act: 'Refund to original method', ent: 'INV 00009812 · Salcedo T1', before: '₱320.00 GCash', after: 'Refunded via gateway', dev: 'Salcedo T1 · approved by Kristine Ocampo' },
-    { t: '10:15 AM', who: 'Maricel Dizon', role: 'Owner', type: 'users', act: 'Added user', ent: 'Andrea Uy', before: '', after: 'Cashier at Cebu IT Park', dev: 'Owner app · Android' },
+    { t: '10:15 AM', who: 'Venice Dizon', role: 'Owner', type: 'users', act: 'Added user', ent: 'Andrea Uy', before: '', after: 'Cashier at Cebu IT Park', dev: 'Owner app · Android' },
     { t: '9:41 AM', who: 'Bea Villareal', role: 'Cashier', type: 'signin', act: 'Failed PIN attempts', ent: 'Maginhawa T1', before: '', after: '3 attempts, locked 5 minutes', dev: 'Maginhawa T1' },
     { t: '9:02 AM', who: 'Paolo Villanueva', role: 'HQ Manager', type: 'price', act: 'Branch price override', ent: 'Beef Tapa Rice Bowl · Cebu IT Park', before: '₱260.00 (HQ)', after: '₱245.00', dev: 'Back Office · 112.198.84.20' },
     { t: '8:30 AM', who: 'Liezl Cabrera', role: 'Branch Manager', type: 'stock', act: 'Received delivery', ent: 'PO-2291 · Bukidnon Highland Coffee', before: '3.3 kg', after: '7.2 kg Arabica', dev: 'Cebu T1' },
@@ -6920,7 +6920,7 @@ const Charts = (() => {
       const saved = store.get('plan', 'max'); const id = { starter: 'basic', growth: 'pro' }[saved] || saved;
       return Cleo.plans.get(id) ? id : (Cleo.plans.get('pro') || Cleo.plans.list()[0]).id;
     },
-    billingMethod() { return store.get('billing-method', { kind: 'card', label: 'Visa ending 4417', sub: 'Expires 08/28 · Maricel Dizon' }); },
+    billingMethod() { return store.get('billing-method', { kind: 'card', label: 'Visa ending 4417', sub: 'Expires 08/28 · Venice Dizon' }); },
     invoices() { return F.invoices; },
     async linkWallet({ kind, mobile }) {
       await latency(2200);

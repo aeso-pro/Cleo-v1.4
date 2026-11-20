@@ -58,7 +58,7 @@ Run `node source/build.js` to rebuild the app, landing, legal pages and offline 
   - While it runs, `serve.js` rebuilds both entry pages whenever `content/plans.md` is saved.
   - Some browsers also block fonts and icons when `index.html` is opened straight from disk.
 - Demo sign-in (open with `?demo`; every way in needs the Terms and Privacy Policy box ticked):
-  - Any email and password work. The demo team's owner and HQ manager emails, such as `maricel@kapelumen.ph`, ask for a 6-digit code. Any code passes except `000000`, which shows the error.
+  - Any email and password work. The demo team's owner and HQ manager emails, such as `venice@kapelumen.ph`, ask for a 6-digit code. Any code passes except `000000`, which shows the error.
   - Backup code `AAAAA-AAAAA` shows the "already used" error.
   - **Continue with Google** is simulated: sign-in returns the demo owner, and sign-up goes on to the business details. (Facebook sign-in was removed.)
   - **Create an account** takes a name, email and password, then a 6-digit email code (again, `000000` is the error example), then the business, then **Choose your plan** and the payment page. Signing up with one of the demo team's emails shows the "already has an account" error.
