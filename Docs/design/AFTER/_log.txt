@@ -1,0 +1,116 @@
+landing-375-light: overflow=false htmlLinks=none
+landing-375-dark: overflow=false htmlLinks=none
+signin-375-light: overflow=false htmlLinks=none
+signin-375-dark: overflow=false htmlLinks=none
+landing-768-light: overflow=false htmlLinks=none
+landing-768-dark: overflow=false htmlLinks=none
+signin-768-light: overflow=false htmlLinks=none
+signin-768-dark: overflow=false htmlLinks=none
+landing-1024-light: overflow=false htmlLinks=none
+landing-1024-dark: overflow=false htmlLinks=none
+signin-1024-light: overflow=false htmlLinks=none
+signin-1024-dark: overflow=false htmlLinks=none
+landing-1440-light: overflow=false htmlLinks=none
+landing-1440-dark: overflow=false htmlLinks=none
+signin-1440-light: overflow=false htmlLinks=none
+signin-1440-dark: overflow=false htmlLinks=none
+form after 0 ms; after sign-in: #/ | MD
+Maricel Dizon
+maricel@kapelumen.ph
+How will you u e Cleo here?
+Kapé Lumen · Pick a mode for thi  device. You can  witch at any time.
+Terminal
+Ca hier ,  er
+state: #/ | MD
+Maricel Dizon
+maricel@kapelumen.ph
+How will you u e Cleo here?
+Kapé Lumen · Pick a mode for thi  device. You can  witch at any time.
+Terminal
+Ca hier ,  erver  and kitchen  taff
+Sell, take paymen
+owner-375-light: overflow=false htmlLinks=none
+backoffice-375-light: overflow=false htmlLinks=none
+plans-375-light: overflow=false htmlLinks=none
+owner-375-dark: overflow=false htmlLinks=none
+backoffice-375-dark: overflow=false htmlLinks=none
+plans-375-dark: overflow=false htmlLinks=none
+owner-768-light: overflow=false htmlLinks=none
+backoffice-768-light: overflow=false htmlLinks=none
+plans-768-light: overflow=false htmlLinks=none
+owner-768-dark: overflow=false htmlLinks=none
+backoffice-768-dark: overflow=false htmlLinks=none
+plans-768-dark: overflow=false htmlLinks=none
+owner-1024-light: overflow=false htmlLinks=none
+backoffice-1024-light: overflow=false htmlLinks=none
+plans-1024-light: overflow=false htmlLinks=none
+owner-1024-dark: overflow=false htmlLinks=none
+backoffice-1024-dark: overflow=false htmlLinks=none
+plans-1024-dark: overflow=false htmlLinks=none
+owner-1440-light: overflow=false htmlLinks=none
+owner: #/owner/dashboard | Skip to content
+Owner
+Da hboard
+Branche 
+Live monitor
+3
+Profit and lo 
+Alert 
+3
+In ight 
+Staff performance
+Inventory in ight 
+Account
+Pl
+backoffice-1440-light: overflow=false htmlLinks=none
+backoffice: #/backoffice/overview | Skip to content
+Back Office
+Overview
+Catalog
+Inventory
+14
+Stock tran fer 
+1
+BIR and report 
+Audit trail
+More
+Expen e 
+Cu tomer 
+U er  and 
+MD
+Maricel Dizon
+Owner · Kapé Lumen
+Regi ter thi  terminal
+Pick the branch thi  device  ell  for. Each terminal keep  it  own BIR 
+plans-1440-light: overflow=false htmlLinks=none
+plans: #/plans | MD
+Maricel Dizon
+maricel@kapelumen.ph
+Set up Cleo
+Ju t the e ential  to get  tarted.
+1
+Account
+Your  ign-in detail 
+2
+Verify
+Confirm your 
+owner-1440-dark: overflow=false htmlLinks=none
+backoffice-1440-dark: overflow=false htmlLinks=none
+plans-1440-dark: overflow=false htmlLinks=none
+reduced-landing-1024-light: overflow=false htmlLinks=none
+reduced-owner-1024-light: overflow=false htmlLinks=none
+reduced-landing-1024-dark: overflow=false htmlLinks=none
+reduced-owner-1024-dark: overflow=false htmlLinks=none
+errors: none
+# Terminal re-captured after registering the device (separate run; the first run stopped at "Register this terminal")
+terminal-375-light: overflow=false htmlLinks=none
+terminal-375-dark: overflow=false htmlLinks=none
+terminal-768-light: overflow=false htmlLinks=none
+terminal-768-dark: overflow=false htmlLinks=none
+terminal-1024-light: overflow=false htmlLinks=none
+terminal-1024-dark: overflow=false htmlLinks=none
+terminal-1440-light: overflow=false htmlLinks=none
+terminal: #/terminal | Kapé Lumen
+terminal-1440-dark: overflow=false htmlLinks=none
+reduced-terminal-1024-light: overflow=false htmlLinks=none
+reduced-terminal-1024-dark: overflow=false htmlLinks=none
