@@ -193,7 +193,8 @@
     mount(card);
     return { card, heading };
   }
-  const appLink = () => h('a', { href: '../app', text: 'Back to Cleo' });
+  // the app's file name works on every server; the website's .htaccess turns it into /app (301)
+  const appLink = () => h('a', { href: '../index.html', text: 'Back to Cleo' });
   const signOutButton = (label = 'Sign out') => h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: () => leave() }, icon('sign-out'), label);
 
   async function forget() {
@@ -1009,7 +1010,7 @@
     formDialog({ title: `Send a password reset to ${email}?`, reason: false, confirm: 'Send email',
       lede: 'They get an email with a link to choose a new password. You never see or set it. Supabase limits how many emails it sends an hour.',
       run: async () => {
-        const result = await client().auth.resetPasswordForEmail(email, { redirectTo: new URL('../app?auth=recovery', location.href).href });
+        const result = await client().auth.resetPasswordForEmail(email, { redirectTo: new URL('../index.html?auth=recovery', location.href).href });
         if (result?.error) throw result.error;
         return { ok: true };
       },

@@ -55,6 +55,17 @@ The rules test `THE_REQUEST`, which is what the browser asked for, not the rewri
 - The Windows app keeps loading `/index.html`, and its sign-in return check still looks for `/index.html`.
 - The Android app keeps `https://localhost/index.html` and `online.cleopos.app://auth-callback`.
 
+## Servers without rewrites (GitHub Pages, VS Code Live Server, a file opened from disk)
+
+`assets/clean-links.js` loads on the landing page and the legal pages. It asks the server once whether `app` exists, with a `HEAD` request:
+
+- **Where it doesn't:** every clean link points at its file instead (`signup` → `index.html#/setup`, `privacy` → `legal/privacy.html`). That covers links drawn later too, such as the plan cards.
+- **A click before the answer:** it goes to the file.
+
+**Typing a clean URL by hand** (for example `127.0.0.1:5501/signup`) still needs a server that has the rewrites. Use `node tools/serve.js`, at `http://127.0.0.1:5175`.
+
+The admin console's "Back to Cleo" link and its password-reset address use `index.html`. Its policy allows no requests to its own site, so it cannot ask; Hostinger 301s `index.html` to `/app`.
+
 ## GitHub Pages (interim host)
 
 GitHub Pages has no `.htaccess`:
