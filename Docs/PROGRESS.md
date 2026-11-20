@@ -7,7 +7,7 @@ The loop's instructions are in [`Docs/overhaul/SUPERPROMPT.md`](overhaul/SUPERPR
 | # | Phase               | Branch                                   | Status      |
 |---|---------------------|------------------------------------------|-------------|
 | 1 | System Architecture | cleo-overhaul/phase-1-architecture       | IN_PROGRESS (paused: owner prioritised the frontend) |
-| 2 | Frontend            | cleo-overhaul/phase-2-frontend           | WAITING (owner review; Apache 301 check needs a staging subdomain) |
+| 2 | Frontend            | cleo-overhaul/phase-2-frontend           | DONE — merged to `main` by the owner 2026-11-20; Apache 301 check still needs a staging subdomain |
 | 3 | Functions           | cleo-overhaul/phase-3-functions          | NOT_STARTED |
 | 4 | Backend             | cleo-overhaul/phase-4-backend            | NOT_STARTED |
 | 5 | Database            | cleo-overhaul/phase-5-database           | NOT_STARTED |
@@ -81,6 +81,7 @@ Phase 1 entries:
 - 2026-11-19 · 1 · **ADR folder** — the architecture (section 12) suggests `docs/adr/NNN-title.md`; the superprompt says `docs/architecture/adr/` — ADRs go in `Docs/architecture/adr/`, numbered from 011 to continue the architecture's 001–010.
 
 ## OWNER DECISIONS
+- 2026-11-20 · **Merge:** "merge it to the main branch at github and main folder in my local." The owner reviewed Phase 2 and had `cleo-overhaul/phase-2-frontend` (stacked on the Phase 1 branch, so the Phase 1 documents come along) fast-forwarded into `main` on GitHub and in the local `main` folder. GitHub Pages, which serves `main`, now shows the new design. Later phases still work on their own branches and merge only on the owner's word.
 - 2026-11-19 · **Priority:** "Prioritize the frontend for now." Phase 1 is paused with the live inventory, the gap analysis and the ADRs still open; Phase 2 (Frontend) starts on `cleo-overhaul/phase-2-frontend`, stacked on the Phase 1 branch. Phase 1 resumes afterwards.
 - 2026-11-19 · **Loop mode:** GATED — stop after every phase for review and merge.
 - 2026-11-19 · **Git:** commit on stacked `cleo-overhaul/phase-N-*` branches and push those branches to GitHub; never push to `main` or merge. This replaces the earlier "push every change to main" rule for overhaul work.
